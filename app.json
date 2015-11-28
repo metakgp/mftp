@@ -32,7 +32,7 @@
         }
     },
     "addons": [
-        "mandrill:basic",
+        "sendgrid:starter",
         "mongolab:sandbox"
     ]
 }
