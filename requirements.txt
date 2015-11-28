@@ -1,0 +1,6 @@
+beautifulsoup4==4.4.1
+docopt==0.4.0
+mandrill==1.0.57
+pymongo==3.1.1
+requests==2.8.1
+wheel==0.24.0
