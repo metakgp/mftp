@@ -16,14 +16,16 @@ def check_companies():
     ERP_CDC_MODULE_URL = 'https://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp?module_id=26&menu_id=11&delegated_by=&parent_menu_id=10'
     ERP_TPSTUDENT_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/TPStudent.jsp'
     ERP_COMPANIES_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/ERPMonitoring.htm?action=fetchData&jqqueryid=37&_search=false&nd=1448725351715&rows=20&page=1&sidx=&sord=asc&totalrows=50'
+    timeout=20
 
     s = requests.Session()
 
-    r = s.get(ERP_HOMEPAGE_URL)
+    r = s.get(ERP_HOMEPAGE_URL, timeout=timeout)
     soup = bs(r.text, 'html.parser')
     sessionToken = soup.find_all(id='sessionToken')[0].attrs['value']
 
-    r = s.post(ERP_SECRET_QUESTION_URL, data={'user_id': env['ERP_USERNAME']})
+    r = s.post(ERP_SECRET_QUESTION_URL, data={'user_id': env['ERP_USERNAME']},
+               timeout=timeout)
     secret_question = r.text
     secret_answer = None
     for i in xrange(1, 4):
@@ -48,16 +50,18 @@ def check_companies():
         'Referer': 'https://erp.iitkgp.ernet.in/SSOAdministration/login.htm?sessionToken=595794DC220159D1CBD10DB69832EF7E.worker3&requestedUrl=https://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp',
     }
 
-    r = s.post(ERP_LOGIN_URL, headers=headers, data=login_details)
+    r = s.post(ERP_LOGIN_URL, headers=headers, data=login_details,
+               timeout=timeout)
     ssoToken = re.search(r'\?ssoToken=(.+)$',
                          r.history[1].headers['Location']).group(1)
 
     r = s.post(ERP_TPSTUDENT_URL, headers=headers,
-               data=dict(ssoToken=ssoToken, menu_id=11, module_id=26))
+               data=dict(ssoToken=ssoToken, menu_id=11, module_id=26),
+               timeout=timeout)
 
     headers['Referer'] = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/TPStudent.jsp'
     headers['Accept'] = 'application/xml, text/xml, */*; q=0.01'
-    r = s.get(ERP_COMPANIES_URL, headers=headers)
+    r = s.get(ERP_COMPANIES_URL, headers=headers, timeout=timeout)
 
     companies_list = bs(r.text, 'html.parser')
     companies = []
@@ -82,19 +86,11 @@ def check_companies():
     different_companies = []
     print 'Checking ', len(companies), 'companies'
     for company in companies:
-        db_companies = companies_coll.find({'name': company['name']})
-        found = False
-        for db_company in db_companies:
-            for k in company.keys():
-                if k not in db_company or db_company[k] != company[k]:
-                    break
-            else:
-                found = True
-        if found is False:
+        db_company = companies_coll.find_one(company)
+        if db_company is None:
             different_companies.append(company)
 
     print 'Different companies:', different_companies
     if len(different_companies) > 0:
         hooks.companies_updated(different_companies)
-    for dc in different_companies:
         companies_coll.insert(different_companies)
