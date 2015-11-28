@@ -92,8 +92,9 @@ def check_companies():
                 found = True
         if found is False:
             different_companies.append(company)
-            companies_coll.insert_one(company)
 
     print 'Different companies:', different_companies
     if len(different_companies) > 0:
         hooks.companies_updated(different_companies)
+    for dc in different_companies:
+        companies_coll.insert(different_companies)
