@@ -1,0 +1,38 @@
+{
+    "name": "MFTP",
+    "description": "Automatic updates from T&P make murderous rage slightly pleasant.",
+    "repository": "https://github.com/amrav/mftp",
+    "env": {
+        "ERP_USERNAME": {
+            "description": "Your ERP username. Example: 12CS30092"
+        },
+        "ERP_PASSWORD": {
+            "description": "Your ERP password. Yes, I might be stealing this, so you should read the code and make sure I'm not."
+        },
+        "ERP_Q1": {
+            "description": "ERP secret question number 1. It doesn't matter which order you set these in as long as the the answer to Question X is in Answer X."
+        },
+        "ERP_A1": {
+            "description": "Answer to ERP secret question number 1. It doesn't matter which order you set these in as long as the the answer to Question X is in Answer X."
+        },
+        "ERP_Q2": {
+            "description": "ERP secret question number 2. It doesn't matter which order you set these in as long as the the answer to Question X is in Answer X."
+        },
+        "ERP_A2": {
+            "description": "Answer to ERP secret question number 2. It doesn't matter which order you set these in as long as the the answer to Question X is in Answer X."
+        },
+        "ERP_Q3": {
+            "description": "ERP secret question number 3. It doesn't matter which order you set these in as long as the the answer to Question X is in Answer X."
+        },
+        "ERP_A3": {
+            "description": "Answer to ERP secret question number 3. It doesn't matter which order you set these in as long as the the answer to Question X is in Answer X."
+        },
+        "EMAIL_ADDRESS": {
+            "description": "The email address where you would like to receive updates."
+        }
+    },
+    "addons": [
+        "mandrill:basic",
+        "mongolab:sandbox"
+    ]
+}
