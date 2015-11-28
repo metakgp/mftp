@@ -77,7 +77,7 @@ def check_companies():
         company['start_date'], company['end_date'] = cds[9], cds[10]
         companies.append(company)
 
-    companies_coll = mc.user_database.companies
+    companies_coll = mc.get_default_database().companies
 
     different_companies = []
     print 'Checking ', len(companies), 'companies'
