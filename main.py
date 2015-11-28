@@ -6,7 +6,8 @@ import os
 # bind to web port to keep Heroku from killing the process
 s = socket.socket(socket.AF_INET)
 try:
-    s.bind(('127.0.0.1', int(os.environ['PORT'])))
+    s.bind((socket.gethostname(), int(os.environ['PORT'])))
+    s.listen(10)
 except KeyError:
     pass
 
