@@ -1,5 +1,6 @@
 from os import environ as env
 import requests
+import cgi
 
 
 def make_text(company):
@@ -22,3 +23,25 @@ def companies_updated(companies):
     r = requests.post('https://api.sendgrid.com/api/mail.send.json',
                       data=message)
     print r.text
+
+
+def notices_updated(notices):
+    for notice in notices:
+        notice['text'] = cgi.escape(notice['text'])
+        notice['text'] = notice['text'].replace('\n', '<br/>')
+        message = {
+            'api_user': env['SENDGRID_USERNAME'],
+            'api_key': env['SENDGRID_PASSWORD'],
+            'to': env['EMAIL_ADDRESS'],
+            'from': 'no-reply@mftp.herokuapp.com',
+            'fromname': 'MFTP',
+            'subject': 'Notice: %s - %s' % (notice['subject'],
+                                            notice['company']),
+            'html': '<i>(%s)</i>: <p>%s<p>' % (notice['time'], notice['text']),
+        }
+        if 'attachment' in notice:
+            message['html'] += '<p>Attachment: <a href="%s">Download</a></p>' \
+                               % notice['attachment']
+        r = requests.post('https://api.sendgrid.com/api/mail.send.json',
+                          data=message)
+        print 'Sent notice:', message['subject'], r.text
