@@ -1,22 +1,29 @@
 import update
 import os
+from concurrent.futures import ThreadPoolExecutor
 import tornado.web
 import tornado.ioloop
+from tornado import gen
 
 ioloop = tornado.ioloop.IOLoop.current()
+executor = ThreadPoolExecutor(max_workers=2)
 
 
+@gen.coroutine
 def run_updates():
-    try:
-        print 'Checking companies...'
-        update.check_companies()
-    except Exception as e:
-        print e
-    try:
-        print 'Checking notices...'
-        update.check_notices()
-    except Exception as e:
-        print e
+    def func():
+        try:
+            print 'Checking companies...'
+            update.check_companies()
+        except Exception as e:
+            print e
+        try:
+            print 'Checking notices...'
+            update.check_notices()
+        except Exception as e:
+            print e
+    yield executor.submit(func)
+    print 'run_updates done'
 
 
 class PingHandler(tornado.web.RequestHandler):

@@ -12,6 +12,11 @@ ERP_COMPANIES_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/ERPMonitor
 
 
 @tnp_login
+def check_notices(session, sessionData):
+    pass
+
+
+@tnp_login
 def check_companies(session, sessionData):
 
     headers['Referer'] = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/TPStudent.jsp'
