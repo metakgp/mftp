@@ -24,7 +24,8 @@ def check_notices(session, sessionData):
 
     notices_list = bs(r.text, 'html.parser')
     notices = []
-    for row in notices_list.find_all('row'):
+    # Only check the first 100 notices
+    for row in notices_list.find_all('row')[:100]:
         notice = {}
 
         cds = filter(lambda x: isinstance(x, CData), row.find_all(text=True))

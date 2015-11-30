@@ -29,7 +29,7 @@ def companies_updated(companies):
 
 
 def notices_updated(notices):
-    for notice in notices[:10]:
+    for notice in notices:
         message = {
             'api_user': env['SENDGRID_USERNAME'],
             'api_key': env['SENDGRID_PASSWORD'],
