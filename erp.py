@@ -3,7 +3,6 @@ from os import environ as env
 from bs4 import BeautifulSoup as bs
 import sys
 import re
-from functools import partial
 
 ERP_HOMEPAGE_URL = 'https://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp'
 ERP_LOGIN_URL = 'https://erp.iitkgp.ernet.in/SSOAdministration/auth.htm'
@@ -21,11 +20,10 @@ req_args = {
     'verify': False
 }
 
+
 def erp_login(func):
 
     def wrapped_func(*args, **kwargs):
-
-        print 'Running erp_login called with', func, args, kwargs
 
         s = requests.Session()
 

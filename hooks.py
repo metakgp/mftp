@@ -1,6 +1,5 @@
 from os import environ as env
 import requests
-import cgi
 
 if 'NOTICES_EMAIL_ADDRESS' not in env:
     env['NOTICES_EMAIL_ADDRESS'] = env['EMAIL_ADDRESS']
