@@ -4,6 +4,9 @@ from concurrent.futures import ThreadPoolExecutor
 import tornado.web
 import tornado.ioloop
 from tornado import gen
+import requests
+
+requests.packages.urllib3.disable_warnings()
 
 ioloop = tornado.ioloop.IOLoop.current()
 executor = ThreadPoolExecutor(max_workers=2)
@@ -37,5 +40,5 @@ if __name__ == '__main__':
     app.listen(os.environ['PORT'])
     run_updates()
     tornado.ioloop.PeriodicCallback(run_updates,
-                                    120 * 1000).start()
+                                    60 * 1000).start()
     ioloop.start()

@@ -12,13 +12,14 @@ ERP_CDC_MODULE_URL = 'https://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp?module_id
 ERP_TPSTUDENT_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/TPStudent.jsp'
 
 
-timeout = 20
-
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36',
-    'Referer': 'https://erp.iitkgp.ernet.in/SSOAdministration/login.htm?sessionToken=595794DC220159D1CBD10DB69832EF7E.worker3&requestedUrl=https://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp',
+req_args = {
+    'timeout': 20,
+    'headers': {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36',
+        'Referer': 'https://erp.iitkgp.ernet.in/SSOAdministration/login.htm?sessionToken=595794DC220159D1CBD10DB69832EF7E.worker3&requestedUrl=https://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp',
+    },
+    'verify': False
 }
-
 
 def erp_login(func):
 
@@ -28,12 +29,12 @@ def erp_login(func):
 
         s = requests.Session()
 
-        r = s.get(ERP_HOMEPAGE_URL, timeout=timeout)
+        r = s.get(ERP_HOMEPAGE_URL, **req_args)
         soup = bs(r.text, 'html.parser')
         sessionToken = soup.find_all(id='sessionToken')[0].attrs['value']
 
         r = s.post(ERP_SECRET_QUESTION_URL, data={'user_id': env['ERP_USERNAME']},
-                   timeout=timeout)
+                   **req_args)
         secret_question = r.text
         secret_answer = None
         for i in xrange(1, 4):
@@ -53,8 +54,8 @@ def erp_login(func):
             'requestedUrl': 'https://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp',
         }
 
-        r = s.post(ERP_LOGIN_URL, headers=headers, data=login_details,
-                   timeout=timeout)
+        r = s.post(ERP_LOGIN_URL, data=login_details,
+                   **req_args)
         ssoToken = re.search(r'\?ssoToken=(.+)$',
                              r.history[1].headers['Location']).group(1)
 
@@ -73,7 +74,7 @@ def tnp_login(func):
         ssoToken = sessionData['ssoToken']
         session.post(ERP_TPSTUDENT_URL,  # headers=headers,
                      data=dict(ssoToken=ssoToken, menu_id=11, module_id=26),
-                     timeout=timeout)
+                     **req_args)
         func(session=session, sessionData=sessionData, *args, **kwargs)
 
     return wrapped_func

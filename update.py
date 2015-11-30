@@ -3,7 +3,7 @@ from pymongo import MongoClient
 from os import environ as env
 import re
 
-from erp import erp_login, tnp_login, headers, timeout
+from erp import tnp_login, req_args
 import hooks
 
 mc = MongoClient(env['MONGOLAB_URI'])
@@ -16,10 +16,10 @@ ERP_ATTACHMENT_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacement/TPJNFDescrip
 
 @tnp_login
 def check_notices(session, sessionData):
-    r = session.get(ERP_NOTICEBOARD_URL, headers=headers, timeout=timeout)
-    headers['Referer'] = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/Notice.jsp'
-    headers['Accept'] = 'application/xml, text/xml, */*; q=0.01'
-    r = session.get(ERP_NOTICES_URL, headers=headers, timeout=timeout)
+    r = session.get(ERP_NOTICEBOARD_URL, **req_args)
+    # headers['Referer'] = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/Notice.jsp'
+    # headers['Accept'] = 'application/xml, text/xml, */*; q=0.01'
+    r = session.get(ERP_NOTICES_URL, **req_args)
 
     notices_list = bs(r.text, 'html.parser')
     notices = []
@@ -42,7 +42,6 @@ def check_notices(session, sessionData):
             notice['attachment'] = ERP_ATTACHMENT_URL + m.group(1)
 
         notices.append(notice)
-        print notice
 
     handle_notices_diff(notices)
 
@@ -59,19 +58,20 @@ def handle_notices_diff(notices):
 
     print 'Different notices: ', different_notices
     if len(different_notices) > 0:
-        hooks.notices_updated(different_notices)
-        notices_coll.insert(different_notices)
+        for notice in different_notices:
+            hooks.notices_updated([notice])
+            notices_coll.insert_one(notice)
 
 
 @tnp_login
 def check_companies(session, sessionData):
-    headers['Referer'] = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/TPStudent.jsp'
-    headers['Accept'] = 'application/xml, text/xml, */*; q=0.01'
-    r = session.get(ERP_COMPANIES_URL, headers=headers, timeout=timeout)
+    # headers['Referer'] = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/TPStudent.jsp'
+    # headers['Accept'] = 'application/xml, text/xml, */*; q=0.01'
+    r = session.get(ERP_COMPANIES_URL, **req_args)
 
     companies_list = bs(r.text, 'html.parser')
     companies = []
-    for row in companies_list.find_all('row')[:1]:
+    for row in companies_list.find_all('row'):
         company = {}
         cds = filter(lambda x: isinstance(x, CData), row.find_all(text=True))
 

@@ -26,9 +26,9 @@ def companies_updated(companies):
 
 
 def notices_updated(notices):
-    for notice in notices:
-        notice['text'] = cgi.escape(notice['text'])
-        notice['text'] = notice['text'].replace('\n', '<br/>')
+    for notice in notices[:10]:
+        text = cgi.escape(notice['text'])
+        text = text.replace('\n', '<br/>')
         message = {
             'api_user': env['SENDGRID_USERNAME'],
             'api_key': env['SENDGRID_PASSWORD'],
@@ -37,7 +37,7 @@ def notices_updated(notices):
             'fromname': 'MFTP',
             'subject': 'Notice: %s - %s' % (notice['subject'],
                                             notice['company']),
-            'html': '<i>(%s)</i>: <p>%s<p>' % (notice['time'], notice['text']),
+            'html': '<i>(%s)</i>: <p>%s<p>' % (notice['time'], text),
         }
         if 'attachment' in notice:
             message['html'] += '<p>Attachment: <a href="%s">Download</a></p>' \
