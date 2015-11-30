@@ -44,4 +44,4 @@ def notices_updated(notices):
                                % notice['attachment']
         r = requests.post('https://api.sendgrid.com/api/mail.send.json',
                           data=message)
-        print 'Sent notice:', message['subject'], r.text
+        print 'Sent notice to', message['to'], ':', message['subject'], r.text
