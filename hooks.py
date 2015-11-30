@@ -2,6 +2,9 @@ from os import environ as env
 import requests
 import cgi
 
+if 'NOTICES_EMAIL_ADDRESS' not in env:
+    env['NOTICES_EMAIL_ADDRESS'] = env['EMAIL_ADDRESS']
+
 
 def make_text(company):
     text = '%s: %s (%s - %s)' % (company['name'], company['job'],
@@ -27,17 +30,15 @@ def companies_updated(companies):
 
 def notices_updated(notices):
     for notice in notices[:10]:
-        text = cgi.escape(notice['text'])
-        text = text.replace('\n', '<br/>')
         message = {
             'api_user': env['SENDGRID_USERNAME'],
             'api_key': env['SENDGRID_PASSWORD'],
-            'to': env['EMAIL_ADDRESS'],
+            'to': env['NOTICES_EMAIL_ADDRESS'],
             'from': 'no-reply@mftp.herokuapp.com',
             'fromname': 'MFTP',
             'subject': 'Notice: %s - %s' % (notice['subject'],
                                             notice['company']),
-            'html': '<i>(%s)</i>: <p>%s<p>' % (notice['time'], text),
+            'html': '<i>(%s)</i>: <p>%s<p>' % (notice['time'], notice['text']),
         }
         if 'attachment' in notice:
             message['html'] += '<p>Attachment: <a href="%s">Download</a></p>' \

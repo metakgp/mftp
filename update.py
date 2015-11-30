@@ -12,6 +12,7 @@ ERP_COMPANIES_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/ERPMonitor
 ERP_NOTICEBOARD_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/Notice.jsp'
 ERP_NOTICES_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/ERPMonitoring.htm?action=fetchData&jqqueryid=54&_search=false&nd=1448884994803&rows=20&page=1&sidx=&sord=asc&totalrows=50'
 ERP_ATTACHMENT_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacement/TPJNFDescriptionShow?filepath='
+ERP_NOTICE_CONTENT_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/ShowContent.jsp?year=%s&id=%s'
 
 
 @tnp_login
@@ -32,7 +33,11 @@ def check_notices(session, sessionData):
         notice['company'] = cds[3].string
 
         a = bs(cds[4].string, 'html.parser').find_all('a')[0]
-        notice['text'] = a.attrs['title']
+        m = re.search(r'ViewNotice\("(.+?)","(.+?)"\)', a.attrs['onclick'])
+        year, id_ = m.group(1), m.group(2)
+        content = bs(session.get(ERP_NOTICE_CONTENT_URL % (year, id_)).text, 'html.parser')
+        content_div = bs.find_all(content, 'div', {'id': 'printableArea'})[0]
+        notice['text'] = content_div.decode_contents(formatter='html')
         notice['time'] = cds[6].string
 
         a = bs(cds[7].string, 'html.parser').find_all('a')[0]
