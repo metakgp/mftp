@@ -60,7 +60,7 @@ def notices_updated(notices):
                 'to': [env['NOTICES_EMAIL_ADDRESS']],
                 'subject': message['subject'],
                 'html': message['html']
-            })
+            }, verify=False)
 
         # r = requests.post('https://api.sendgrid.com/api/mail.send.json',
         # data=message)
