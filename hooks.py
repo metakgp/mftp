@@ -22,8 +22,18 @@ def companies_updated(companies):
             [c['name'] for c in companies]),
         'text': '\n'.join([make_text(c) for c in companies]),
     }
-    r = requests.post('https://api.sendgrid.com/api/mail.send.json',
-                      data=message)
+    r = requests.post(
+        'https://api.mailgun.net/v3/%s/messages' % env['MAILGUN_DOMAIN'],
+        auth=('api', env['MAILGUN_API_KEY']),
+        data={
+            'from': 'MFTP <no-reply@%s>' % env['MAILGUN_DOMAIN'],
+            'to': [env['EMAIL_ADDRESS']],
+            'subject': message['subject'],
+            'html': message['html']
+        })
+
+    # r = requests.post('https://api.sendgrid.com/api/mail.send.json',
+    #                  data=message)
     print r.text
 
 
@@ -42,6 +52,16 @@ def notices_updated(notices):
         if 'attachment' in notice:
             message['html'] += '<p>Attachment: <a href="%s">Download</a></p>' \
                                % notice['attachment']
-        r = requests.post('https://api.sendgrid.com/api/mail.send.json',
-                          data=message)
+        r = requests.post(
+            'https://api.mailgun.net/v3/%s/messages' % env['MAILGUN_DOMAIN'],
+            auth=('api', env['MAILGUN_API_KEY']),
+            data={
+                'from': 'MFTP <no-reply@%s>' % env['MAILGUN_DOMAIN'],
+                'to': [env['NOTICES_EMAIL_ADDRESS']],
+                'subject': message['subject'],
+                'html': message['html']
+            })
+
+        # r = requests.post('https://api.sendgrid.com/api/mail.send.json',
+        # data=message)
         print 'Sent notice to', message['to'], ':', message['subject'], r.text
