@@ -32,7 +32,7 @@
         }
     },
     "addons": [
-        "sendgrid:starter",
+        "mailgun:starter",
         "mongolab:sandbox"
     ]
 }
