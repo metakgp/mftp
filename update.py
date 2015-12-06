@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup as bs, CData
 from pymongo import MongoClient
 from os import environ as env
 import re
+import hashlib
 
 from erp import tnp_login, req_args
 import hooks
@@ -18,14 +19,12 @@ ERP_NOTICE_CONTENT_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/ShowC
 @tnp_login
 def check_notices(session, sessionData):
     r = session.get(ERP_NOTICEBOARD_URL, **req_args)
-    # headers['Referer'] = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/Notice.jsp'
-    # headers['Accept'] = 'application/xml, text/xml, */*; q=0.01'
     r = session.get(ERP_NOTICES_URL, **req_args)
 
     notices_list = bs(r.text, 'html.parser')
     notices = []
-    # Only check the first 100 notices
-    for row in notices_list.find_all('row')[:100]:
+    # Only check the first 50 notices
+    for row in notices_list.find_all('row')[:50]:
         notice = {}
 
         cds = filter(lambda x: isinstance(x, CData), row.find_all(text=True))
@@ -45,7 +44,13 @@ def check_notices(session, sessionData):
         if a.attrs['title'] == 'Download':
             onclick = a.attrs['onclick']
             m = re.search(r'TPNotice\("(.+)"\)', onclick)
-            notice['attachment'] = ERP_ATTACHMENT_URL + m.group(1)
+            notice['attachment_url'] = ERP_ATTACHMENT_URL + m.group(1)
+            r = session.get(notice['attachment_url'], stream=True)
+            r.raw.decode_content = True
+            hash_ = hashlib.md5()
+            for chunk in iter(lambda: r.raw.read(4096), b""):
+                hash_.update(chunk)
+            notice['attachment_md5'] = hash_.hexdigest()
 
         notices.append(notice)
 
@@ -71,8 +76,6 @@ def handle_notices_diff(notices):
 
 @tnp_login
 def check_companies(session, sessionData):
-    # headers['Referer'] = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/TPStudent.jsp'
-    # headers['Accept'] = 'application/xml, text/xml, */*; q=0.01'
     r = session.get(ERP_COMPANIES_URL, **req_args)
 
     companies_list = bs(r.text, 'html.parser')
@@ -97,7 +100,6 @@ def check_companies(session, sessionData):
 
 
 def handle_companies_diff(companies):
-
     companies_coll = mc.get_default_database().companies
 
     different_companies = []
