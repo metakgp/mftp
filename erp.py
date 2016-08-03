@@ -5,11 +5,11 @@ import sys
 import re
 import settings
 
-ERP_HOMEPAGE_URL = 'https://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp'
-ERP_LOGIN_URL = 'https://erp.iitkgp.ernet.in/SSOAdministration/auth.htm'
-ERP_SECRET_QUESTION_URL = 'https://erp.iitkgp.ernet.in/SSOAdministration/getSecurityQues.htm'
-ERP_CDC_MODULE_URL = 'https://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp?module_id=26&menu_id=11&delegated_by=&parent_menu_id=10'
-ERP_TPSTUDENT_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/TPStudent.jsp'
+ERP_HOMEPAGE_URL = 'http://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp'
+ERP_LOGIN_URL = 'http://erp.iitkgp.ernet.in/SSOAdministration/auth.htm'
+ERP_SECRET_QUESTION_URL = 'http://erp.iitkgp.ernet.in/SSOAdministration/getSecurityQues.htm'
+ERP_CDC_MODULE_URL = 'http://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp?module_id=26&menu_id=11&delegated_by=&parent_menu_id=10'
+ERP_TPSTUDENT_URL = 'http://erp.iitkgp.ernet.in/TrainingPlacementSSO/TPStudent.jsp'
 
 
 req_args = {
@@ -26,17 +26,25 @@ def erp_login(func):
 
     def wrapped_func(*args, **kwargs):
 
+        print "Started erp_login!"
+
         s = requests.Session()
 
         r = s.get(ERP_HOMEPAGE_URL, **req_args)
         soup = bs(r.text, 'html.parser')
-        sessionToken = soup.find_all(id='sessionToken')[0].attrs['value']
+
+        print "Length of the fetched HTML: " + str(len(str(r.text)))
+        if soup.find(id='sessionToken'):
+            sessionToken = soup.find(id='sessionToken').attrs['value']
+        else:
+            raise Exception("Could not get the sessionToken!")
 
         r = s.post(ERP_SECRET_QUESTION_URL, data={'user_id': env['ERP_USERNAME']},
                    **req_args)
         secret_question = r.text
         secret_answer = None
         for i in xrange(1, 4):
+            print env['ERP_Q%d' % i]
             if env['ERP_Q%d' % i] == secret_question:
                 secret_answer = env['ERP_A%d' % i]
                 break
@@ -53,14 +61,16 @@ def erp_login(func):
             'requestedUrl': 'https://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp',
         }
 
+
         r = s.post(ERP_LOGIN_URL, data=login_details,
                    **req_args)
         ssoToken = re.search(r'\?ssoToken=(.+)$',
-                             r.history[1].headers['Location']).group(1)
+                             r.history[1].headers['Location']).group(1) 
 
         func(session=s, sessionData={'ssoToken': ssoToken,
                                      'sessionToken': sessionToken},
              *args, **kwargs)
+        print "ERP Login completed!"
 
     return wrapped_func
 
@@ -75,5 +85,7 @@ def tnp_login(func):
                      data=dict(ssoToken=ssoToken, menu_id=11, module_id=26),
                      **req_args)
         func(session=session, sessionData=sessionData, *args, **kwargs)
+
+        print "TNP Login completed!"
 
     return wrapped_func

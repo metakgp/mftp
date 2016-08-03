@@ -21,7 +21,9 @@ ERP_NOTICE_CONTENT_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/ShowC
 @tnp_login
 def check_notices(session, sessionData):
     r = session.get(ERP_NOTICEBOARD_URL, **req_args)
-    r = session.get(ERP_NOTICES_URL, **req_args)
+    r = session.get(ERP_NOTICES_URL, **req_args);
+    
+    print "ERP and TNP login completed!"
 
     notices_list = bs(r.text, 'html.parser')
     notices = []
