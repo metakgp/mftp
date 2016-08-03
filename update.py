@@ -4,6 +4,8 @@ from os import environ as env
 import re
 import hashlib
 
+import settings
+
 from erp import tnp_login, req_args
 import hooks
 

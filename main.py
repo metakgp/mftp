@@ -5,6 +5,7 @@ import tornado.web
 import tornado.ioloop
 from tornado import gen
 import requests
+import settings
 
 requests.packages.urllib3.disable_warnings()
 

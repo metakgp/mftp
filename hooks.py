@@ -1,6 +1,8 @@
 from os import environ as env
 import requests
 
+import settings
+
 from erp import req_args
 
 if 'NOTICES_EMAIL_ADDRESS' not in env:

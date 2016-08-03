@@ -3,6 +3,7 @@ from os import environ as env
 from bs4 import BeautifulSoup as bs
 import sys
 import re
+import settings
 
 ERP_HOMEPAGE_URL = 'https://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp'
 ERP_LOGIN_URL = 'https://erp.iitkgp.ernet.in/SSOAdministration/auth.htm'
