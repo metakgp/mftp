@@ -43,6 +43,7 @@ def erp_login(func):
         r = s.post(ERP_SECRET_QUESTION_URL, data={'user_id': env['ERP_USERNAME']},
                    **req_args)
         secret_question = r.text
+        print "Secret question from the ERP: " + secret_question
         secret_answer = None
         for i in xrange(1, 4):
             print env['ERP_Q%d' % i]
