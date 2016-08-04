@@ -5,11 +5,11 @@ import sys
 import re
 import settings
 
-ERP_HOMEPAGE_URL = 'http://erp.iitkgp.ernet.in/IIT_ERP3/welcome.jsp'
-ERP_LOGIN_URL = 'http://erp.iitkgp.ernet.in/SSOAdministration/auth.htm'
-ERP_SECRET_QUESTION_URL = 'http://erp.iitkgp.ernet.in/SSOAdministration/getSecurityQues.htm'
+ERP_HOMEPAGE_URL = 'https://erp.iitkgp.ernet.in/IIT_ERP3/welcome.jsp'
+ERP_LOGIN_URL = 'https://erp.iitkgp.ernet.in/SSOAdministration/auth.htm'
+ERP_SECRET_QUESTION_URL = 'https://erp.iitkgp.ernet.in/SSOAdministration/getSecurityQues.htm'
 ERP_CDC_MODULE_URL = 'https://erp.iitkgp.ernet.in/IIT_ERP3/menulist.htm?module_id=26'
-ERP_TPSTUDENT_URL = 'http://erp.iitkgp.ernet.in/TrainingPlacementSSO/TPStudent.jsp'
+ERP_TPSTUDENT_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/TPStudent.jsp'
 
 
 req_args = {
