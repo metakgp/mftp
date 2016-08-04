@@ -60,7 +60,7 @@ def erp_login(func):
             'password': env['ERP_PASSWORD'],
             'answer': secret_answer,
             'sessionToken': sessionToken,
-            'requestedUrl': 'https://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp',
+            'requestedUrl': 'https://erp.iitkgp.ernet.in/IIT_ERP3/welcome.jsp',
         }
 
 

@@ -59,8 +59,6 @@ def check_notices(session, sessionData):
 
     print "Total number of notices fetched: %d" % len(notices_list)
 
-    print notices_list
-
     notices = []
     # Only check the first 50 notices
     for row in notices_list.find_all('row')[:NUM_NOTICES_DIFFED]:
