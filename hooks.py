@@ -17,8 +17,6 @@ def make_text(company):
 
 def companies_updated(companies):
     message = {
-        'api_user': env['SENDGRID_USERNAME'],
-        'api_key': env['SENDGRID_PASSWORD'],
         'to': env['EMAIL_ADDRESS'],
         'from': 'no-reply@mftp.herokuapp.com',
         'fromname': 'MFTP',
@@ -44,8 +42,6 @@ def companies_updated(companies):
 def notices_updated(notices):
     for notice in notices:
         message = {
-            'api_user': env['SENDGRID_USERNAME'],
-            'api_key': env['SENDGRID_PASSWORD'],
             'to': env['NOTICES_EMAIL_ADDRESS'],
             'from': 'no-reply@mftp.herokuapp.com',
             'fromname': 'MFTP',
@@ -67,8 +63,8 @@ def notices_updated(notices):
             data={
                 'from': 'MFTP <no-reply@%s>' % env['MAILGUN_DOMAIN'],
                 'to': [env['NOTICES_EMAIL_ADDRESS']],
-                'subject': message['subject'],
-                'html': message['html']
+                'subject': message['subject'].encode("utf-8"),
+                'html': message['html'].encode("utf-8")
             }, files=files, verify=False)
 
         # r = requests.post('https://api.sendgrid.com/api/mail.send.json',
