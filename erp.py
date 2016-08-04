@@ -5,10 +5,10 @@ import sys
 import re
 import settings
 
-ERP_HOMEPAGE_URL = 'http://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp'
+ERP_HOMEPAGE_URL = 'http://erp.iitkgp.ernet.in/IIT_ERP3/welcome.jsp'
 ERP_LOGIN_URL = 'http://erp.iitkgp.ernet.in/SSOAdministration/auth.htm'
 ERP_SECRET_QUESTION_URL = 'http://erp.iitkgp.ernet.in/SSOAdministration/getSecurityQues.htm'
-ERP_CDC_MODULE_URL = 'http://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp?module_id=26&menu_id=11&delegated_by=&parent_menu_id=10'
+ERP_CDC_MODULE_URL = 'https://erp.iitkgp.ernet.in/IIT_ERP3/menulist.htm?module_id=26'
 ERP_TPSTUDENT_URL = 'http://erp.iitkgp.ernet.in/TrainingPlacementSSO/TPStudent.jsp'
 
 
@@ -34,6 +34,7 @@ def erp_login(func):
         soup = bs(r.text, 'html.parser')
 
         print "Length of the fetched HTML: " + str(len(str(r.text)))
+        # print str(r.text)
         if soup.find(id='sessionToken'):
             sessionToken = soup.find(id='sessionToken').attrs['value']
         else:
