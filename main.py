@@ -42,5 +42,5 @@ if __name__ == '__main__':
     app.listen(os.environ['PORT'])
     run_updates()
     tornado.ioloop.PeriodicCallback(run_updates,
-                                    6 * 1000).start()
+                                    2 * 60 * 1000).start()
     ioloop.start()
