@@ -69,13 +69,12 @@ def erp_login(func):
         ssoToken = re.search(r'\?ssoToken=(.+)$',
                              r.history[1].headers['Location']).group(1) 
 
+        print "ERP Login completed!"
         r = s.get("https://erp.iitkgp.ernet.in/IIT_ERP3/?%s" % ssoToken, **req_args)
 
         func(session=s, sessionData={'ssoToken': ssoToken,
                                      'sessionToken': sessionToken},
              *args, **kwargs)
-        print "ERP Login completed!"
-
 
     return wrapped_func
 
@@ -89,8 +88,7 @@ def tnp_login(func):
         session.post(ERP_TPSTUDENT_URL,  # headers=headers,
                      data=dict(ssoToken=ssoToken, menu_id=11, module_id=26),
                      **req_args)
-        func(session=session, sessionData=sessionData, *args, **kwargs)
-
         print "TNP Login completed!"
+        func(session=session, sessionData=sessionData, *args, **kwargs)
 
     return wrapped_func

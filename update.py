@@ -13,8 +13,6 @@ NUM_NOTICES_DIFFED = 5
 
 mc = MongoClient(env['MONGOLAB_URI'])
 
-ERP_URL_1 = "https://erp.iitkgp.ernet.in/IIT_ERP3/menulist.htm?module_id=26"
-ERP_URL_2 = "https://erp.iitkgp.ernet.in/IIT_ERP3/showmenu.htm"
 ERP_COMPANIES_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/ERPMonitoring.htm?action=fetchData&jqqueryid=37&_search=false&nd=1448725351715&rows=20&page=1&sidx=&sord=asc&totalrows=50'
 ERP_NOTICEBOARD_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/Notice.jsp'
 ERP_NOTICES_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/ERPMonitoring.htm?action=fetchData&jqqueryid=54&_search=false&nd=1448884994803&rows=20&page=1&sidx=&sord=asc&totalrows=50'
@@ -24,32 +22,6 @@ ERP_NOTICE_CONTENT_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/ShowC
 
 @tnp_login
 def check_notices(session, sessionData):
-    '''
-    r = session.get(ERP_URL_1, **req_args)
-    r = session.get(ERP_URL_2, **req_args)
-    r = session.post("https://erp.iitkgp.ernet.in/IIT_ERP3/showmenu.htm",
-            {
-                'module_id': '26',
-                'menu_id': '11'
-            }, **req_args)
-    r = session.post("https://erp.iitkgp.ernet.in/IIT_ERP3/getModules.htm", **req_args)
-    r = session.post("https://erp.iitkgp.ernet.in/IIT_ERP3/getMenus.htm?module_id=26", **req_args)
-
-    TPParameters = {
-                'ssoToken': sessionData['ssoToken'],
-                'module_id': '26',
-                'menu_id': '11'
-            }
-    r = session.post("https://erp.iitkgp.ernet.in/TrainingPlacementSSO/TPStudent.jsp",
-            TPParameters,
-            **req_args)
-
-    ''
-    r = session.get(ERP_URL_1, **req_args)
-    r = session.get(ERP_URL_2, **req_args)
-    r = session.post("https://erp.iitkgp.ernet.in/IIT_ERP3/getMenuAccessInfo.htm?module_id=26&menu_id=11", **req_args)
-    '''
-
     r = session.get(ERP_NOTICEBOARD_URL, **req_args)
     r = session.get(ERP_NOTICES_URL, **req_args)
     
