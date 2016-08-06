@@ -16,7 +16,8 @@ req_args = {
     'timeout': 20,
     'headers': {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36',
-        'Referer': 'https://erp.iitkgp.ernet.in/SSOAdministration/login.htm?sessionToken=595794DC220159D1CBD10DB69832EF7E.worker3&requestedUrl=https://erp.iitkgp.ernet.in/IIT_ERP2/welcome.jsp',
+        'Referer':
+        'https://erp.iitkgp.ernet.in/SSOAdministration/login.htm?sessionToken=595794DC220159D1CBD10DB69832EF7E.worker3',
     },
     'verify': False
 }
