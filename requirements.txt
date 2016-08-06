@@ -10,3 +10,4 @@ singledispatch==3.4.0.3
 six==1.10.0
 tornado==4.3
 wheel==0.24.0
+python-dotenv==0.5.1

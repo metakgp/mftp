@@ -4,8 +4,12 @@ from os import environ as env
 import re
 import hashlib
 
+import settings
+
 from erp import tnp_login, req_args
 import hooks
+
+NUM_NOTICES_DIFFED = 5
 
 mc = MongoClient(env['MONGOLAB_URI'])
 
@@ -20,11 +24,16 @@ ERP_NOTICE_CONTENT_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/ShowC
 def check_notices(session, sessionData):
     r = session.get(ERP_NOTICEBOARD_URL, **req_args)
     r = session.get(ERP_NOTICES_URL, **req_args)
+    
+    print "ERP and TNP login completed!"
 
     notices_list = bs(r.text, 'html.parser')
+
+    print "Total number of notices fetched: %d" % len(notices_list)
+
     notices = []
     # Only check the first 50 notices
-    for row in notices_list.find_all('row')[:50]:
+    for row in notices_list.find_all('row')[:NUM_NOTICES_DIFFED]:
         notice = {}
 
         cds = filter(lambda x: isinstance(x, CData), row.find_all(text=True))

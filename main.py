@@ -5,6 +5,7 @@ import tornado.web
 import tornado.ioloop
 from tornado import gen
 import requests
+import settings
 
 requests.packages.urllib3.disable_warnings()
 
@@ -24,6 +25,7 @@ def run_updates():
             print 'Checking notices...'
             update.check_notices()
         except Exception as e:
+            print "There was an error!"
             print e
     yield executor.submit(func)
     print 'run_updates done'
