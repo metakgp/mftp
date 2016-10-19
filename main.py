@@ -6,6 +6,7 @@ import tornado.ioloop
 from tornado import gen
 import requests
 import settings
+import traceback
 
 requests.packages.urllib3.disable_warnings()
 
@@ -24,14 +25,15 @@ def run_updates():
         try:
             print 'Checking notices...'
             update.check_notices()
-        except Exception as e:
-            print "There was an error!"
-            print e
+        except:
+            print "Following error occured :\n{}".format(traceback.format_exc())
+
     yield executor.submit(func)
     print 'run_updates done'
 
 
 class PingHandler(tornado.web.RequestHandler):
+
     def get(self):
         return
 
