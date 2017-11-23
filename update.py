@@ -11,7 +11,7 @@ import hooks
 
 NUM_NOTICES_DIFFED = 5
 
-mc = MongoClient(env['MONGOLAB_URI'])
+mc = MongoClient(env['MONGODB_URI'])
 
 ERP_COMPANIES_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/ERPMonitoring.htm?action=fetchData&jqqueryid=37&_search=false&nd=1448725351715&rows=20&page=1&sidx=&sord=asc&totalrows=50'
 ERP_NOTICEBOARD_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/Notice.jsp'

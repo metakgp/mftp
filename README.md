@@ -30,14 +30,14 @@ MAILGUN_SMTP_LOGIN
 MAILGUN_SMTP_PASSWORD
 MAILGUN_SMTP_PORT
 MAILGUN_SMTP_SERVER
-MONGOLAB_URI
+MONGODB_URI
 NOTICES_EMAIL_ADDRESS
 ```
 
 Among these, the variables prefixed by `MAILGUN` will be added by Heroku when
 you run the command `heroku addons:create mailgun:starter`.
 
-The `MONGOLAB_URI` env variable will be set by `heroku addons:create
+The `MONGODB_URI` env variable will be set by `heroku addons:create
 mongolab:sandbox`.
 
 You need to add the other variables. You can add either by using the command
