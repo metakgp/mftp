@@ -9,7 +9,10 @@ import settings
 from erp import tnp_login, req_args
 import hooks
 
-NUM_NOTICES_DIFFED = 5
+# Checking all the notices is ideal, but too slow to do quickly, since
+# we're fetching attachments. Instead, check enough notices that the
+# likelihood of missing an update is low.
+NUM_NOTICES_DIFFED = 50
 
 mc = MongoClient(env['MONGODB_URI'])
 
@@ -24,12 +27,12 @@ ERP_NOTICE_CONTENT_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/ShowC
 def check_notices(session, sessionData):
     r = session.get(ERP_NOTICEBOARD_URL, **req_args)
     r = session.get(ERP_NOTICES_URL, **req_args)
-    
+
     print "ERP and TNP login completed!"
 
     notices_list = bs(r.text, 'html.parser')
 
-    print "Total number of notices fetched: %d" % len(notices_list)
+    print "Total number of notices fetched: %d" % len(notices_list.find_all('row'))
 
     notices = []
     # Only check the first 50 notices

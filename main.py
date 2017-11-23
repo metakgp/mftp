@@ -5,13 +5,13 @@ import tornado.web
 import tornado.ioloop
 from tornado import gen
 import requests
-import settings
+import datetime
 import traceback
 
 requests.packages.urllib3.disable_warnings()
 
 ioloop = tornado.ioloop.IOLoop.current()
-executor = ThreadPoolExecutor(max_workers=2)
+UPDATE_PERIOD = 2 * 60 * 1000
 
 
 @gen.coroutine
@@ -26,13 +26,20 @@ def run_updates():
             print 'Checking notices...'
             update.check_notices()
         except:
-            print "Following error occured :\n{}".format(traceback.format_exc())
+            print "Unhandled error occured :\n{}".format(traceback.format_exc())
 
-    yield executor.submit(func)
-    print 'run_updates done'
+    try:
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            yield gen.with_timeout(datetime.timedelta(UPDATE_PERIOD/1000.0),
+                                   executor.submit(func))
+        print 'run_updates done'
+    except gen.TimeoutError:
+        print 'run_updates timed out'
 
 
 class PingHandler(tornado.web.RequestHandler):
+    def head(self):
+        return
 
     def get(self):
         return
@@ -44,5 +51,5 @@ if __name__ == '__main__':
     app.listen(os.environ['PORT'])
     run_updates()
     tornado.ioloop.PeriodicCallback(run_updates,
-                                    2 * 60 * 1000).start()
+                                    UPDATE_PERIOD).start()
     ioloop.start()
