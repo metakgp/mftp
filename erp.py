@@ -54,10 +54,12 @@ def erp_login(func):
         secret_question = r.text
         print "Secret question from the ERP: " + secret_question
         secret_answer = None
+        secret_answer_index = None
         for i in xrange(1, 4):
             print env['ERP_Q%d' % i]
             if env['ERP_Q%d' % i] == secret_question:
                 secret_answer = env['ERP_A%d' % i]
+                secret_answer_index = i
                 break
 
         if secret_answer is None:
@@ -76,6 +78,11 @@ def erp_login(func):
                    **req_args)
 
         if len(r.history) < 2:
+            print("{answer} (ERP_A{index}) is wrong for {question}".format(
+                answer=secret_answer,
+                index=secret_answer_index,
+                question=secret_question
+            ))
             raise SecretAnswerError
 
         ssoToken = re.search(r'\?ssoToken=(.+)$',
