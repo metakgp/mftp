@@ -3,7 +3,6 @@ from os import environ as env
 from bs4 import BeautifulSoup as bs
 import sys
 import re
-import settings
 
 ERP_HOMEPAGE_URL = 'https://erp.iitkgp.ac.in/IIT_ERP3/welcome.jsp'
 ERP_LOGIN_URL = 'https://erp.iitkgp.ac.in/SSOAdministration/auth.htm'
@@ -15,12 +14,21 @@ ERP_TPSTUDENT_URL = 'https://erp.iitkgp.ac.in/TrainingPlacementSSO/TPStudent.jsp
 req_args = {
     'timeout': 20,
     'headers': {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/46.0.2490.86 Safari/537.36',
         'Referer':
         'https://erp.iitkgp.ac.in/SSOAdministration/login.htm?sessionToken=595794DC220159D1CBD10DB69832EF7E.worker3',
     },
     'verify': False
 }
+
+
+class SecretAnswerError(Exception):
+    """
+    Error which is raised when there is issue with user's secret answer settings
+
+    """
+    print("Please check your secret answer settings!")
 
 
 def erp_login(func):
@@ -64,11 +72,14 @@ def erp_login(func):
             'requestedUrl': 'https://erp.iitkgp.ac.in/IIT_ERP3/welcome.jsp',
         }
 
-
         r = s.post(ERP_LOGIN_URL, data=login_details,
                    **req_args)
+
+        if len(r.history) < 2:
+            raise SecretAnswerError
+
         ssoToken = re.search(r'\?ssoToken=(.+)$',
-                             r.history[1].headers['Location']).group(1) 
+                             r.history[1].headers['Location']).group(1)
 
         print "ERP Login completed!"
         r = s.get("https://erp.iitkgp.ac.in/IIT_ERP3/?%s" % ssoToken, **req_args)
