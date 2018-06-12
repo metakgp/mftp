@@ -5,11 +5,11 @@ import sys
 import re
 import settings
 
-ERP_HOMEPAGE_URL = 'https://erp.iitkgp.ernet.in/IIT_ERP3/welcome.jsp'
-ERP_LOGIN_URL = 'https://erp.iitkgp.ernet.in/SSOAdministration/auth.htm'
-ERP_SECRET_QUESTION_URL = 'https://erp.iitkgp.ernet.in/SSOAdministration/getSecurityQues.htm'
-ERP_CDC_MODULE_URL = 'https://erp.iitkgp.ernet.in/IIT_ERP3/menulist.htm?module_id=26'
-ERP_TPSTUDENT_URL = 'https://erp.iitkgp.ernet.in/TrainingPlacementSSO/TPStudent.jsp'
+ERP_HOMEPAGE_URL = 'https://erp.iitkgp.ac.in/IIT_ERP3/welcome.jsp'
+ERP_LOGIN_URL = 'https://erp.iitkgp.ac.in/SSOAdministration/auth.htm'
+ERP_SECRET_QUESTION_URL = 'https://erp.iitkgp.ac.in/SSOAdministration/getSecurityQues.htm'
+ERP_CDC_MODULE_URL = 'https://erp.iitkgp.ac.in/IIT_ERP3/menulist.htm?module_id=26'
+ERP_TPSTUDENT_URL = 'https://erp.iitkgp.ac.in/TrainingPlacementSSO/TPStudent.jsp'
 
 
 req_args = {
@@ -17,7 +17,7 @@ req_args = {
     'headers': {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36',
         'Referer':
-        'https://erp.iitkgp.ernet.in/SSOAdministration/login.htm?sessionToken=595794DC220159D1CBD10DB69832EF7E.worker3',
+        'https://erp.iitkgp.ac.in/SSOAdministration/login.htm?sessionToken=595794DC220159D1CBD10DB69832EF7E.worker3',
     },
     'verify': False
 }
@@ -61,7 +61,7 @@ def erp_login(func):
             'password': env['ERP_PASSWORD'],
             'answer': secret_answer,
             'sessionToken': sessionToken,
-            'requestedUrl': 'https://erp.iitkgp.ernet.in/IIT_ERP3/welcome.jsp',
+            'requestedUrl': 'https://erp.iitkgp.ac.in/IIT_ERP3/welcome.jsp',
         }
 
 
@@ -71,7 +71,7 @@ def erp_login(func):
                              r.history[1].headers['Location']).group(1) 
 
         print "ERP Login completed!"
-        r = s.get("https://erp.iitkgp.ernet.in/IIT_ERP3/?%s" % ssoToken, **req_args)
+        r = s.get("https://erp.iitkgp.ac.in/IIT_ERP3/?%s" % ssoToken, **req_args)
 
         func(session=s, sessionData={'ssoToken': ssoToken,
                                      'sessionToken': sessionToken},
