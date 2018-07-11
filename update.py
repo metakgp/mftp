@@ -45,7 +45,11 @@ def check_notices(session, sessionData):
         notice['company'] = cds[3].string
 
         a = bs(cds[4].string, 'html.parser').find_all('a')[0]
-        m = re.search(r'ViewNotice\("(.+?)","(.+?)"\)', a.attrs['onclick'])
+        try :
+            m = re.search(r'ViewNotice\("(.+?)","(.+?)"\)', a.attrs['onclick'])
+        except KeyError :
+            print("Poorly formatted notice found")
+            continue
         year, id_ = m.group(1), m.group(2)
         content = bs(session.get(ERP_NOTICE_CONTENT_URL % (year, id_)).text, 'html.parser')
         content_div = bs.find_all(content, 'div', {'id': 'printableArea'})[0]
