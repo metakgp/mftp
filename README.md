@@ -44,6 +44,29 @@ You need to add the other variables. You can add either by using the command
 `heroku config:set KEY=VALUE` from the command line, or you can use the Heroku
 web interface, under the **Settings** tab.
 
+### Testing on local system
+
+1. Make a copy of the .env-template file and rename it to .env in the root directory.
+
+`cp ./.env-template ./.env`
+
+2. Add values of all the variables in the newly created .env file accordingly. (Descriptions of all the varibales can be found in app.json).
+Note : app.json does not contain `DEBUG` variable as it explicitly configures scripts to run in local environment friendly way.
+
+3. Install all the python modules from the requirements file. **Note : The program runs on Python 2**
+
+`pip install -r requirements.txt`
+
+4. Run settings.py to load variables from .env file to the local environment.
+
+`python settings.py`
+
+5. Now run the main tornado server.
+
+`python main.py`
+
+
+
 ## WTF
 
 mftp monitors your ERP account for changes to the notices and the companies list, and sends you an email if there are any new or modified entries. Your credentials are stored as Heroku config variables, and you run your own Heroku instance.
