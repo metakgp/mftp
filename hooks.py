@@ -51,9 +51,10 @@ def notices_updated(notices):
         }
         files = []
         if 'attachment_url' in notice:
-            r = requests.get(notice['attachment_url'], stream=True,
-                             **req_args)
-            r.raw.decode_content = True
+            r = notice['attachment_raw']
+            # r = requests.get(notice['attachment_url'], stream=True,
+            #                  **req_args)
+            # r.raw.decode_content = True
             filename = notice['attachment_url'].split('/')[-1]
             files = [('attachment', (filename, r.raw))]
 
