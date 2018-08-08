@@ -64,7 +64,7 @@ def check_notices(session, sessionData):
             notice['attachment_url'] = ERP_ATTACHMENT_URL + m.group(1)
             r = session.get(notice['attachment_url'], stream=True)
             r.raw.decode_content = True
-            notice['attachment_raw'] = r
+            notice['attachment_raw'] = r.raw
             hash_ = hashlib.md5()
 
             for chunk in iter(lambda: r.raw.read(4096), b""):

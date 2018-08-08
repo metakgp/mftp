@@ -52,7 +52,7 @@ def notices_updated(notices):
         files = []
         if 'attachment_url' in notice:
             filename = notice['attachment_url'].split('/')[-1]
-            files = [('attachment', (filename, notice['attachment_raw'].raw))]
+            files = [('attachment', (filename, notice['attachment_raw']))]
 
         r = requests.post(
             'https://api.mailgun.net/v3/%s/messages' % env['MAILGUN_DOMAIN'],
