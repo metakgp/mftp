@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from os import environ as env
 import re
 import hashlib
+from copy import deepcopy
 
 import settings
 
@@ -64,11 +65,11 @@ def check_notices(session, sessionData):
             r = session.get(notice['attachment_url'], stream=True)
             r.raw.decode_content = True
             notice['attachment_raw'] = r
-            # hash_ = hashlib.md5()
+            hash_ = hashlib.md5()
 
-            # for chunk in iter(lambda: r.raw.read(4096), b""):
-            #     hash_.update(chunk)
-            # notice['attachment_md5'] = hash_.hexdigest()
+            for chunk in iter(lambda: r.raw.read(4096), b""):
+                hash_.update(chunk)
+            notice['attachment_md5'] = hash_.hexdigest()
 
         notices.append(notice)
 
@@ -81,7 +82,8 @@ def handle_notices_diff(notices):
     different_notices = []
     print 'Checking ', len(notices), 'notices'
     for notice in notices:
-        db_notice = notices_coll.find_one(notice)
+        sanitised_notice = sanitise_notice_for_database(notice)
+        db_notice = notices_coll.find_one(sanitised_notice)
         if db_notice is None:
             different_notices.append(notice)
 
@@ -89,8 +91,12 @@ def handle_notices_diff(notices):
     if len(different_notices) > 0:
         for notice in different_notices:
             hooks.notices_updated([notice])
-            notices_coll.insert_one(notice)
+            notices_coll.insert_one(sanitised_notice)
 
+def sanitise_notice_for_database(notice):
+    sanitised_notice = deepcopy(notice)
+    del sanitised_notice['attachment_raw']
+    return sanitised_notice
 
 @tnp_login
 def check_companies(session, sessionData):
