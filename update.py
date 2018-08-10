@@ -65,7 +65,7 @@ def check_notices(session, sessionData):
             r = session.get(notice['attachment_url'], stream=True)
             r.raw.decode_content = True
             hash_ = hashlib.md5()
-            notice['attachment_raw'] = ""
+            notice['attachment_raw'] = b""
             for chunk in r.iter_content(4096):
                 notice['attachment_raw'] += chunk
                 hash_.update(chunk)
