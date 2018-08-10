@@ -3,7 +3,6 @@ from pymongo import MongoClient
 from os import environ as env
 import re
 import hashlib
-from copy import deepcopy
 
 import settings
 
@@ -67,6 +66,8 @@ def check_notices(session, sessionData):
             notice['attachment_raw'] = r.raw
             hash_ = hashlib.md5()
 
+            r = session.get(notice['attachment_url'], stream=True)
+            r.raw.decode_content = True
             for chunk in iter(lambda: r.raw.read(4096), b""):
                 hash_.update(chunk)
             notice['attachment_md5'] = hash_.hexdigest()
@@ -90,12 +91,23 @@ def handle_notices_diff(notices):
     print 'Different notices: ', different_notices
     if len(different_notices) > 0:
         for notice in different_notices:
+            sanitised_notice = sanitise_notice_for_database(notice)
             hooks.notices_updated([notice])
             notices_coll.insert_one(sanitised_notice)
 
 def sanitise_notice_for_database(notice):
-    sanitised_notice = deepcopy(notice)
-    del sanitised_notice['attachment_raw']
+    sanitised_notice = {}
+    sanitised_notice['subject'] = notice['subject']
+    sanitised_notice['company'] = notice['company']
+    sanitised_notice['text'] = notice['text']
+    sanitised_notice['time'] = notice['time']
+
+    if 'attachment_url' in notice:
+        sanitised_notice['attachment_url'] = notice['attachment_url']
+
+    if 'attachment_md5' in notice:
+        sanitised_notice['attachment_md5'] = notice['attachment_md5']
+
     return sanitised_notice
 
 @tnp_login
