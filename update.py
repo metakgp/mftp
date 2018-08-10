@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from os import environ as env
 import re
 import hashlib
+from copy import copy as shallow_copy
 
 import settings
 
@@ -63,12 +64,10 @@ def check_notices(session, sessionData):
             notice['attachment_url'] = ERP_ATTACHMENT_URL + m.group(1)
             r = session.get(notice['attachment_url'], stream=True)
             r.raw.decode_content = True
-            notice['attachment_raw'] = r.raw
             hash_ = hashlib.md5()
-
-            r = session.get(notice['attachment_url'], stream=True)
-            r.raw.decode_content = True
-            for chunk in iter(lambda: r.raw.read(4096), b""):
+            notice['attachment_raw'] = ""
+            for chunk in r.iter_content(4096):
+                notice['attachment_raw'] += chunk
                 hash_.update(chunk)
             notice['attachment_md5'] = hash_.hexdigest()
 
@@ -96,17 +95,10 @@ def handle_notices_diff(notices):
             notices_coll.insert_one(sanitised_notice)
 
 def sanitise_notice_for_database(notice):
-    sanitised_notice = {}
-    sanitised_notice['subject'] = notice['subject']
-    sanitised_notice['company'] = notice['company']
-    sanitised_notice['text'] = notice['text']
-    sanitised_notice['time'] = notice['time']
+    sanitised_notice = shallow_copy(notice)
 
-    if 'attachment_url' in notice:
-        sanitised_notice['attachment_url'] = notice['attachment_url']
-
-    if 'attachment_md5' in notice:
-        sanitised_notice['attachment_md5'] = notice['attachment_md5']
+    if 'attachment_raw' in sanitised_notice:
+        del sanitised_notice['attachment_raw']
 
     return sanitised_notice
 
