@@ -23,6 +23,14 @@ req_args = {
 }
 
 
+class WrongPasswordError(Exception):
+    """
+    Error which is raised when there no secret question is fetched due to wrong password or other reasons.
+
+    """
+    print("Failed to fetch secret question: please check that username and password are valid!")
+
+
 class SecretAnswerError(Exception):
     """
     Error which is raised when there is issue with user's secret answer settings
@@ -52,6 +60,10 @@ def erp_login(func):
         r = s.post(ERP_SECRET_QUESTION_URL, data={'user_id': env['ERP_USERNAME']},
                    **req_args)
         secret_question = r.text
+
+        if secret_question is None:
+            raise WrongPasswordError
+
         print "Secret question from the ERP: " + secret_question
         secret_answer = None
         secret_answer_index = None
