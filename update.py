@@ -98,8 +98,10 @@ def handle_notices_diff(notices):
 def sanitise_notice_for_database(notice):
     sanitised_notice = shallow_copy(notice)
 
-    if 'attachment_raw' in sanitised_notice:
+    try:
         del sanitised_notice['attachment_raw']
+    except KeyError:
+        pass
 
     return sanitised_notice
 
