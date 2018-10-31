@@ -41,12 +41,19 @@ def companies_updated(companies):
 
 def notices_updated(notices):
     for notice in notices:
+        if " : PLACEMENT" in notice['text']:
+            notice_type = "Placement"
+        elif " : INTERNSHIP" in notice['text']:
+            notice_type = "Internship"
+        else:
+            notice_type = "Notice"
         message = {
             'to': env['NOTICES_EMAIL_ADDRESS'],
             'from': 'no-reply@mftp.herokuapp.com',
             'fromname': 'MFTP',
-            'subject': 'Notice: %s - %s' % (notice['subject'],
-                                            notice['company']),
+            'subject': '%s: %s - %s' % (notice_type,
+                                        notice['subject'],
+                                        notice['company']),
             'html': '<i>(%s)</i>: <p>%s<p>' % (notice['time'], notice['text']),
         }
         files = []
