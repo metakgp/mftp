@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup as bs, CData
 from pymongo import MongoClient
 from os import environ as env
+from sys import setrecursionlimit
 import re
 import hashlib
 from copy import copy as shallow_copy
@@ -14,6 +15,11 @@ import hooks
 # we're fetching attachments. Instead, check enough notices that the
 # likelihood of missing an update is low.
 NUM_NOTICES_DIFFED = 50
+
+# The new format of ERP is poorly formatted and hence 10000 recursion limit
+# is required by BS4.
+# TODO(#28): Look for a better solution
+setrecursionlimit(10000)
 
 mc = MongoClient(env['MONGODB_URI'])
 
