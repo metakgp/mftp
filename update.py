@@ -18,7 +18,7 @@ NUM_NOTICES_DIFFED = 50
 
 # The new format of ERP is poorly formatted and hence 10000 recursion limit
 # is required by BS4.
-# TODO: Look for a better solution
+# TODO(#28): Look for a better solution
 setrecursionlimit(10000)
 
 mc = MongoClient(env['MONGODB_URI'])
