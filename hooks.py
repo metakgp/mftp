@@ -7,6 +7,7 @@ from erp import req_args
 
 if 'NOTICES_EMAIL_ADDRESS' not in env:
     env['NOTICES_EMAIL_ADDRESS'] = env['EMAIL_ADDRESS']
+METAKGP_BRANDING = "Brought To Your Inbox By <a href='https://www.github.com/metakgp'>Metakgp</a> With <3"
 
 
 def make_text(company):
@@ -47,8 +48,9 @@ def notices_updated(notices):
             'fromname': 'MFTP',
             'subject': 'Notice: %s - %s' % (notice['subject'],
                                             notice['company']),
-            'html': '<i>(%s)</i>: <p>%s<p>' % (notice['time'], notice['text']),
+            'html': '<i>(%s)</i>: <p>%s</p><p>%s</p>' % (notice['time'], notice['text'], METAKGP_BRANDING),
         }
+        print(message)
         files = []
         if 'attachment_url' in notice:
             filename = notice['attachment_url'].split('/')[-1]
