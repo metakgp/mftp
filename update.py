@@ -104,6 +104,7 @@ def sanitise_notice_for_database(notice):
 
     try:
         del sanitised_notice['attachment_raw']
+        del sanitised_notice['attachment_url']
     except KeyError:
         pass
 
