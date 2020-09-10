@@ -2,6 +2,8 @@
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
+NOTE: The `master` branch is auto-deployed to Heroku.
+
 Get emails when T&P stuff changes on IIT KGP's ERP.
 
 ## Setup
