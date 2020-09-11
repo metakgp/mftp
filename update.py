@@ -100,7 +100,7 @@ def handle_notices_diff(notices):
             db_notice = notices_coll.find_one(notice_cpy)
             if db_notice is None:
                 different_notices.append(notice)
-            else
+            else:
                 updated_notices.append(sanitised_notice)
 
     print 'Different notices: ', different_notices
