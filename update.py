@@ -63,7 +63,7 @@ def check_notices(session, sessionData):
         content_div = bs.find_all(content, 'div', {'id': 'printableArea'})[0]
         notice['text'] = content_div.decode_contents(formatter='html')
         notice['time'] = cds[6].string
-        notice['id'] = id_ + "_" + year
+        notice['uid'] = id_ + "_" + year
 
         a = bs(cds[7].string, 'html.parser').find_all('a')[0]
         if a.attrs['title'] == 'Download':
@@ -90,11 +90,11 @@ def handle_notices_diff(notices):
     print 'Checking ', len(notices), 'notices'
     for notice in notices:
         sanitised_notice = sanitise_notice_for_database(notice)
-        db_notice = notices_coll.find_one({'id' : sanitised_notice['id']})
+        db_notice = notices_coll.find_one({'uid' : sanitised_notice['uid']})
         if db_notice is None:
             notice_cpy = shallow_copy(sanitised_notice)
             try:
-                del notice_cpy['id']
+                del notice_cpy['uid']
             except KeyError:
                 pass
             db_notice = notices_coll.find_one(notice_cpy)
@@ -115,10 +115,10 @@ def handle_notices_diff(notices):
         for notice in updated_notices:
             notice_cpy = shallow_copy(notice)
             try:
-                del notice_cpy['id']
+                del notice_cpy['uid']
             except KeyError:
                 pass
-            notices_coll.find_one_and_update(notice_cpy, {'$set' : {'id': notice['id']} })
+            notices_coll.find_one_and_update(notice_cpy, {'$set' : {'uid': notice['uid']} })
 
 def sanitise_notice_for_database(notice):
     sanitised_notice = shallow_copy(notice)
