@@ -118,7 +118,7 @@ def handle_notices_diff(notices):
                 del notice_cpy['id']
             except KeyError:
                 pass
-            notices_coll.find_one_and_update(notice_cpy, {'id': notice['id']})
+            notices_coll.find_one_and_update(notice_cpy, {'$set' : {'id': notice['id']} })
 
 def sanitise_notice_for_database(notice):
     sanitised_notice = shallow_copy(notice)
