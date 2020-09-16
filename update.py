@@ -86,39 +86,26 @@ def handle_notices_diff(notices):
     notices_coll = mc.get_default_database().notices
 
     different_notices = []
-    updated_notices = []
     print 'Checking ', len(notices), 'notices'
     for notice in notices:
         sanitised_notice = sanitise_notice_for_database(notice)
-        db_notice = notices_coll.find_one({'uid' : sanitised_notice['uid']})
+        notice_cpy = shallow_copy(sanitised_notice)
+        try:
+            del notice_cpy['uid']
+        except KeyError:
+            pass
+
+        db_notice = notices_coll.find_one({'$or':[{'uid' : sanitised_notice['uid']}, notice_cpy]})
         if db_notice is None:
-            notice_cpy = shallow_copy(sanitised_notice)
-            try:
-                del notice_cpy['uid']
-            except KeyError:
-                pass
-            db_notice = notices_coll.find_one(notice_cpy)
-            if db_notice is None:
-                different_notices.append(notice)
-            else:
-                updated_notices.append(sanitised_notice)
+            different_notices.append(sanitised_notice)
+
 
     print 'Different notices: ', different_notices
     if len(different_notices) > 0:
         for notice in different_notices:
-            sanitised_notice = sanitise_notice_for_database(notice) # actually no need for this
+            sanitised_notice = sanitise_notice_for_database(notice)
             hooks.notices_updated([notice])
             notices_coll.insert_one(sanitised_notice)
-            
-    print 'Updated notices: ', updated_notices
-    if len(updated_notices) > 0:
-        for notice in updated_notices:
-            notice_cpy = shallow_copy(notice)
-            try:
-                del notice_cpy['uid']
-            except KeyError:
-                pass
-            notices_coll.find_one_and_update(notice_cpy, {'$set' : {'uid': notice['uid']} })
 
 def sanitise_notice_for_database(notice):
     sanitised_notice = shallow_copy(notice)
