@@ -76,6 +76,7 @@ def check_notices(session, sessionData):
                 notice['attachment_raw'] += chunk
                 hash_.update(chunk)
             notice['attachment_md5'] = hash_.hexdigest()
+            notice['uid'] += "_"+notice['attachment_md5']
 
         notices.append(notice)
 
@@ -97,10 +98,10 @@ def handle_notices_diff(notices):
 
         db_notice = notices_coll.find_one({'$or':[{'uid' : sanitised_notice['uid']}, notice_cpy]})
         if db_notice is None:
-            different_notices.append(sanitised_notice)
+            different_notices.append(notice)
 
 
-    print 'Different notices: ', different_notices
+    print 'Different notices: ', [sanitise_notice_for_database(notice) for notice in different_notices]
     if len(different_notices) > 0:
         for notice in different_notices:
             sanitised_notice = sanitise_notice_for_database(notice)
