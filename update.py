@@ -63,6 +63,7 @@ def check_notices(session, sessionData):
         content_div = bs.find_all(content, 'div', {'id': 'printableArea'})[0]
         notice['text'] = content_div.decode_contents(formatter='html')
         notice['time'] = cds[6].string
+        notice['uid'] = id_ + "_" + year
 
         a = bs(cds[7].string, 'html.parser').find_all('a')[0]
         if a.attrs['title'] == 'Download':
@@ -75,6 +76,7 @@ def check_notices(session, sessionData):
                 notice['attachment_raw'] += chunk
                 hash_.update(chunk)
             notice['attachment_md5'] = hash_.hexdigest()
+            notice['uid'] += "_"+notice['attachment_md5']
 
         notices.append(notice)
 
@@ -88,11 +90,18 @@ def handle_notices_diff(notices):
     print 'Checking ', len(notices), 'notices'
     for notice in notices:
         sanitised_notice = sanitise_notice_for_database(notice)
-        db_notice = notices_coll.find_one(sanitised_notice)
+        notice_cpy = shallow_copy(sanitised_notice)
+        try:
+            del notice_cpy['uid']
+        except KeyError:
+            pass
+
+        db_notice = notices_coll.find_one({'$or':[{'uid' : sanitised_notice['uid']}, notice_cpy]})
         if db_notice is None:
             different_notices.append(notice)
 
-    print 'Different notices: ', different_notices
+
+    print 'Different notices: ', [sanitise_notice_for_database(notice) for notice in different_notices]
     if len(different_notices) > 0:
         for notice in different_notices:
             sanitised_notice = sanitise_notice_for_database(notice)
