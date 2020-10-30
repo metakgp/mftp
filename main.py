@@ -8,6 +8,14 @@ import requests
 import datetime
 import traceback
 
+# Script for exporting database
+# As before using MONGODB_URI in env to act as original database
+# Add MONGODB_URI_ATLAS in env to act as target database
+import export_database
+export_database.export_db();
+# export_database.insert_from_file("defaulters.bson");
+
+
 requests.packages.urllib3.disable_warnings()
 
 ioloop = tornado.ioloop.IOLoop.current()
