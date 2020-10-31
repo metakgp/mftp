@@ -1,11 +1,9 @@
 from pymongo import MongoClient
 from pymongo import errors
-from dotenv import load_dotenv
-from os import environ as env
 import bson
 from bson.json_util import dumps, loads
-
-load_dotenv()
+from os import environ as env
+import sys
 
 def export_db():
     '''
@@ -88,7 +86,7 @@ def insert_from_file(filename, further_defaulter_filename = "further_defaulters.
     for notice in notices:
         out = insert_notice(notice, mc_new)
         if(out == 1):
-            further_defaulters.append(notice);
+            further_defaulters.append(notice)
         elif(out == 2):
             further_repeated.append(notice)
 
@@ -109,7 +107,13 @@ def start_database_export():
         Using OLD_MONGODB_URI in env to act as original database
         Add NEW_MONGODB_URI in env to act as target database
     '''
-    export_db();
-    # insert_from_file("defaulters.bson");
+    export_db()
+    # insert_from_file("defaulters.bson")
 
-start_database_export();
+
+if __name__ == "__main__":
+    old_mongodb_uri = raw_input("OLD URI: ")
+    new_mongodb_uri = raw_input("NEW URI: ")
+    env["OLD_MONGODB_URI"] = old_mongodb_uri
+    env["NEW_MONGODB_URI"] = new_mongodb_uri
+    start_database_export()
