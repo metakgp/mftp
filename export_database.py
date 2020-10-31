@@ -5,6 +5,9 @@ from bson.json_util import dumps, loads
 from os import environ as env
 import sys
 
+old_mongodb_uri = ""
+new_mongodb_uri = ""
+
 def export_db():
     '''
         Tries to Exports the whole Database (each and every notice)
@@ -14,11 +17,11 @@ def export_db():
         Can be run multiple times with no fear of multiple entries in case of any confusion
     '''
     print("connecting to old DB")
-    mc_old = MongoClient(env['OLD_MONGODB_URI'])
+    mc_old = MongoClient(old_mongodb_uri)
     print("collecting notices cursor from old database")
     notices_cursor = mc_old.get_default_database().notices.find()
     print("connecting to new DB")
-    mc_new = MongoClient(env['NEW_MONGODB_URI'])
+    mc_new = MongoClient(new_mongodb_uri)
     print("connected to new DB")
 
     defaulters = []
@@ -76,7 +79,7 @@ def insert_from_file(filename, further_defaulter_filename = "further_defaulters.
         If a notice fails to be inserted it is pushed to further_defaulters and finally saved in file with filename 'further_defaulter_filename'
         If a notice already exists in target database, it is pushed to 'further_repeated_filename'
     '''
-    mc_new = MongoClient(env['NEW_MONGODB_URI'])
+    mc_new = MongoClient(new_mongodb_uri)
     print("connected to new DB")
 
     notices = loads(open(filename, "r").read())
@@ -114,6 +117,4 @@ def start_database_export():
 if __name__ == "__main__":
     old_mongodb_uri = raw_input("OLD URI: ")
     new_mongodb_uri = raw_input("NEW URI: ")
-    env["OLD_MONGODB_URI"] = old_mongodb_uri
-    env["NEW_MONGODB_URI"] = new_mongodb_uri
     start_database_export()
