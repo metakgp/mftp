@@ -7,8 +7,6 @@ from tornado import gen
 import requests
 import datetime
 import traceback
-import sys
-import export_database
 
 requests.packages.urllib3.disable_warnings()
 
