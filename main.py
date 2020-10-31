@@ -10,16 +10,6 @@ import traceback
 import sys
 import export_database
 
-def start_database_export():
-    '''
-        Script for exporting database
-        Using OLD_MONGODB_URI in env to act as original database
-        Add NEW_MONGODB_URI in env to act as target database
-    '''
-    export_database.export_db();
-    # export_database.insert_from_file("defaulters.bson");
-    sys.exit(0)
-
 requests.packages.urllib3.disable_warnings()
 
 ioloop = tornado.ioloop.IOLoop.current()
@@ -57,9 +47,6 @@ class PingHandler(tornado.web.RequestHandler):
         return
 
 if __name__ == '__main__':
-
-    start_database_export();
-
     app = tornado.web.Application([
         (r'/', PingHandler)
     ])

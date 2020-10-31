@@ -1,8 +1,11 @@
 from pymongo import MongoClient
 from pymongo import errors
+from dotenv import load_dotenv
 from os import environ as env
 import bson
 from bson.json_util import dumps, loads
+
+load_dotenv()
 
 def export_db():
     '''
@@ -99,3 +102,14 @@ def insert_from_file(filename, further_defaulter_filename = "further_defaulters.
     open(further_repeated_filename, "w").write(dumps(further_repeated))
 
     print("Attempt to insert from file: {} complete".format(filename))
+
+def start_database_export():
+    '''
+        Script for exporting database
+        Using OLD_MONGODB_URI in env to act as original database
+        Add NEW_MONGODB_URI in env to act as target database
+    '''
+    export_db();
+    # insert_from_file("defaulters.bson");
+
+start_database_export();
