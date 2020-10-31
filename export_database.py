@@ -12,19 +12,19 @@ def export_db():
 
         Can be run multiple times with no fear of multiple entries in case of any confusion
     '''
-    print("connecting to mlab DB")
-    mc_mlab = MongoClient(env['MONGODB_URI'])
-    print("collecting notices cursor from MLab")
-    notices_cursor = mc_mlab.get_default_database().notices.find()
-    print("connecting to atlas DB")
-    mc_atlas = MongoClient(env['MONGODB_URI_ATLAS'])
-    print("connected to atlas DB")
+    print("connecting to old DB")
+    mc_old = MongoClient(env['OLD_MONGODB_URI'])
+    print("collecting notices cursor from old database")
+    notices_cursor = mc_old.get_default_database().notices.find()
+    print("connecting to new DB")
+    mc_new = MongoClient(env['NEW_MONGODB_URI'])
+    print("connected to new DB")
 
     defaulters = []
     repeated_notices = []
     for notice in notices_cursor:
         try:
-            mc_atlas.get_default_database().notices.insert(notice)
+            mc_new.get_default_database().notices.insert(notice)
             print("inserted notice: ", notice)
         except errors.DuplicateKeyError:
             print("entry already in database")
@@ -35,19 +35,19 @@ def export_db():
 
     if(len(defaulters)):
         print("Defaulters Present!!!")
+    else:
+        print("Yohoo!! No Defaulters")
 
-    print(repeated_notices)
-    print(type(repeated_notices[0]['_id']), (repeated_notices[0]['_id']))
 
     print("Saving defaulters and repeated notices...")
     open("defaulters.bson", "w").write(dumps(defaulters))
     open("repeated_notices.bson","w").write(dumps(repeated_notices))
 
     print("Export Complete!")
-    mc_mlab.close()
-    mc_atlas.close()
+    mc_old.close()
+    mc_new.close()
 
-def insert_notice(notice, mc_atlas):
+def insert_notice(notice, mc_new):
     '''
         Tries to insert a notice in default database of MongoClient passed as second argument
         Returns 0 if insert successful
@@ -55,7 +55,7 @@ def insert_notice(notice, mc_atlas):
         Returns 1 if some other error occurs
     '''
     try:
-        mc_atlas.get_default_database().notices.insert(notice)
+        mc_new.get_default_database().notices.insert(notice)
         print("inserted specific notice: ", notice)
         return 0
     except errors.DuplicateKeyError:
@@ -75,15 +75,15 @@ def insert_from_file(filename, further_defaulter_filename = "further_defaulters.
         If a notice fails to be inserted it is pushed to further_defaulters and finally saved in file with filename 'further_defaulter_filename'
         If a notice already exists in target database, it is pushed to 'further_repeated_filename'
     '''
-    mc_atlas = MongoClient(env['MONGODB_URI_ATLAS'])
-    print("connected to atlas DB")
+    mc_new = MongoClient(env['NEW_MONGODB_URI'])
+    print("connected to new DB")
 
     notices = loads(open(filename, "r").read())
     print("Notice count: {}".format(len(notices)))
     further_defaulters = []
     further_repeated = []
     for notice in notices:
-        out = insert_notice(notice, mc_atlas)
+        out = insert_notice(notice, mc_new)
         if(out == 1):
             further_defaulters.append(notice);
         elif(out == 2):
