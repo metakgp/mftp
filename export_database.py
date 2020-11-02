@@ -125,7 +125,6 @@ def start_database_export():
         Add NEW_MONGODB_URI in env to act as target database
     '''
     export_db()
-    # insert_from_file("defaulters.bson")
 
 
 if __name__ == "__main__":
@@ -148,5 +147,3 @@ if __name__ == "__main__":
         print("Source DB: {}".format(old_mongodb_uri))
         print("Target DB: {}".format(new_mongodb_uri))
         start_database_export()
-    # old_mongodb_uri = raw_input("OLD URI: ")
-    # new_mongodb_uri = raw_input("NEW URI: ")
