@@ -47,10 +47,8 @@ def export_db():
     print("Saving defaulters and repeated notices...")
     with open("defaulters.bson", "w") as f:
         f.write(dumps(defaulters))
-        f.close()
     with open("repeated_notices.bson","w") as f:
         f.write(dumps(repeated_notices))
-        f.close()
 
     print("Export Complete!")
     mc_old.close()
@@ -101,7 +99,6 @@ def insert_from_file(filename):
                 further_defaulters.append(notice)
             elif(out == 2):
                 further_repeated.append(notice)
-        f.close()
 
     print("Further defaulters count: {}".format(len(further_defaulters)))
     print("Further repeated count: {}".format(len(further_repeated)))
@@ -109,12 +106,10 @@ def insert_from_file(filename):
     print("Saving further defaulters to {}".format(further_defaulter_filename))
     with open(further_defaulter_filename, "w") as f:
         f.write(dumps(further_defaulters))
-        f.close()
 
     print("Saving further repeated to {}".format(further_repeated_filename))
     with open(further_repeated_filename, "w") as f:
         f.write(dumps(further_repeated))
-        f.close()
 
     print("Attempt to insert from file: {} complete".format(filename))
 
@@ -129,14 +124,12 @@ def start_database_export():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Database Export Script")
-    parser.add_argument('--source', '-s', dest="old_mongodb_uri", help="URI for source database", required=True)
     parser.add_argument('--target', '-t', dest="new_mongodb_uri", help="URI for target database", required=True)
-    parser.add_argument('--try-defaulters', '-d', dest="defaulter_filename", help="bson file with defaulters dump to upload")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--source', '-s', dest="old_mongodb_uri", help="URI for source database")
+    group.add_argument('--try-defaulters', '-d', dest="defaulter_filename", help="bson file with defaulters dump to upload")
 
     args = parser.parse_args()
-    if(not args.old_mongodb_uri or not args.new_mongodb_uri):
-        print("Please ensure source and target URIs")
-        sys.exit()
 
     old_mongodb_uri = args.old_mongodb_uri
     new_mongodb_uri = args.new_mongodb_uri
