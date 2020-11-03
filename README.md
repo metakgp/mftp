@@ -71,7 +71,7 @@ Note : app.json does not contain `DEBUG` variable as it explicitly configures sc
 
 ## Migration
 
-export_database.py contains script to migrate the default database
+export_database.py contains script to migrate the default database from one instance of MongoDB to another.
 
 ### Usage
 
@@ -101,7 +101,7 @@ Examples:
 
     `python export_database.py --source "<Source DB URI>" --target "<Target DB URI>" --try-defaulters defaulters.bson`
 
-`provide URIs enclosed inside quotes to avoid any unnecessary parsing errors`
+**NOTE: Please provide URIs enclosed inside quotes to avoid any unnecessary parsing errors**
 
 ## WTF
 
