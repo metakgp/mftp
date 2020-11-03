@@ -67,11 +67,13 @@ Note : app.json does not contain `DEBUG` variable as it explicitly configures sc
 
 `python main.py`
 
-
-
 ## WTF
 
 mftp monitors your ERP account for changes to the notices and the companies list, and sends you an email if there are any new or modified entries. Your credentials are stored as Heroku config variables, and you run your own Heroku instance.
+
+## Errors
+
+The folder `error_diagnosis` contains information about failures and downtimes we have noticed in the past, their cause, and the solutions employed.
 
 ## License
 
