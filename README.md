@@ -73,7 +73,7 @@ mftp monitors your ERP account for changes to the notices and the companies list
 
 ## Errors
 
-The folder `error_diagnosis` contains information about failures and downtimes we have noticed in the past, their cause, and the solutions employed.
+The folder `incident-postmortems` contains information about failures and downtimes we have noticed in the past, their cause, and the solutions employed. More information is provided in the `README.md` inside the folder.
 
 ## License
 
