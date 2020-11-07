@@ -135,6 +135,8 @@ if __name__ == "__main__":
     new_mongodb_uri = args.new_mongodb_uri
 
     if(args.defaulter_filename):
+        print("Defaulter File: {}".format(args.defaulter_filename))
+        print("Target DB: {}".format(new_mongodb_uri))
         insert_from_file(args.defaulter_filename)
     else:
         print("Source DB: {}".format(old_mongodb_uri))
