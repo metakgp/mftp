@@ -17,11 +17,6 @@ UPDATE_PERIOD = 2 * 60 * 1000
 @gen.coroutine
 def run_updates():
     def func():
-        # try:
-        #     print 'Checking companies...'
-        #     update.check_companies()
-        # except Exception as e:
-        #     print e
         try:
             print 'Checking notices...'
             update.check_notices()
