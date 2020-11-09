@@ -16,30 +16,6 @@ def make_text(company):
     return text
 
 
-def companies_updated(companies):
-    message = {
-        'to': env['EMAIL_ADDRESS'],
-        'from': 'no-reply@mftp.herokuapp.com',
-        'fromname': 'MFTP',
-        'subject': 'Companies updated: ' + ', '.join(
-            [c['name'] for c in companies]),
-        'text': '\n'.join([make_text(c) for c in companies]),
-    }
-    r = requests.post(
-        'https://api.mailgun.net/v3/%s/messages' % env['MAILGUN_DOMAIN'],
-        auth=('api', env['MAILGUN_API_KEY']),
-        data={
-            'from': 'MFTP <no-reply@%s>' % env['MAILGUN_DOMAIN'],
-            'to': [env['EMAIL_ADDRESS']],
-            'subject': message['subject'],
-            'html': message['html']
-        })
-
-    # r = requests.post('https://api.sendgrid.com/api/mail.send.json',
-    #                  data=message)
-    print r.text
-
-
 def notices_updated(notices):
     for notice in notices:
         message = {

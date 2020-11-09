@@ -16,7 +16,6 @@ The following is a list of all the config variables that are required for MFTP
 to work:
 
 ```sh
-EMAIL_ADDRESS
 ERP_A1
 ERP_A2
 ERP_A3
