@@ -2,6 +2,8 @@
 
 export_database.py contains script to migrate the default database from one instance of MongoDB to another.
 
+NOTE: Requires Python 2.7
+
 ## Usage
 
 If you want to migrate source DB to target DB, required arguments:

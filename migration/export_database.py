@@ -44,11 +44,14 @@ def export_db():
         print("\nYohoo!! No Defaulters")
 
 
-    print("Saving defaulters and repeated notices...")
-    with open("defaulters.bson", "w") as f:
-        f.write(dumps(defaulters))
-    with open("repeated_notices.bson","w") as f:
-        f.write(dumps(repeated_notices))
+    if (defaulters):
+        print("Saving defaulters...")
+        with open("defaulters.bson", "w") as f:
+            f.write(dumps(defaulters))
+    if (repeated_notices):
+        print("Saving repeaters...")
+        with open("repeated_notices.bson","w") as f:
+            f.write(dumps(repeated_notices))
 
     print("Export Complete!")
     mc_old.close()
