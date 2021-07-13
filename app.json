@@ -26,9 +26,6 @@
         },
         "ERP_A3": {
             "description": "Answer to ERP secret question number 3. It doesn't matter which order you set these in as long as the the answer to Question X is in Answer X."
-        },
-        "EMAIL_ADDRESS": {
-            "description": "The email address where you would like to receive updates."
         }
     },
     "addons": [
