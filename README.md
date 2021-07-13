@@ -38,8 +38,15 @@ NOTICES_EMAIL_ADDRESS
 Among these, the variables prefixed by `MAILGUN` will be added by Heroku when
 you run the command `heroku addons:create mailgun:starter`.
 
-The `MONGODB_URI` env variable will be set by `heroku addons:create
-mongolab:sandbox`.
+Set `NOTICES_EMAIL_ADDRESS` variable to the email you want to send notice updates to.
+
+Set `MONGODB_URI` variable to the uri of mongoDB instance you want to use.
+We use [MongoDB Atlas](https://www.mongodb.com/cloud/atlas "Atlas") for storage.
+You can get your own URI [here](https://docs.atlas.mongodb.com/getting-started/)
+
+We suggest using a log manager addon like 
+[Papertrail](https://elements.heroku.com/addons/papertrail) 
+since the application generates lots of logs.
 
 You need to add the other variables. You can add either by using the command
 `heroku config:set KEY=VALUE` from the command line, or you can use the Heroku
