@@ -1,10 +1,10 @@
-from pymongo import MongoClient
-from pymongo import errors
-import bson
-from bson.json_util import dumps, loads
-from os import environ as env
-import sys
+#import sys
 import argparse
+#import bson
+from pymongo import errors
+#from os import environ as env
+from pymongo import MongoClient
+from bson.json_util import dumps, loads 
 
 old_mongodb_uri = ""
 new_mongodb_uri = ""
@@ -29,7 +29,7 @@ def export_db():
     repeated_notices = []
     for notice in notices_cursor:
         try:
-            mc_new.get_default_database().notices.insert(notice)
+            mc_new.get_default_database().notices.insert_one(notice)
             print("inserted notice: ", notice)
         except errors.DuplicateKeyError:
             print("entry already in database")
@@ -65,7 +65,7 @@ def insert_notice(notice, mc_new):
         Returns 1 if some other error occurs
     '''
     try:
-        mc_new.get_default_database().notices.insert(notice)
+        mc_new.get_default_database().notices.insert_one(notice)
         print("inserted specific notice: ", notice)
         return 0
     except errors.DuplicateKeyError:

@@ -1,9 +1,7 @@
-from os import environ as env
 import requests
-
 import settings
-
 from erp import req_args
+from os import environ as env
 
 if 'NOTICES_EMAIL_ADDRESS' not in env:
     env['NOTICES_EMAIL_ADDRESS'] = env['EMAIL_ADDRESS']
@@ -43,4 +41,4 @@ def notices_updated(notices):
 
         # r = requests.post('https://api.sendgrid.com/api/mail.send.json',
         # data=message)
-        print 'Sent notice to', message['to'], ':', message['subject'], r.text
+        print('Sent notice to', message['to'], ':', message['subject'], r.text) 
