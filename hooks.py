@@ -39,6 +39,4 @@ def notices_updated(notices):
                 'html': message['html'].encode("utf-8")
             }, files=files, verify=False)
 
-        # r = requests.post('https://api.sendgrid.com/api/mail.send.json',
-        # data=message)
         print('Sent notice to', message['to'], ':', message['subject'], r.text)

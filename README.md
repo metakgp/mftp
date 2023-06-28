@@ -61,7 +61,7 @@ web interface, under the **Settings** tab.
 2. Add values of all the variables in the newly created .env file accordingly. (Descriptions of all the varibales can be found in app.json).
 Note : app.json does not contain `DEBUG` variable as it explicitly configures scripts to run in local environment friendly way.
 
-3. Install all the python modules from the requirements file. **Note : The program runs on Python 2**
+3. Install all the python modules from the requirements file. **Note : The program runs on Python 3**
 
 `pip install -r requirements.txt`
 

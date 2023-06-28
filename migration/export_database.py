@@ -1,9 +1,7 @@
 from pymongo import MongoClient
 from pymongo import errors
-import bson
 from bson.json_util import dumps, loads
 from os import environ as env
-import sys
 import argparse
 
 old_mongodb_uri = ""
@@ -29,7 +27,7 @@ def export_db():
     repeated_notices = []
     for notice in notices_cursor:
         try:
-            mc_new.get_default_database().notices.insert(notice)
+            mc_new.get_default_database().notices.insert_one(notice)
             print(("inserted notice: ", notice))
         except errors.DuplicateKeyError:
             print("entry already in database")
@@ -65,7 +63,7 @@ def insert_notice(notice, mc_new):
         Returns 1 if some other error occurs
     '''
     try:
-        mc_new.get_default_database().notices.insert(notice)
+        mc_new.get_default_database().notices.insert_one(notice)
         print(("inserted specific notice: ", notice))
         return 0
     except errors.DuplicateKeyError:
@@ -116,14 +114,6 @@ def insert_from_file(filename):
 
     print(("Attempt to insert from file: {} complete".format(filename)))
 
-def start_database_export():
-    '''
-        Script for exporting database
-        Using OLD_MONGODB_URI in env to act as original database
-        Add NEW_MONGODB_URI in env to act as target database
-    '''
-    export_db()
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Database Export Script")
@@ -144,4 +134,4 @@ if __name__ == "__main__":
     else:
         print(("Source DB: {}".format(old_mongodb_uri)))
         print(("Target DB: {}".format(new_mongodb_uri)))
-        start_database_export()
+        export_db()
