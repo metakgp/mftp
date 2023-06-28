@@ -28,7 +28,9 @@ class WrongPasswordError(Exception):
     Error which is raised when there no secret question is fetched due to wrong password or other reasons.
 
     """
-    print("Failed to fetch secret question: please check that username and password are valid!")
+    def __init__(self):
+        print("Failed to fetch secret question: please check that username and password are valid!")
+        super().__init__()
 
 
 class SecretAnswerError(Exception):
@@ -36,21 +38,23 @@ class SecretAnswerError(Exception):
     Error which is raised when there is issue with user's secret answer settings
 
     """
-    print("Please check your secret answer settings!")
+    def __init__(self):
+        print("Please check your secret answer settings!")
+        super().__init__()
 
 
 def erp_login(func):
 
     def wrapped_func(*args, **kwargs):
 
-        print "Started erp_login!"
+        print("Started erp_login!")
 
         s = requests.Session()
 
         r = s.get(ERP_HOMEPAGE_URL, **req_args)
         soup = bs(r.text, 'html.parser')
 
-        print "Length of the fetched HTML: " + str(len(str(r.text)))
+        print("Length of the fetched HTML: " + str(len(str(r.text))))
         # print str(r.text)
         if soup.find(id='sessionToken'):
             sessionToken = soup.find(id='sessionToken').attrs['value']
@@ -62,20 +66,20 @@ def erp_login(func):
         secret_question = r.text
 
         if secret_question is None:
-            raise WrongPasswordError
+            raise WrongPasswordError()
 
-        print "Secret question from the ERP: " + secret_question
+        print("Secret question from the ERP: " + secret_question)
         secret_answer = None
         secret_answer_index = None
-        for i in xrange(1, 4):
-            print env['ERP_Q%d' % i]
+        for i in range(1, 4):
+            print(env['ERP_Q%d' % i])
             if env['ERP_Q%d' % i] == secret_question:
                 secret_answer = env['ERP_A%d' % i]
                 secret_answer_index = i
                 break
 
         if secret_answer is None:
-            print 'No secret question matched:', secret_question
+            print('No secret question matched:', secret_question)
             sys.exit(1)
 
         login_details = {
@@ -90,17 +94,17 @@ def erp_login(func):
                    **req_args)
 
         if len(r.history) < 2:
-            print("{answer} (ERP_A{index}) is wrong for {question}".format(
+            print(("{answer} (ERP_A{index}) is wrong for {question}".format(
                 answer=secret_answer,
                 index=secret_answer_index,
                 question=secret_question
-            ))
-            raise SecretAnswerError
+            )))
+            raise SecretAnswerError()
 
         ssoToken = re.search(r'\?ssoToken=(.+)$',
                              r.history[1].headers['Location']).group(1)
 
-        print "ERP Login completed!"
+        print("ERP Login completed!")
         r = s.get("https://erp.iitkgp.ac.in/IIT_ERP3/?%s" % ssoToken, **req_args)
 
         func(session=s, sessionData={'ssoToken': ssoToken,
@@ -119,7 +123,7 @@ def tnp_login(func):
         session.post(ERP_TPSTUDENT_URL,  # headers=headers,
                      data=dict(ssoToken=ssoToken, menu_id=11, module_id=26),
                      **req_args)
-        print "TNP Login completed!"
+        print("TNP Login completed!")
         func(session=session, sessionData=sessionData, *args, **kwargs)
 
     return wrapped_func

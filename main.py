@@ -18,18 +18,18 @@ UPDATE_PERIOD = 2 * 60 * 1000
 def run_updates():
     def func():
         try:
-            print 'Checking notices...'
+            print('Checking notices...')
             update.check_notices()
         except:
-            print "Unhandled error occured :\n{}".format(traceback.format_exc())
+            print("Unhandled error occured :\n{}".format(traceback.format_exc()))
 
     try:
         with ThreadPoolExecutor(max_workers=1) as executor:
             yield gen.with_timeout(datetime.timedelta(UPDATE_PERIOD/1000.0),
                                    executor.submit(func))
-        print 'run_updates done'
+        print('run_updates done')
     except gen.TimeoutError:
-        print 'run_updates timed out'
+        print('run_updates timed out')
 
 
 class PingHandler(tornado.web.RequestHandler):
@@ -43,7 +43,8 @@ if __name__ == '__main__':
     app = tornado.web.Application([
         (r'/', PingHandler)
     ])
-    app.listen(os.environ['PORT'])
+    app.listen(int(os.environ.get('PORT', '8080')))
+    # app.listen(os.environ['PORT'])
     run_updates()
     tornado.ioloop.PeriodicCallback(run_updates,
                                     UPDATE_PERIOD).start()
