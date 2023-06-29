@@ -36,18 +36,18 @@ def check_notices(session, sessionData):
     r = session.get(ERP_NOTICEBOARD_URL, **req_args)
     r = session.get(ERP_NOTICES_URL, **req_args)
 
-    print "ERP and TNP login completed!"
+    print("ERP and TNP login completed!")
 
     notices_list = bs(r.text, 'html.parser')
 
-    print "Total number of notices fetched: %d" % len(notices_list.find_all('row'))
+    print("Total number of notices fetched: %d" % len(notices_list.find_all('row')))
 
     notices = []
     # Only check the first 50 notices
     for row in notices_list.find_all('row')[:NUM_NOTICES_DIFFED]:
         notice = {}
 
-        cds = filter(lambda x: isinstance(x, CData), row.find_all(text=True))
+        cds = [x for x in row.find_all(text=True) if isinstance(x, CData)]
 
         notice['subject'] = cds[2].string
         notice['company'] = cds[3].string
@@ -87,7 +87,7 @@ def handle_notices_diff(notices):
     notices_coll = mc.get_default_database().notices
 
     different_notices = []
-    print 'Checking ', len(notices), 'notices'
+    print('Checking ', len(notices), 'notices')
     for notice in notices:
         sanitised_notice = sanitise_notice_for_database(notice)
         notice_cpy = shallow_copy(sanitised_notice)
@@ -101,7 +101,7 @@ def handle_notices_diff(notices):
             different_notices.append(notice)
 
 
-    print 'Different notices: ', [sanitise_notice_for_database(notice) for notice in different_notices]
+    print('Different notices: ', [sanitise_notice_for_database(notice) for notice in different_notices])
     if len(different_notices) > 0:
         for notice in different_notices:
             sanitised_notice = sanitise_notice_for_database(notice)
