@@ -55,7 +55,6 @@ def erp_login(func):
         soup = bs(r.text, 'html.parser')
 
         print("Length of the fetched HTML: " + str(len(str(r.text))))
-        # print str(r.text)
         if soup.find(id='sessionToken'):
             sessionToken = soup.find(id='sessionToken').attrs['value']
         else:
@@ -94,11 +93,11 @@ def erp_login(func):
                    **req_args)
 
         if len(r.history) < 2:
-            print(("{answer} (ERP_A{index}) is wrong for {question}".format(
+            print("{answer} (ERP_A{index}) is wrong for {question}".format(
                 answer=secret_answer,
                 index=secret_answer_index,
                 question=secret_question
-            )))
+            ))
             raise SecretAnswerError()
 
         ssoToken = re.search(r'\?ssoToken=(.+)$',

@@ -28,12 +28,12 @@ def export_db():
     for notice in notices_cursor:
         try:
             mc_new.get_default_database().notices.insert_one(notice)
-            print(("inserted notice: ", notice))
+            print("inserted notice: ", notice)
         except errors.DuplicateKeyError:
             print("entry already in database")
             repeated_notices.append(notice)
         except Exception as ex:
-            print(("error in inserting: ", ex))
+            print("error in inserting: ", ex)
             defaulters.append(notice)
 
     if(len(defaulters)):
@@ -64,7 +64,7 @@ def insert_notice(notice, mc_new):
     '''
     try:
         mc_new.get_default_database().notices.insert_one(notice)
-        print(("inserted specific notice: ", notice))
+        print("inserted specific notice: ", notice)
         return 0
     except errors.DuplicateKeyError:
         print("specific entry already in database")
@@ -73,7 +73,7 @@ def insert_notice(notice, mc_new):
         print("Error while connecting to DB")
         return 1
     except Exception as ex:
-        print(("error in specific inserting: ", ex))
+        print("error in specific inserting: ", ex)
         return 1
 
 def insert_from_file(filename):
@@ -93,7 +93,7 @@ def insert_from_file(filename):
     further_repeated = []
     with open(filename, "r") as f:
         notices = loads(f.read())
-        print(("Notice count: {}".format(len(notices))))
+        print("Notice count: {}".format(len(notices)))
         for notice in notices:
             out = insert_notice(notice, mc_new)
             if(out == 1):
@@ -101,18 +101,18 @@ def insert_from_file(filename):
             elif(out == 2):
                 further_repeated.append(notice)
 
-    print(("Further defaulters count: {}".format(len(further_defaulters))))
-    print(("Further repeated count: {}".format(len(further_repeated))))
+    print("Further defaulters count: {}".format(len(further_defaulters)))
+    print("Further repeated count: {}".format(len(further_repeated)))
 
-    print(("Saving further defaulters to {}".format(further_defaulter_filename)))
+    print("Saving further defaulters to {}".format(further_defaulter_filename))
     with open(further_defaulter_filename, "w") as f:
         f.write(dumps(further_defaulters))
 
-    print(("Saving further repeated to {}".format(further_repeated_filename)))
+    print("Saving further repeated to {}".format(further_repeated_filename))
     with open(further_repeated_filename, "w") as f:
         f.write(dumps(further_repeated))
 
-    print(("Attempt to insert from file: {} complete".format(filename)))
+    print("Attempt to insert from file: {} complete".format(filename))
 
 
 if __name__ == "__main__":
@@ -128,10 +128,10 @@ if __name__ == "__main__":
     new_mongodb_uri = args.new_mongodb_uri
 
     if(args.defaulter_filename):
-        print(("Defaulter File: {}".format(args.defaulter_filename)))
-        print(("Target DB: {}".format(new_mongodb_uri)))
+        print("Defaulter File: {}".format(args.defaulter_filename))
+        print("Target DB: {}".format(new_mongodb_uri))
         insert_from_file(args.defaulter_filename)
     else:
-        print(("Source DB: {}".format(old_mongodb_uri)))
-        print(("Target DB: {}".format(new_mongodb_uri)))
+        print("Source DB: {}".format(old_mongodb_uri))
+        print("Target DB: {}".format(new_mongodb_uri))
         export_db()
