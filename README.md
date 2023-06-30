@@ -44,8 +44,8 @@ Set `MONGODB_URI` variable to the uri of mongoDB instance you want to use.
 We use [MongoDB Atlas](https://www.mongodb.com/cloud/atlas "Atlas") for storage.
 You can get your own mongoDB URI [here](https://docs.atlas.mongodb.com/getting-started/).
 
-We suggest using a log manager addon like 
-[Papertrail](https://elements.heroku.com/addons/papertrail) 
+We suggest using a log manager addon like
+[Papertrail](https://elements.heroku.com/addons/papertrail)
 since the application generates lots of logs.
 
 You need to add the other variables. You can add either by using the command
@@ -67,11 +67,11 @@ Note : app.json does not contain `DEBUG` variable as it explicitly configures sc
 
 4. Run settings.py to load variables from .env file to the local environment.
 
-`python settings.py`
+`python src/settings.py`
 
 5. Now run the main tornado server.
 
-`python main.py`
+`python src/main.py`
 
 
 ## Migration
