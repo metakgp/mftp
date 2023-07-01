@@ -28,3 +28,6 @@ COPY src/ .
 
 # Run the app
 CMD ["python", "main.py"]
+
+# Expose the default 8080 port
+EXPOSE 8080
