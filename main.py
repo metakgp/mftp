@@ -18,20 +18,25 @@ else:
     _, ssoToken = erp.get_tokens_from_file('.session')
     
 try:
-    notices = notice.fetch(headers, session, ssoToken)
-    print ('>> [FETCHED NOTICES]')
+    notices, session, year = notice.fetch(headers, session, ssoToken)
+    print ('>> [NOTICES FETCHED]')
 except Exception as e:
     raise e
     
+try:
+    notice.save(notices)
+    print ('>> [SAVED NEW NOTICES]')
+except Exception as e:
+    raise e
 
 try:
-    mails = mail.format(notices)
-    print ('>> [FORMATTED MAIL]')
+    mails = mail.format(notices, session, year)
+    print ('>> [MAILS FORMATTED]')
 except Exception as e:
     raise e
 
 try:
     mail.send(mails)
-    print ('>> [SENT MAILS]')
+    print ('>> [MAILS SENT]')
 except Exception as e:
     raise e
