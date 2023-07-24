@@ -1,2 +1,10 @@
+# Garbage
 .DS_Store
-.vscode
+.vscode/
+__pycache__/
+
+# secrets
+.session
+env.py
+credentials.json
+token.json
