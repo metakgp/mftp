@@ -1,0 +1,2 @@
+pymongo==3.11
+iitkgp_erp_login==2.1.3

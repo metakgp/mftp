@@ -13,3 +13,4 @@ FROM_EMAIL_PASS = "**********"
 
 # OTHER PARAMETERS
 TO_EMAIL = "xyz@googlegroup.com"
+MONGODB_URI = "%****%******%"
