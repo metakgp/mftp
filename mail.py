@@ -18,7 +18,7 @@ def format(notices, session, year):
         body = parseBody(session, year, notice['Index'])
         message.attach(MIMEText(body, "html"))
         
-        if notice['Attachment']:
+        if notice.get('Attachment', False):
             file = MIMEBase('application', 'octet-stream')
             attachment = parseAttachment(session, year, notice['Index'])
             file.set_payload(attachment)
