@@ -23,11 +23,11 @@ try:
 except Exception as e:
     raise e
     
-try:
-    notice.save(notices)
-    print ('>> [SAVED NEW NOTICES]')
-except Exception as e:
-    raise e
+# try:
+#     notice.save(notices)
+#     print ('>> [SAVED NEW NOTICES]')
+# except Exception as e:
+#     raise e
 
 try:
     mails = mail.format(notices, session, year)
