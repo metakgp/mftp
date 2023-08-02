@@ -18,7 +18,7 @@ else:
     _, ssoToken = erp.get_tokens_from_file('.session')
     
 try:
-    notices, session, year = notice.fetch(headers, session, ssoToken)
+    notices, session = notice.fetch(headers, session, ssoToken)
     print ('>> [NOTICES FETCHED]')
 except Exception as e:
     raise e
@@ -30,7 +30,7 @@ except Exception as e:
 #     raise e
 
 try:
-    mails = mail.format(notices, session, year)
+    mails = mail.format(notices, session)
     print ('>> [MAILS FORMATTED]')
 except Exception as e:
     raise e

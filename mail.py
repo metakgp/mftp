@@ -7,7 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from env import FROM_EMAIL, FROM_EMAIL_PASS, TO_EMAIL
 from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
 
-def format(notices, session, year): 
+def format(notices, session): 
     mails = []
     for notice in notices:
         message = MIMEMultipart()
@@ -15,12 +15,17 @@ def format(notices, session, year):
         message["From"] = FROM_EMAIL
         message["To"] = TO_EMAIL
 
-        body = parseBody(session, year, notice['Index'])
+        uid = notice['UID'].split('_')
+        id_ = uid[0]
+        year = uid[1]
+        attachment = uid[2]
+        
+        body = parseBody(session, year, id_)
         message.attach(MIMEText(body, "html"))
         
-        if notice.get('Attachment', False):
+        if attachment:
             file = MIMEBase('application', 'octet-stream')
-            attachment = parseAttachment(session, year, notice['Index'])
+            attachment = parseAttachment(session, year, id_)
             file.set_payload(attachment)
             encoders.encode_base64(file)
             file.add_header('Content-Disposition', 'attachment', filename='Attachment.pdf')
@@ -36,7 +41,7 @@ def send(mails):
     # with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
     #     server.login(FROM_EMAIL, FROM_EMAIL_PASS.encode("utf-8"))
     with smtplib.SMTP("localhost", 1025) as server:
-        for mail in mails: 
+        for mail in reversed(mails): 
             server.sendmail(mail["From"], mail["To"], mail.as_string())
             
             
