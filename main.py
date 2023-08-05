@@ -2,6 +2,7 @@ import env
 import mail
 import notice
 import requests
+import shortlist
 import iitkgp_erp_login.erp as erp
 
 headers = {
@@ -30,11 +31,20 @@ except Exception as e:
 #     raise e
 
 try:
-    mails = mail.format(notices, session)
-    print ('>> [MAILS FORMATTED]')
+    mails = mail.format_notice(notices, session)
+    print ('>> [NOTICES FORMATTED]')
 except Exception as e:
     raise e
 
+try:
+    companies = shortlist.check(mails)
+    print ('>> [SHORTLISTS CHECKED]')
+    if companies:
+        mails = mail.format_shortlist(companies, mails)
+        print ('>> [SHORTLISTS FORMATTED]')
+except Exception as e:
+    raise e
+    
 try:
     mail.send(mails)
     print ('>> [MAILS SENT]')
