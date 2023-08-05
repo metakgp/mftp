@@ -15,7 +15,7 @@ def check_mail(mail):
     body = str(mail.get_payload()[0]._payload)
     # if mail_body.find(ROLL_NUMBER) != -1:
     if body.find("20CS30071") != -1:
-        match = re.search(r'shortlist for (\w+)', body)
+        match = re.search(r'shortlist for (\w+(?: \w+)*)', body)
         company = match.group(1)
         companies.append(company)
 
