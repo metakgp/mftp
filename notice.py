@@ -23,13 +23,13 @@ def fetch(headers, session, ssoToken):
         latest_index = 0
         
     notices = []
-    
     for row in root.findall('row'):
         id_ = row.find('cell[1]').text.strip()
         year = root.findall('row')[0].find('cell[8]').text.split('"')[1].strip()
         has_attachment = True if bs(row.find('cell[8]').text, 'html.parser').find('a').attrs['title'] == 'Download' else False
         notice = {
             'UID': f'{id_}_{year}_{has_attachment}',
+            'Time': row.find('cell[7]').text.strip(),
             'Type': row.find('cell[2]').text.strip(),
             'Subject': row.find('cell[3]').text.strip(),
             'Company': row.find('cell[4]').text.strip(),
