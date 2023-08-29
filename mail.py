@@ -18,37 +18,6 @@ def send(mails):
             server.sendmail(mail["From"], mail["To"], mail.as_string())
             
 
-def format_shortlist(companies, mails):
-    message = MIMEMultipart('alternative')
-    message["Subject"] = f"SHORTLISTED!"
-    message["From"] = 'MFTP <' + FROM_EMAIL + '>'
-    message["To"] = TO_EMAIL
-    
-    shortlisted = ''
-    count = 1
-    for company in companies:
-        shortlisted += f'{count}. {company}\n'
-        count += 1
-        
-    body = f"""
-    <html>
-        <body>
-            <div style="font-family: Arial, sans-serif; width: 90%; margin: 0 auto; border: 1px solid #333; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);">
-                <div style="margin-bottom: 20px;">
-                    You are shortlisted in following companies:
-                    {shortlisted}
-                </div>
-            </div>
-        </body>
-    </html>
-    """
-        
-    message.attach(MIMEText(body, "html"))
-    mails.append(message)
-
-    return mails
-
-
 def format_notice(notices, session): 
     mails = []
     for notice in notices:

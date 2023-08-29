@@ -2,7 +2,6 @@ import env
 import mail
 import notice
 import requests
-import shortlist
 import iitkgp_erp_login.erp as erp
 
 headers = {
@@ -24,24 +23,15 @@ try:
 except Exception as e:
     raise e
     
-# try:
-#     notice.save(notices)
-#     print ('>> [SAVED NEW NOTICES]')
-# except Exception as e:
-#     raise e
-
 try:
-    mails = mail.format_notice(notices, session)
-    print ('>> [NOTICES FORMATTED]')
+    notice.save(notices)
+    print ('>> [SAVED NEW NOTICES]')
 except Exception as e:
     raise e
 
 try:
-    companies = shortlist.check(mails)
-    print ('>> [SHORTLISTS CHECKED]')
-    if companies:
-        mails = mail.format_shortlist(companies, mails)
-        print ('>> [SHORTLISTS FORMATTED]')
+    mails = mail.format_notice(notices, session)
+    print ('>> [NOTICES FORMATTED]')
 except Exception as e:
     raise e
     
