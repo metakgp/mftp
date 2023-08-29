@@ -1,5 +1,6 @@
 import env
 import mail
+import time
 import notice
 import requests
 import iitkgp_erp_login.erp as erp
@@ -10,33 +11,37 @@ headers = {
 }
 session = requests.Session()
 
-if not erp.session_alive(session):
-    print ('>> [LOGGING IN]')
-    _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
-else:
-    print(">> [PREVIOUS SESSION]")
-    _, ssoToken = erp.get_tokens_from_file('.session')
-    
-try:
-    notices, session = notice.fetch(headers, session, ssoToken)
-    print ('>> [NOTICES FETCHED]')
-except Exception as e:
-    raise e
-    
-try:
-    notice.save(notices)
-    print ('>> [SAVED NEW NOTICES]')
-except Exception as e:
-    raise e
+while True:
+    if not erp.session_alive(session):
+        print ('>> [LOGGING IN]')
+        _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
+    else:
+        print(">> [PREVIOUS SESSION]")
+        _, ssoToken = erp.get_tokens_from_file('.session')
+        
+    try:
+        notices, session = notice.fetch(headers, session, ssoToken)
+        print ('>> [NOTICES FETCHED]')
+    except Exception as e:
+        raise e
+        
+    try:
+        notice.save(notices)
+        print ('>> [SAVED NEW NOTICES]')
+    except Exception as e:
+        raise e
 
-try:
-    mails = mail.format_notice(notices, session)
-    print ('>> [NOTICES FORMATTED]')
-except Exception as e:
-    raise e
+    try:
+        mails = mail.format_notice(notices, session)
+        print ('>> [NOTICES FORMATTED]')
+    except Exception as e:
+        raise e
+        
+    try:
+        mail.send(mails)
+        print ('>> [MAILS SENT]')
+    except Exception as e:
+        raise e
     
-try:
-    mail.send(mails)
-    print ('>> [MAILS SENT]')
-except Exception as e:
-    raise e
+    print(">> [PAUSED FOR 2 MINS]")
+    time.sleep(120) # Sleep for 2 minutes
