@@ -1,2 +1,4 @@
 pymongo==3.11
 iitkgp_erp_login
+lxml
+dnspython
