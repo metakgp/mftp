@@ -1,8 +1,9 @@
 from endpoints import *
+from pymongo import DESCENDING
 from env import MONGODB_URI as uri
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup as bs
-from pymongo import DESCENDING
+from datetime import datetime, timedelta
 from pymongo.mongo_client import MongoClient as mc
 # Notices Collection
 col = mc(uri).mftp.notices
@@ -35,7 +36,10 @@ def fetch(headers, session, ssoToken):
             'Company': row.find('cell[4]').text.strip(),
         }
         
-        if int(id_) > latest_index:
+        latest_time = datetime.strptime(notice["Time"], '%d-%m-%Y %H:%M')
+        current_time = datetime.now()
+        
+        if int(id_) > latest_index and latest_time + timedelta(minutes=2) < current_time:
             notices.append(notice)
         else:
             break
