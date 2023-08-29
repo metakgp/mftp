@@ -11,9 +11,8 @@ from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
 
 def send(mails):
     context = ssl.create_default_context()
-    # with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-    #     server.login(FROM_EMAIL, FROM_EMAIL_PASS.encode("utf-8"))
-    with smtplib.SMTP("localhost", 1025) as server:
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(FROM_EMAIL, FROM_EMAIL_PASS.encode("utf-8"))
         for mail in reversed(mails): 
             server.sendmail(mail["From"], mail["To"], mail.as_string())
             
