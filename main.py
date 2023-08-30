@@ -17,7 +17,7 @@ while True:
         _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
     else:
         print(">> [PREVIOUS SESSION]")
-        _, ssoToken = erp.get_tokens_from_file('.session')
+        _, ssoToken = erp.get_tokens_from_file('.session', log=True)
         
     try:
         notices, session = notice.fetch(headers, session, ssoToken)
