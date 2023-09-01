@@ -4,7 +4,6 @@
 __pycache__/
 
 # secrets
+*.json
 .session
 env.py
-credentials.json
-token.json
