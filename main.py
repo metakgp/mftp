@@ -3,6 +3,7 @@ import mail
 import time
 import notice
 import requests
+import argparse
 import iitkgp_erp_login.erp as erp
 
 headers = {
@@ -10,6 +11,16 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/51.0.2704.79 Chrome/51.0.2704.79 Safari/537.36',
 }
 session = requests.Session()
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='One stop mailing solution for CDC NoticeBoard at IIT KGP')
+    parser.add_argument('--smtp', action="store_true", help='Use SMTP for sending the mails', required=False)
+    parser.add_argument('--gmail-api', action="store_true", help='Use GMAIL API for sending the mails', required=False)
+    return parser.parse_args()
+
+
+args = parse_args()
 
 while True:
     if not erp.session_alive(session):
@@ -38,7 +49,7 @@ while True:
         raise e
         
     try:
-        mail.send(mails)
+        mail.send(mails, args.smtp, args.gmail_api)
         print ('>> [MAILS SENT]')
     except Exception as e:
         raise e
