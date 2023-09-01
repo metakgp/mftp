@@ -1,5 +1,4 @@
 import re
-import smtplib, ssl
 from email import encoders
 from bs4 import BeautifulSoup as bs
 from email.mime.text import MIMEText
@@ -9,13 +8,51 @@ from env import FROM_EMAIL, FROM_EMAIL_PASS, TO_EMAIL
 from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
 
 
-def send(mails):
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-        server.login(FROM_EMAIL, FROM_EMAIL_PASS)
-        for mail in reversed(mails): 
-            server.sendmail(mail["From"], mail["To"], mail.as_string())
+def send(mails, smtp, gmail_api):
+    if gmail_api:
+        import base64
+        
+        service = generate_send_service()
+        for mail in reversed(mails):
+            service.users().messages().send(
+                userId="me", 
+                body={"raw": base64.urlsafe_b64encode(mail.as_bytes()).decode()}
+            ).execute()
+    elif smtp:
+        import smtplib, ssl
+        
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+            server.login(FROM_EMAIL, FROM_EMAIL_PASS)
+            for mail in reversed(mails): 
+                server.sendmail(mail["From"], mail["To"], mail.as_string())
             
+
+def generate_send_service():
+    import os
+    from googleapiclient.discovery import build
+    from google.oauth2.credentials import Credentials
+    from google_auth_oauthlib.flow import InstalledAppFlow
+    
+    creds = None
+    SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
+
+    if os.path.exists("mail_send_token.json"):
+        creds = Credentials.from_authorized_user_file("mail_send_token.json", SCOPES)
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                "mail_send_creds.json", SCOPES
+            )
+            creds = flow.run_local_server(port=0)
+        with open("mail_send_token.json", "w") as token:
+            token.write(creds.to_json())
+
+    return build("gmail", "v1", credentials=creds)
+
 
 def format_notice(notices, session): 
     mails = []
