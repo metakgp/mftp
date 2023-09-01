@@ -57,7 +57,7 @@ def generate_send_service():
 def format_notice(notices, session): 
     mails = []
     for notice in notices:
-        message = MIMEMultipart('alternative')
+        message = MIMEMultipart()
         message["Subject"] = f"{notice['Subject']} - {notice['Company']}"
         message["From"] = 'MFTP <' + FROM_EMAIL + '>'
         message["To"] = TO_EMAIL
