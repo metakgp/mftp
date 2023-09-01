@@ -4,6 +4,7 @@ import time
 import notice
 import requests
 import argparse
+from datetime import datetime
 import iitkgp_erp_login.erp as erp
 
 headers = {
@@ -23,6 +24,7 @@ def parse_args():
 args = parse_args()
 
 while True:
+    print(f"=============== <<: {datetime.now()} :>> ===============")
     if not erp.session_alive(session):
         print ('>> [LOGGING IN]')
         _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
