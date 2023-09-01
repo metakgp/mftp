@@ -24,37 +24,37 @@ def parse_args():
 args = parse_args()
 
 while True:
-    print(f"=============== <<: {datetime.now()} :>> ===============")
+    print(f"=============== <<: {datetime.now()} :>> ===============", flush=True)
     if not erp.session_alive(session):
-        print ('>> [LOGGING IN]')
+        print ('>> [LOGGING IN]', flush=True)
         _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
     else:
-        print(">> [PREVIOUS SESSION]")
+        print(">> [PREVIOUS SESSION]", flush=True)
         _, ssoToken = erp.get_tokens_from_file('.session', log=True)
         
     try:
         notices, session = notice.fetch(headers, session, ssoToken)
-        print ('>> [NOTICES FETCHED]')
+        print ('>> [NOTICES FETCHED]', flush=True)
     except Exception as e:
         raise e
         
     try:
         notice.save(notices)
-        print ('>> [SAVED NEW NOTICES]')
+        print ('>> [SAVED NEW NOTICES]', flush=True)
     except Exception as e:
         raise e
 
     try:
         mails = mail.format_notice(notices, session)
-        print ('>> [NOTICES FORMATTED]')
+        print ('>> [NOTICES FORMATTED]', flush=True)
     except Exception as e:
         raise e
         
     try:
         mail.send(mails, args.smtp, args.gmail_api)
-        print ('>> [MAILS SENT]')
+        print ('>> [MAILS SENT]', flush=True)
     except Exception as e:
         raise e
     
-    print(">> [PAUSED FOR 2 MINS]")
+    print(">> [PAUSED FOR 2 MINS]", flush=True)
     time.sleep(120) # Sleep for 2 minutes
