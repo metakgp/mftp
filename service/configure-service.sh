@@ -1,47 +1,41 @@
 #!/bin/bash
 
-rm -f mftp-service-aliases
-for script in scripts/*; do 
-  echo "alias mftp.$(basename ${script%.sh})=$(pwd)/${script}" >> mftp-service-aliases
-done
-echo "export MFTPD=$(dirname $(pwd))" >> mftp-service-aliases
+# Copying the service module to /usr/loca/bin
+cp mftp-as-a-service.sh /usr/local/bin/mftp
 
-cat mftp-service-aliases
-
+# Detecting the shell config file
 if [[ "$(basename $SHELL)" == "bash" ]]; then
-  ALIAS_CONFIGURED=$(grep -q 'mftp-service-aliases' ~/.bashrc && echo true || echo false)
   SHELL_RC=~/.bashrc
 elif [[ "$(basename $SHELL)" == "zsh" ]]; then
-  ALIAS_CONFIGURED=$(grep -q 'mftp-service-aliases' ~/.zshrc && echo true || echo false)
   SHELL_RC=~/.zshrc
 fi
 
-if [ "$ALIAS_CONFIGURED" == "false" ]; then
-  echo "source $(pwd)/mftp-service-aliases" >> "$SHELL_RC"
+DIRECTORY_CONFIGURED=$(grep -q 'MFTPD' "$SHELL_RC" && echo true || echo false)
+if [ "$DIRECTORY_CONFIGURED" == "false" ]; then
+  # Storing the location where mftp is installed to be used in service module
+  echo "export MFTPD=$(dirname $(pwd))" >> "$SHELL_RC"
 fi
 source "$SHELL_RC"
 
-KERNEL=$(uname -s)
-if [[ "$KERNEL" == "Linux" ]]; then
-  sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp.service
-  sed -i "s#USERNAME#${USER}#g" systemd/mftp.service
-  sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp-startup-service.sh
+# Only for linux
+# Configuring startup service for MFTP
+sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp.service
+sed -i "s#USERNAME#${USER}#g" systemd/mftp.service
+sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp-startup-service.sh
 
-  if [ ! -f /etc/systemd/system/mftp.service ]; then
-    echo -e "${GREEN}[+] ${BLUE}Creating MFTP startup service${WHITE}"
-    chmod 644 systemd/mftp.service
-    sudo cp systemd/mftp.service /etc/systemd/system/
-    sudo chmod 777 /etc/systemd/system/mftp.service
-    sudo systemctl daemon-reload
-  else
-    echo -e "${YELLOW}[-] ${BLUE}MFTP startup service already created${WHITE}"
-  fi
-
-  if [ "$(systemctl is-enabled mftp)" == "disabled" ]; then
-    echo -e "${GREEN}[+] ${BLUE}Enabling MFTP startup service${WHITE}"
-    sudo systemctl enable mftp
-  else
-    echo -e "${YELLOW}[-] ${BLUE}MFTP startup service already enabled${WHITE}"
-  fi
+if [ ! -f /etc/systemd/system/mftp.service ]; then
+  echo -e "${GREEN}[+] ${BLUE}Creating MFTP startup service${WHITE}"
+  chmod 644 systemd/mftp.service
+  sudo cp systemd/mftp.service /etc/systemd/system/
+  sudo chmod 777 /etc/systemd/system/mftp.service
+  sudo systemctl daemon-reload
+else
+  echo -e "${YELLOW}[-] ${BLUE}MFTP startup service already created${WHITE}"
 fi
 
+if [ "$(systemctl is-enabled mftp)" == "disabled" ]; then
+  echo -e "${GREEN}[+] ${BLUE}Enabling MFTP startup service${WHITE}"
+  sudo systemctl enable mftp
+else
+  echo -e "${YELLOW}[-] ${BLUE}MFTP startup service already enabled${WHITE}"
+fi
