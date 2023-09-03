@@ -1,11 +1,12 @@
 [Unit]
 Description=MFTP server
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 ExecStart=MFTPD/service/systemd/mftp-startup-service.sh
-User=root
-Group=root
+User=USERNAME
+Group=USERNAME
 
 [Install]
 WantedBy=multi-user.target
