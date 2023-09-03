@@ -19,7 +19,6 @@ if [ -n "$mftpID" ]; then
 fi
 
 cd "$MFTPD" || exit 1
-python3 mftp.py --${1:-smtp} >>logs.txt 2>&1 &
-cd - || exit 1
-
+setsid python3 mftp.py --${1:-gmail-api} >>logs.txt 2>&1 &
 echo -e "${GREEN}[+] ${BLUE}Successfully started MFTP server!${WHITE}"
+cd - >/dev/null || exit 1
