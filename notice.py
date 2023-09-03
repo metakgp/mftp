@@ -1,3 +1,4 @@
+import logging
 from endpoints import *
 from pymongo import DESCENDING
 from env import MONGODB_URI as uri
@@ -9,21 +10,33 @@ from pymongo.mongo_client import MongoClient as mc
 col = mc(uri).mftp.notices
     
 def fetch(headers, session, ssoToken):
-    r = session.post(TPSTUDENT_URL, data=dict(ssoToken=ssoToken, menu_id=11, module_id=26), headers=headers)
-    r = session.get(NOTICEBOARD_URL, headers=headers)
-    r = session.get(NOTICES_URL, headers=headers)
-    
-    soup = bs(r.text, features="xml")
-    xml = soup.prettify().encode('utf-8')
-    root = ET.fromstring(xml)
+    print('[FETCHING NOTICES]', flush=True)
+    try:
+        r = session.post(TPSTUDENT_URL, data=dict(ssoToken=ssoToken, menu_id=11, module_id=26), headers=headers)
+        r = session.get(NOTICEBOARD_URL, headers=headers)
+        r = session.get(NOTICES_URL, headers=headers)
+    except Exception as e:
+        logging.error(f" Failed to navigate to Noticeboard ~ {str(e)}")
+
+    try:
+        soup = bs(r.text, features="xml")
+        xml = soup.prettify().encode('utf-8')
+        root = ET.fromstring(xml)
+    except Exception as e:
+        logging.error(f" Failed to extract data from Noticeboard ~ {str(e)}")
 
     if len(list(col.find())) != 0:
-        latest_document = col.find_one(sort=[('_id', DESCENDING)])
+        try:
+            latest_document = col.find_one(sort=[('_id', DESCENDING)])
+        except Exception as e:
+            logging.error(f" Failed to fetch Latest Saved Notice Index ~ {str(e)}")
         latest_index = int(latest_document['UID'].split('_')[0])
     else:
         latest_index = 0
+    logging.info(f" Latest Saved Notice Index ~ {latest_index}")
         
     notices = []
+    logging.info(f" Notices uploaded within 2 minutes of current time will be skipped")
     for row in root.findall('row'):
         id_ = row.find('cell[1]').text.strip()
         year = root.findall('row')[0].find('cell[8]').text.split('"')[1].strip()
@@ -36,11 +49,16 @@ def fetch(headers, session, ssoToken):
             'Company': row.find('cell[4]').text.strip(),
         }
         
-        latest_time = datetime.strptime(notice["Time"], '%d-%m-%Y %H:%M')
         current_time = datetime.now()
+        notice_time = datetime.strptime(notice["Time"], '%d-%m-%Y %H:%M')
+        logging.info(f" Notice ID ~ {id_} | Notice Time ~ {notice_time} | Current Time ~ {current_time}")
         
-        if int(id_) > latest_index and latest_time + timedelta(minutes=2) < current_time:
-            notices.append(notice)
+        if int(id_) > latest_index:
+            if notice_time + timedelta(minutes=2) < current_time:
+                notices.append(notice)
+                logging.info(f" [ADDED NOTICE ~ {id_}]: {notice['Subject']} | {notice['Company']} | {notice['Time']} | {has_attachment}")
+            else:
+                logging.info(f" [SKIPPED NOTICE ~ {id_}]: {notice['Subject']} | {notice['Company']} | {notice['Time']} | {has_attachment}")
         else:
             break
             
@@ -48,6 +66,8 @@ def fetch(headers, session, ssoToken):
 
 
 def save(notices):
-    for notice in reversed(notices):
-        col.insert_one(notice)
-            
+    try:
+        for notice in reversed(notices):
+            col.insert_one(notice)
+    except Exception as e:
+        logging.error(f" Failed to save notices ~ {str(e)}")
