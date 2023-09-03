@@ -67,6 +67,7 @@ def fetch(headers, session, ssoToken):
 
 def save(notices):
     try:
+        if notices: print('[SAVING NOTICES]', flush=True)
         for notice in reversed(notices):
             col.insert_one(notice)
     except Exception as e:

@@ -1,4 +1,5 @@
 import re
+import logging
 from email import encoders
 from bs4 import BeautifulSoup as bs
 from email.mime.text import MIMEText
@@ -9,23 +10,47 @@ from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
 
 
 def send(mails, smtp, gmail_api):
+    if mails: print(f"[SENDING MAILS]", flush=True)
     if gmail_api:
         import base64
         
-        service = generate_send_service()
+        try:
+            service = generate_send_service()
+        except Exception as e:
+            logging.error(f" Failed to generate GMAIL API creds ~ {str(e)}")
+
         for mail in reversed(mails):
-            service.users().messages().send(
-                userId="me", 
-                body={"raw": base64.urlsafe_b64encode(mail.as_bytes()).decode()}
-            ).execute()
+            try:
+                response = service.users().messages().send(
+                    userId="me", 
+                    body={"raw": base64.urlsafe_b64encode(mail.as_bytes()).decode()}
+                ).execute()
+            except Exception as e:
+                logging.error(f"  Failed to send request to GMAIL API ~ {str(e)}")
+            
+            if 'id' in response:
+                logging.info(f" Mail Sent ~ {mail['Subject']}")
+            else:
+                logging.error(f" Failed to Send Mail ~ {mail['Subject']}")
     elif smtp:
         import smtplib, ssl
-        
         context = ssl.create_default_context()
+
+        logging.info(" Connecting to smtp.google.com ...")
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(FROM_EMAIL, FROM_EMAIL_PASS)
+            logging.info(" Connected!")
+            try:
+                server.login(FROM_EMAIL, FROM_EMAIL_PASS)
+                logging.info(" Logged In!")
+            except Exception as e:
+                logging.error(f" Failed to log in ~ {str(e)}")
+
             for mail in reversed(mails): 
-                server.sendmail(mail["From"], mail["To"], mail.as_string())
+                try:
+                    server.sendmail(mail["From"], mail["To"], mail.as_string())
+                    logging.info(f" Mail Sent ~ {mail['Subject']}")
+                except smtplib.SMTPException as e:
+                    logging.error(f" Failed to Send Mail ~ {mail['Subject']}")
             
 
 def generate_send_service():
@@ -57,20 +82,23 @@ def generate_send_service():
 
 def format_notice(notices, session): 
     mails = []
+    if notices: print('[FORMATTING MAILS]', flush=True)
     for notice in notices:
         message = MIMEMultipart()
-        message["Subject"] = f"{notice['Subject']} - {notice['Company']}"
-        message["From"] = 'MFTP <' + FROM_EMAIL + '>'
+        message["Subject"] = f"{notice['Subject']} | {notice['Company']}"
+        message["From"] = f'MFTP < {FROM_EMAIL} >'
         message["To"] = TO_EMAIL
 
-        uid = notice['UID'].split('_')
-        id_ = uid[0]
-        year = uid[1]
-        attachment = uid[2]
+        id_, year, attachment = notice['UID'].split('_')
         
-        body = parseBody(session, year, id_)
+        try:
+            body = parseBody(session, year, id_)
+        except Exception as e:
+            logging.error(f" Failed to parse mail body ~ {str(e)}")
+
         # Hyperlinking any link with <click here> to reduce link clutter
         body = re.sub(r"(https?://[^\s]+)", r'<a href="\1">click here</a>', body)
+
         # Decent enough layout for the mail
         body = f"""
         <html>
@@ -91,7 +119,10 @@ def format_notice(notices, session):
         
         if eval(attachment):
             file = MIMEBase('application', 'octet-stream')
-            attachment = parseAttachment(session, year, id_)
+            try:
+                attachment = parseAttachment(session, year, id_)
+            except Exception as e:
+                logging.error(f" Failed to parse mail attachment ~ {str(e)}")
             file.set_payload(attachment)
             encoders.encode_base64(file)
             file.add_header('Content-Disposition', 'attachment', filename='Attachment.pdf')
