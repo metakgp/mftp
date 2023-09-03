@@ -2,7 +2,6 @@ import env
 import mail
 import time
 import notice
-import logging
 import requests
 import argparse
 from datetime import datetime
@@ -14,15 +13,11 @@ headers = {
 }
 session = requests.Session()
 
+parser = argparse.ArgumentParser(description='One stop mailing solution for CDC NoticeBoard at IIT KGP')
+parser.add_argument('--smtp', action="store_true", help='Use SMTP for sending the mails', required=False)
+parser.add_argument('--gmail-api', action="store_true", help='Use GMAIL API for sending the mails', required=False)
+args = parser.parse_args()
 
-def parse_args():
-    parser = argparse.ArgumentParser(description='One stop mailing solution for CDC NoticeBoard at IIT KGP')
-    parser.add_argument('--smtp', action="store_true", help='Use SMTP for sending the mails', required=False)
-    parser.add_argument('--gmail-api', action="store_true", help='Use GMAIL API for sending the mails', required=False)
-    return parser.parse_args()
-
-
-args = parse_args()
 while True:
     print(f"=============== <<: {datetime.now()} :>> ===============", flush=True)
     if not erp.session_alive(session):
@@ -34,18 +29,8 @@ while True:
      
     notices, session = notice.fetch(headers, session, ssoToken)
     notice.save(notices)
-
-    try:
-        mails = mail.format_notice(notices, session)
-        print ('>> [NOTICES FORMATTED]', flush=True)
-    except Exception as e:
-        raise e
-        
-    try:
-        mail.send(mails, args.smtp, args.gmail_api)
-        print ('>> [MAILS SENT]', flush=True)
-    except Exception as e:
-        raise e
+    mails = mail.format_notice(notices, session)
+    mail.send(mails, args.smtp, args.gmail_api)
     
-    print(">> [PAUSED FOR 2 MINS]", flush=True)
-    time.sleep(120) # Sleep for 2 minutes
+    print("[PAUSED FOR 2 MINUTES]", flush=True)
+    time.sleep(120)
