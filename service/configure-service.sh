@@ -2,7 +2,7 @@
 
 rm -f mftp-service-aliases
 for script in scripts/*; do 
-  echo "alias mftp.${script%.sh}=$(pwd)/${script}" >> mftp-service-aliases
+  echo "alias mftp.$(basename ${script%.sh})=$(pwd)/${script}" >> mftp-service-aliases
 done
 echo "export MFTPD=$(dirname $(pwd))" >> mftp-service-aliases
 
