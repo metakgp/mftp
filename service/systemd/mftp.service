@@ -3,7 +3,7 @@ Description=MFTP server
 After=network.target
 
 [Service]
-ExecStart=MFTPD/systemd/mftp.sh
+ExecStart=MFTPD/service/systemd/mftp-startup-service.sh
 User=root
 Group=root
 
