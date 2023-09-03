@@ -24,6 +24,7 @@ source "$SHELL_RC"
 KERNEL=$(uname -s)
 if [[ "$KERNEL" == "Linux" ]]; then
   sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp.service
+  sed -i "s#USERNAME#${USER}#g" systemd/mftp.service
   sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp-startup-service.sh
 
   if [ ! -f /etc/systemd/system/mftp.service ]; then
