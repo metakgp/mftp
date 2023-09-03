@@ -56,7 +56,8 @@ case $1 in
   sudo systemctl restart mftp
   ;;
 "stop")
-  sudo systemctl stop mftp
+  sudo systemctl stop mftp &&\
+  echo "======================== <<: STOPPED :>> =========================" >> "$MFTPD"/logs.txt
   ;;
 "start")
   sudo systemctl start mftp
