@@ -1,10 +1,8 @@
 #!/bin/bash
 
 rm -f mftp-service-aliases
-for script in *; do 
-  if [[ "$script" != "setup-service.sh" ]]; then
-    echo "alias mftp.${script%.sh}=$(pwd)/${script}" >> mftp-service-aliases
-  fi
+for script in scripts/*; do 
+  echo "alias mftp.${script%.sh}=$(pwd)/${script}" >> mftp-service-aliases
 done
 echo "export MFTPD=$(dirname $(pwd))" >> mftp-service-aliases
 
