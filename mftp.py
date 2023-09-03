@@ -2,6 +2,7 @@ import env
 import mail
 import time
 import notice
+import logging
 import requests
 import argparse
 from datetime import datetime
@@ -22,27 +23,17 @@ def parse_args():
 
 
 args = parse_args()
-
 while True:
     print(f"=============== <<: {datetime.now()} :>> ===============", flush=True)
     if not erp.session_alive(session):
-        print ('>> [LOGGING IN]', flush=True)
+        print('[ERP LOGIN]', flush=True)
         _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
     else:
-        print(">> [PREVIOUS SESSION]", flush=True)
+        print("[PREVIOUS SESSION ~ ALIVE]", flush=True)
         _, ssoToken = erp.get_tokens_from_file('.session', log=True)
-        
-    try:
-        notices, session = notice.fetch(headers, session, ssoToken)
-        print ('>> [NOTICES FETCHED]', flush=True)
-    except Exception as e:
-        raise e
-        
-    try:
-        notice.save(notices)
-        print ('>> [SAVED NEW NOTICES]', flush=True)
-    except Exception as e:
-        raise e
+     
+    notices, session = notice.fetch(headers, session, ssoToken)
+    notice.save(notices)
 
     try:
         mails = mail.format_notice(notices, session)
