@@ -20,11 +20,8 @@ args = parser.parse_args()
 
 while True:
     print(f"=============== <<: {datetime.now()} :>> ===============", flush=True)
-    if not erp.session_alive(session):
-        print('[ERP LOGIN]', flush=True)
-        _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
-    else:
-        print("[PREVIOUS SESSION ~ ALIVE]", flush=True)
+    print('[ERP LOGIN]', flush=True)
+    _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
      
     notices, session = notice.fetch(headers, session, ssoToken)
     notice.save(notices)
