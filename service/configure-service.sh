@@ -11,7 +11,6 @@ cp mftp-as-a-service.sh ~/.local/bin/mftp &&\
   echo -e "${GREEN}[+] ${BLUE}Installed MFTP as a service script${WHITE}" ||\
   echo -e "${RED}[ERROR] ${BLUE}Failed to install MFTP as a service script${WHITE}"
 
-
 # Detecting the shell config file
 if [[ "$(basename $SHELL)" == "bash" ]]; then
   SHELL_RC=~/.bashrc
@@ -31,13 +30,18 @@ source "$SHELL_RC"
 
 # Only for linux
 # Configuring startup service for MFTP
-if [ $(grep -q 'USERNAME' systemd/mftp.service && echo true || echo false)  == "true" ] ||
-  [ $(grep -q 'USERNAME' systemd/mftp-startup-service.sh && echo true || echo false) == "true" ]; then
-  echo -e "${GREEN}[+] ${BLUE}Configuring MFTP startup service${WHITE}"
-  sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp-startup-service.sh
+echo -e "${GREEN}[+] ${BLUE}Configuring MFTP startup service${WHITE}"
+if [ $(grep -q 'USERNAME' systemd/mftp.service && echo true || echo false) == "true" ]; then
   sed -i "s#USERNAME#${USER}#g" systemd/mftp.service
+fi
+
+if [ $(grep -q 'USERNAME' systemd/mftp.service && echo true || echo false)  == "true" ] ||\
+  [ $(grep -q 'MFTPD' systemd/mftp-startup-service.sh && echo true || echo false)  == "true" ]; then
+  sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp-startup-service.sh
   sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp.service
+fi
   
+if [ $(grep -q 'MAILSERVICE' systemd/mftp.service && echo true || echo false)  == "true" ]; then
   read -rp "${YELLOW}How do you want to send mail? ${WHITE}[${GREEN}smtp${WHITE}/${GREEN}gmail-api${WHITE}]${YELLOW}:${WHITE} " MAILSERVICE
   while [[ ! $MAILSERVICE =~ ^(smtp|gmail-api)$ ]]; do
     read -rp "${RED}Invalid option. ${YELLOW}Please enter '${GREEN}smtp${YELLOW}' or '${GREEN}gmail-api${YELLOW}':${WHITE} " MAILSERVICE 
@@ -45,23 +49,14 @@ if [ $(grep -q 'USERNAME' systemd/mftp.service && echo true || echo false)  == "
   echo -e "\n${YELLOW}[~] ${WHITE}You can change it later in ${GREEN}systemd/mftp.service${WHITE}\n"
   
   sed -i "s#MAILSERVICE#${MAILSERVICE:=smtp}#g" systemd/mftp.service
-else
-  echo -e "${YELLOW}[-] ${BLUE}MFTP startup service already configured${WHITE}"
 fi
 
-if [ ! -f /etc/systemd/system/mftp.service ]; then
-  echo -e "${GREEN}[+] ${BLUE}Setting MFTP startup service${WHITE}"
-  chmod 644 systemd/mftp.service
-  sudo cp systemd/mftp.service /etc/systemd/system/
-  sudo chmod 777 /etc/systemd/system/mftp.service
-  sudo systemctl daemon-reload
-else
-  echo -e "${YELLOW}[-] ${BLUE}MFTP startup service already set${WHITE}"
-fi
+echo -e "${GREEN}[+] ${BLUE}Setting MFTP startup service${WHITE}"
+chmod 644 systemd/mftp.service
+sudo cp systemd/mftp.service /etc/systemd/system/
+sudo chmod 777 /etc/systemd/system/mftp.service
+sudo systemctl daemon-reload
 
-if [ "$(systemctl is-enabled mftp)" == "disabled" ]; then
-  echo -e "${GREEN}[+] ${BLUE}Enabling MFTP startup service${WHITE}"
-  sudo systemctl enable mftp
-else
-  echo -e "${YELLOW}[-] ${BLUE}MFTP startup service already enabled${WHITE}"
-fi
+sudo systemctl enable mftp &&\
+  echo -e "${GREEN}[+] ${BLUE}Enabled MFTP startup service${WHITE}" ||\
+  echo -e "${RED}[ERROR] ${BLUE}Failed to enable MFTP startup service${WHITE}"
