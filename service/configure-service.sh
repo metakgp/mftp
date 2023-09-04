@@ -34,9 +34,17 @@ source "$SHELL_RC"
 if [ $(grep -q 'USERNAME' systemd/mftp.service && echo true || echo false)  == "true" ] ||
   [ $(grep -q 'USERNAME' systemd/mftp-startup-service.sh && echo true || echo false) == "true" ]; then
   echo -e "${GREEN}[+] ${BLUE}Configuring MFTP startup service${WHITE}"
+  sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp-startup-service.sh
   sed -i "s#USERNAME#${USER}#g" systemd/mftp.service
   sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp.service
-  sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp-startup-service.sh
+  
+  read -rp "${YELLOW}How do you want to send mail? ${WHITE}[${GREEN}smtp${WHITE}/${GREEN}gmail-api${WHITE}]${YELLOW}:${WHITE} " MAILSERVICE
+  while [[ ! $MAILSERVICE =~ ^(smtp|gmail-api)$ ]]; do
+    read -rp "${RED}Invalid option. ${YELLOW}Please enter '${GREEN}smtp${YELLOW}' or '${GREEN}gmail-api${YELLOW}':${WHITE} " MAILSERVICE 
+  done
+  echo -e "\n${YELLOW}[~] ${WHITE}You can change it later in ${GREEN}systemd/mftp.service${WHITE}\n"
+  
+  sed -i "s#MAILSERVICE#${MAILSERVICE:=smtp}#g" systemd/mftp.service
 else
   echo -e "${YELLOW}[-] ${BLUE}MFTP startup service already configured${WHITE}"
 fi
