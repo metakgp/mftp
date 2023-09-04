@@ -9,30 +9,25 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
+[![Wiki][wiki-shield]][wiki-url]
 
 </div>
 
-<!-- PROJECT LOGO -->
 <br />
-<!-- UPDATE -->
 <div align="center">
-  <a href="https://github.com/proffapt/PROJECT_NAME">
+  <!-- PROJECT LOGO -->
+  <!-- <a href="https://github.com/metakgp/MFTP">
     <img width="140" alt="image" src="https://user-images.githubusercontent.com/86282911/206632284-cb260f57-c612-4ab5-b92b-2172c341ab23.png">
-  </a>
+  </a> -->
 
-  <h3 align="center">PROJECT_NAME</h3>
+  <h3 align="center">MFTP - My Freaking Training & Placements</h3>
 
   <p align="center">
-  <!-- UPDATE -->
-    <i>Project one liner slogan goes here</i>
+    <i>CDC Noticeboard on Your Mail: Where Automatic Updates Turn Chaos into Pleasure!</i>
     <br />
-    <a href="https://github.com/proffapt/PROJECT_NAME"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/proffapt/PROJECT_NAME/issues">Report Bug</a>
+    <a href="https://github.com/metakgp/MFTP/issues">Report Bug</a>
     ·
-    <a href="https://github.com/proffapt/PROJECT_NAME/issues">Request Feature</a>
+    <a href="https://github.com/metakgp/MFTP/issues">Request Feature</a>
   </p>
 </div>
 
@@ -42,13 +37,15 @@
 <summary>Table of Contents</summary>
 
 - [About The Project](#about-the-project)
-  - [Supports](#supports)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
+    - [Supports](#supports)
+- [Setup](#setup)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+        - [Setup MFTP as a Service](#setup-mftp-as-a-service)
 - [Usage](#usage)
+    - [Using MFTP as a Service](#using-mftp-as-a-service)
+- [Maintainer(s)](#maintainers)
 - [Contact](#contact)
-- [Acknowledgements](#acknowledgments)
 - [Additional documentation](#additional-documentation)
 
 </details>
@@ -56,14 +53,16 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-<!-- UPDATE -->
+
 <div align="center">
-  <a href="https://github.com/proffapt/PROJECT_NAME">
-    <img width="80%" alt="image" src="https://user-images.githubusercontent.com/86282911/206632547-a3b34b47-e7ae-4186-a1e6-ecda7ddb38e6.png">
+
+  <a href="https://github.com/metakgp/MFTP">
+	<img width="1200" alt="image" src="https://user-images.githubusercontent.com/86282911/265526168-8edc1b6f-4326-4d90-b2e5-f9742d0bed6e.png">
   </a>
 </div>
+<br/>
 
-_Detailed explaination of the project goes here_
+MFTP continuously monitors the CDC Noticeboard and forwards incoming notices to the configured email address, whether it's an individual account or a Google Group. It is also available as a service on linux systems.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -72,118 +71,177 @@ _Detailed explaination of the project goes here_
 ### Supports:
 1. Shells
     * `bash`
-    * `fish`
     * `zsh`
 2. OS(s)
-    * `MacOS`[`BSD` based]
     * any `*nix`[`GNU+Linux` and `Unix`]
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-<!-- GETTING STARTED -->
-## Getting Started
+## Setup
 
 To set up a local instance of the application, follow the steps below.
 
 ### Prerequisites
-<!-- UPDATE -->
-The following dependencies are required to be installed for the project to function properly:
-* npm
+The following requirements are to be satisfied for the project to function properly:
+* [python3](https://www.python.org/downloads/) `>=python3.10`
   ```sh
-  npm install npm@latest -g
+  sudo apt update
+  sudo apt install python3
   ```
+* [MongoDB clusters' URI](https://www.mongodb.com/docs/manual/reference/connection-string/). Creating an account on MongoDB Atlas and then create a cluster, give yourself access to that cluster and get the mongoDB connect URI.
+* This project depends on [ERP Login module](https://github.com/proffapt/iitkgp-erp-login-pypi) by [Arpit Bhardwaj](https://github.com/proffapt) for the ERP Login workflow. Read its [documentation](https://github.com/proffapt/iitkgp-erp-login-pypi/blob/main/README.md) and setup your environment for it.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Installation
 
-_Now that the environment has been set up and configured to properly compile and run the project, the next step is to install and configure the project locally on your system._
-<!-- UPDATE -->
+_Now that the environment has been set up and configured to properly compile and run the project, the next step is to download and configure the project locally on your system._
 1. Clone the repository
    ```sh
-   git clone https://github.com/proffapt/PROJECT_NAME.git
+   git clone https://github.com/metakgp/MFTP.git
+   cd ./MFTP
    ```
-2. Make the script executable
+2. Install required dependencies
    ```sh
-   cd ./PROJECT_NAME
-   chmod +x ./PROJECT_NAME
+   pip3 install -r requirements.txt
    ```
-3. Execute the script
-   ```sh
-   ./PROJECT_NAME
-   ```
+3. #### Sending Emails
+    The tool provides two methods of sending emails.
+
+    > Why?<br/>
+    > Because on campus LAN port `465` (SMTP port) is blocked and if you want to host it on an internal server on the campus LAN, you will need another method than SMTP. <br/>
+    > However, it is preferred to use SMTP when hosting on external server as SMTP is the easiest of the two.
+
+    - ##### Using SMTP
+      > `--smtp`
+      - [Create an app password](https://support.google.com/accounts/answer/185833?hl=en) for the senders' email.
+      - After creating app password use it as your `FROM_EMAIL_PASS` value in  next step.
+    - ##### Using GMAIL API
+      > `--gmail-api`
+      - Follow this [quick start guide](https://developers.google.com/gmail/api/quickstart/python) to configure _gmail api_ on the senders' mail.
+      - After successfull configuration of gmail api, you can leave the value of `FROM_EMAIL_PASS` as it is in the next step.
+4. Configuring environment variables
+   - Copy `env.example.py` as `env.py`. It looks like this:
+     ```python
+     # ERP Credentials
+     ROLL_NUMBER = "XXYYXXXXX"
+     PASSWORD = "**********"
+     SECURITY_QUESTIONS_ANSWERS = {
+         "Q1" : "A1",
+         "Q2" : "A2",
+         "Q3" : "A3",
+     }
+ 
+     # EMAIL CREDENTIALS
+     FROM_EMAIL = "abc@gmail.com"
+     FROM_EMAIL_PASS = "**********"
+ 
+     # OTHER PARAMETERS
+     TO_EMAIL = "xyz@googlegroups.com"
+     MONGODB_URI = "%****%******%"
+     ```
+   - Update the values inside the `double quotes` ("). **DO NOT CHANGE VAR NAMES.**
+
+
+#### Setup MFTP as a Service
+
+For linux systems MFTP is available as a service . To configure it, execute the following commands after navigating into the root directory of the project (inside the mftp folder).
+```sh
+cd service/
+./configure-service.sh
+```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
 <!-- USAGE EXAMPLES -->
 ## Usage
-<!-- UPDATE -->
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space.
 
-<div align="center">
-  <a href="https://github.com/proffapt/PROJECT_NAME">
-    <img width="80%" alt="image" src="https://user-images.githubusercontent.com/86282911/206632640-40dc440e-5ef3-4893-be48-618f2bd85f37.png">
-  </a>
-</div>
+It is mandatory to provide either of the following flags to the execution command.
+- `--smtp`
+- `--gmail-api`
+
+<!-- UPDATE -->
+```python
+python3 mftp.py --smtp        # Using SMTP for sending mails
+python3 mftp.py --gmail-api   # Using GMAIL API for sending mails
+```
+
+#### Using MFTP as a Service
+
+After [configuring MFTP as a service](#setup-mftp-as-a-service), you can use the `mftp` command with several options to interact with the tool as a service.<br/> Following is the help menu for the service.
+
+```graphql
+Usage: mftp [OPTIONS]
+
+Options:
+  -h, --help               Display this help and exit
+  logs [OPTIONS]           Display last 25 lines of log file
+    Options:
+      clear                 Clear the log file
+      NUM                   Display last NUM lines of log file
+  disable                  Disable mftp service
+  enable                   Enable mftp service
+  status                   Check status of mftp service
+  restart                  Restart mftp service
+  stop                     Stop mftp service
+  start                    Start mftp service
+```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-<!-- CONTACT -->
+## Maintainer(s)
+
+- [Arpit Bhardwaj](https://github.com/proffapt)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 ## Contact
 
 <p>
-📫 Arpit Bhardwaj ( aka proffapt ) -
-<a href="https://twitter.com/proffapt">
-  <img align="center" alt="proffapt's Twitter " width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/twitter.svg" />
+📫 Metakgp -
+<a href="https://bit.ly/metakgp-slack">
+  <img align="center" alt="Metakgp's slack invite" width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/slack.svg" />
 </a>
-<a href="https://t.me/proffapt">
-  <img align="center" alt="proffapt's Telegram" width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/telegram.svg" />
+<a href="mailto:metakgp@gmail.com">
+  <img align="center" alt="Metakgp's email " width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/gmail.svg" />
 </a>
-<a href="https://www.linkedin.com/in/proffapt/">
-  <img align="center" alt="proffapt's LinkedIn" width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/linkedin.svg" />
+<a href="https://www.facebook.com/metakgp">
+  <img align="center" alt="metakgp's Facebook" width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/facebook.svg" />
 </a>
-<a href="mailto:proffapt@pm.me">
-  <img align="center" alt="proffapt's mail" width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/mail.svg" />
+<a href="https://www.linkedin.com/company/metakgp-org/">
+  <img align="center" alt="metakgp's LinkedIn" width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/linkedin.svg" />
 </a>
-<a href="https://cybernity.group">
-  <img align="center" alt="proffapt's forum for cybernity" width="22px" src="https://cybernity.group/uploads/default/original/1X/a8338f86bbbedd39701c85d5f32cf3d817c04c27.png" />
+<a href="https://twitter.com/metakgp">
+  <img align="center" alt="metakgp's Twitter " width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/twitter.svg" />
+</a>
+<a href="https://www.instagram.com/metakgp_/">
+  <img align="center" alt="metakgp's Instagram" width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/instagram.svg" />
 </a>
 </p>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-
-* [Choose an Open Source License](https://choosealicense.com)
-* [Img Shields](https://shields.io)
-<!-- UPDATE -->
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 ## Additional documentation
 
-  - [Changelogs](/.github/CHANGELOG.md)
-  - [License](/LICENSE.txt)
-  - [Security Policy](/.github/SECURITY.md)
+  - [License](/LICENSE)
   - [Code of Conduct](/.github/CODE_OF_CONDUCT.md)
+  - [Security Policy](/.github/SECURITY.md)
   - [Contribution Guidelines](/.github/CONTRIBUTING.md)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/proffapt/PROJECT_NAME.svg?style=for-the-badge
-[contributors-url]: https://github.com/proffapt/PROJECT_NAME/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/proffapt/PROJECT_NAME.svg?style=for-the-badge
-[forks-url]: https://github.com/proffapt/PROJECT_NAME/network/members
-[stars-shield]: https://img.shields.io/github/stars/proffapt/PROJECT_NAME.svg?style=for-the-badge
-[stars-url]: https://github.com/proffapt/PROJECT_NAME/stargazers
-[issues-shield]: https://img.shields.io/github/issues/proffapt/PROJECT_NAME.svg?style=for-the-badge
-[issues-url]: https://github.com/proffapt/PROJECT_NAME/issues
-[license-shield]: https://img.shields.io/github/license/proffapt/PROJECT_NAME.svg?style=for-the-badge
-[license-url]: https://github.com/proffapt/PROJECT_NAME/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/proffapt
+[contributors-shield]: https://img.shields.io/github/contributors/metakgp/MFTP.svg?style=for-the-badge
+[contributors-url]: https://github.com/metakgp/MFTP/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/metakgp/MFTP.svg?style=for-the-badge
+[forks-url]: https://github.com/metakgp/MFTP/network/members
+[stars-shield]: https://img.shields.io/github/stars/metakgp/MFTP.svg?style=for-the-badge
+[stars-url]: https://github.com/metakgp/MFTP/stargazers
+[issues-shield]: https://img.shields.io/github/issues/metakgp/MFTP.svg?style=for-the-badge
+[issues-url]: https://github.com/metakgp/MFTP/issues
+[license-shield]: https://img.shields.io/github/license/metakgp/MFTP.svg?style=for-the-badge
+[license-url]: https://github.com/metakgp/MFTP/blob/master/LICENSE
+[wiki-shield]: https://custom-icon-badges.demolab.com/badge/metakgp_wiki-grey?logo=metakgp_logo&logoColor=white&style=for-the-badge
+[wiki-url]: https://wiki.metakgp.org
