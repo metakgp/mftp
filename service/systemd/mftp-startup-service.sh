@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Sleeping till the network is not available
-while ! ip route | grep -q default; do
+while ! /usr/bin/curl -Is https://google.com > /dev/null; do
   sleep 1
 done
 
