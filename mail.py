@@ -51,45 +51,18 @@ def send(mails, smtp, gmail_api):
                     logging.info(f" Mail Sent ~ {mail['Subject']}")
                 except smtplib.SMTPException as e:
                     logging.error(f" Failed to Send Mail ~ {mail['Subject']}")
-            
-
-def generate_send_service():
-    import os
-    from googleapiclient.discovery import build
-    from google.oauth2.credentials import Credentials
-    from google.auth.transport.requests import Request
-    from google_auth_oauthlib.flow import InstalledAppFlow
-    
-    creds = None
-    SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
-
-    if os.path.exists("mail_send_token.json"):
-        creds = Credentials.from_authorized_user_file("mail_send_token.json", SCOPES)
-
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                "mail_send_creds.json", SCOPES
-            )
-            creds = flow.run_local_server(port=0)
-        with open("mail_send_token.json", "w") as token:
-            token.write(creds.to_json())
-
-    return build("gmail", "v1", credentials=creds)
 
 
-def format_notice(notices, session): 
+def format_notice(notices, session):
     mails = []
     if notices: print('[FORMATTING MAILS]', flush=True)
     for notice in notices:
+        id_, year, attachment = notice['UID'].split('_')
+        
         message = MIMEMultipart()
-        message["Subject"] = f"{notice['Subject']} | {notice['Company']}"
+        message["Subject"] = f"#{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']}"
         message["From"] = f'MFTP < {FROM_EMAIL} >'
         message["To"] = TO_EMAIL
-
-        id_, year, attachment = notice['UID'].split('_')
         
         try:
             body = parseBody(session, year, id_)
@@ -131,8 +104,35 @@ def format_notice(notices, session):
         mails.append(message)
 
     return mails
-        
-            
+
+
+def generate_send_service():
+    import os
+    from googleapiclient.discovery import build
+    from google.oauth2.credentials import Credentials
+    from google.auth.transport.requests import Request
+    from google_auth_oauthlib.flow import InstalledAppFlow
+    
+    creds = None
+    SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
+
+    if os.path.exists("mail_send_token.json"):
+        creds = Credentials.from_authorized_user_file("mail_send_token.json", SCOPES)
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                "mail_send_creds.json", SCOPES
+            )
+            creds = flow.run_local_server(port=0)
+        with open("mail_send_token.json", "w") as token:
+            token.write(creds.to_json())
+
+    return build("gmail", "v1", credentials=creds)
+
+
 def parseBody(session, year, id_):
     content = session.get(NOTICE_CONTENT_URL.format(year, id_))
     content_html = bs(content.text, 'html.parser')
