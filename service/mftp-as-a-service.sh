@@ -53,11 +53,12 @@ case $1 in
   sudo systemctl status mftp
   ;;
 "restart")
+  echo "======================== <<: RESTARTED :>> =========================" >> "$MFTPD"/logs.txt
   sudo systemctl restart mftp
   ;;
 "stop")
   sudo systemctl stop mftp &&\
-  echo "======================== <<: STOPPED :>> =========================" >> "$MFTPD"/logs.txt
+  echo "========================= <<: STOPPED :>> ==========================" >> "$MFTPD"/logs.txt
   ;;
 "start")
   sudo systemctl start mftp
