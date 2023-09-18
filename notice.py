@@ -20,14 +20,7 @@ def fetch(headers, session, ssoToken, col):
     except Exception as e:
         logging.error(f" Failed to extract data from Noticeboard ~ {str(e)}")
 
-    if len(list(col.find())) != 0:
-        try:
-            latest_document = col.find_one(sort=[('_id', DESCENDING)])
-        except Exception as e:
-            logging.error(f" Failed to fetch Latest Saved Notice Index ~ {str(e)}")
-        latest_index = int(latest_document['UID'].split('_')[0])
-    else:
-        latest_index = 0
+    latest_index = get_latest_index(col)
     logging.info(f" Latest Saved Notice Index ~ {latest_index}")
         
     notices = []
@@ -50,6 +43,19 @@ def fetch(headers, session, ssoToken, col):
             break
             
     return notices
+
+
+def get_latest_index(col):
+    if len(list(col.find())) != 0:
+        try:
+            latest_document = col.find_one(sort=[('_id', DESCENDING)])
+        except Exception as e:
+            logging.error(f" Failed to fetch Latest Saved Notice Index ~ {str(e)}")
+        latest_index = int(latest_document['UID'].split('_')[0])
+    else:
+        latest_index = 0
+    
+    return latest_index
 
 
 def save(col, notices, i):

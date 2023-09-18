@@ -4,10 +4,10 @@ from email import encoders
 from bs4 import BeautifulSoup as bs
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
-from notice import save as save_notice
 from email.mime.multipart import MIMEMultipart
 from env import FROM_EMAIL, FROM_EMAIL_PASS, TO_EMAIL
 from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
+from notice import save as save_notice, get_latest_index
 
 
 def send(mails, smtp, gmail_api, col, notices):
@@ -23,6 +23,8 @@ def send(mails, smtp, gmail_api, col, notices):
                 logging.error(f" Failed to generate GMAIL API creds ~ {str(e)}")
 
             for i, mail in enumerate(mails, 1):
+                if has_idx_mutated(col, notices, i): break
+
                 try:
                     response = service.users().messages().send(
                         userId="me", 
@@ -50,6 +52,8 @@ def send(mails, smtp, gmail_api, col, notices):
                     logging.error(f" Failed to log in ~ {str(e)}")
 
                 for i, mail in enumerate(mails, 1): 
+                    if has_idx_mutated(col, notices, i): break
+
                     try:
                         server.sendmail(mail["From"], mail["To"], mail.as_string())
                         logging.info(f" [MAIL SENT] ~ {mail['Subject']}")
@@ -110,6 +114,18 @@ def format_notice(notices, session):
         mails.append(message)
 
     return mails
+
+
+def has_idx_mutated(col, notices, i):
+    lidx_from_db = int(get_latest_index(col))
+    cidx_from_to_send_mails = int(notices[-i]['UID'].split('_')[0])
+    difference_in_idx = cidx_from_to_send_mails - lidx_from_db
+
+    if difference_in_idx != 1: 
+        logging.error(f" Trying to send mail #{cidx_from_to_send_mails} while latest in database is #{lidx_from_db}")
+        return True
+    
+    return False
 
 
 def parseBody(session, year, id_):
