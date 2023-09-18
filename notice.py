@@ -50,3 +50,11 @@ def fetch(headers, session, ssoToken, col):
             break
             
     return notices
+
+
+def save(col, notices, i):
+    try:
+        col.insert_one(notices[-i])
+        logging.info(f" [SAVED NOTICE #{notices[-i]['UID'].split('_')[0]}]")
+    except Exception as e:
+        logging.error(f" Failed to Save Notice : #{notices[-i]['UID'].split('_')[0]} ~ {str(e)}")
