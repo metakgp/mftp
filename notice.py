@@ -27,9 +27,8 @@ def fetch(headers, session, ssoToken, col):
     for row in root.findall('row'):
         id_ = row.find('cell[1]').text.strip()
         year = root.findall('row')[0].find('cell[8]').text.split('"')[1].strip()
-        has_attachment = True if bs(row.find('cell[8]').text, 'html.parser').find('a').attrs['title'] == 'Download' else False
         notice = {
-            'UID': f'{id_}_{year}_{has_attachment}',
+            'UID': f'{id_}_{year}',
             'Time': row.find('cell[7]').text.strip(),
             'Type': row.find('cell[2]').text.strip(),
             'Subject': row.find('cell[3]').text.strip(),
@@ -38,7 +37,7 @@ def fetch(headers, session, ssoToken, col):
         
         if int(id_) > latest_index:
             notices.append(notice)
-            logging.info(f" [NEW NOTICE]: #{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']} | {notice['Time']} | {has_attachment}")
+            logging.info(f" [NEW NOTICE]: #{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']} | {notice['Time']}")
         else:
             break
             
