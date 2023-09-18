@@ -22,7 +22,7 @@ parser.add_argument('--gmail-api', action="store_true", help='Use GMAIL API for 
 args = parser.parse_args()
 
 while True:
-    print(f"=============== <<: {datetime.now()} :>> ===============", flush=True)
+    print(f"================ <<: {datetime.now()} :>> ================", flush=True)
     print('[ERP LOGIN]', flush=True)
     _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
      
