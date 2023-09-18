@@ -67,7 +67,7 @@ def format_notice(notices, session):
 
     mails = []
     for notice in reversed(notices):
-        id_, year, attachment = notice['UID'].split('_')
+        id_, year = notice['UID'].split('_')
         
         message = MIMEMultipart()
         message["Subject"] = f"#{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']}"
@@ -100,16 +100,19 @@ def format_notice(notices, session):
         
         message.attach(MIMEText(body, "html"))
         
-        if eval(attachment):
+        # Handling attachment
+        try:
+            attachment = parseAttachment(session, year, id_)
+        except Exception as e:
+            logging.error(f" Failed to parse mail attachment ~ {str(e)}")
+
+        if len(attachment) != 0:
             file = MIMEBase('application', 'octet-stream')
-            try:
-                attachment = parseAttachment(session, year, id_)
-            except Exception as e:
-                logging.error(f" Failed to parse mail attachment ~ {str(e)}")
             file.set_payload(attachment)
             encoders.encode_base64(file)
             file.add_header('Content-Disposition', 'attachment', filename='Attachment.pdf')
             message.attach(file)
+            logging.info(f" [PDF ATTACHED] On notice #{id_} of length ~ {len(attachment)}")
             
         mails.append(message)
 
