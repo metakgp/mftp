@@ -1,15 +1,10 @@
 import logging
 from endpoints import *
 from pymongo import DESCENDING
-from env import MONGODB_URI as uri
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup as bs
-from datetime import datetime, timedelta
-from pymongo.mongo_client import MongoClient as mc
-# Notices Collection
-col = mc(uri).mftp.notices
     
-def fetch(headers, session, ssoToken):
+def fetch(headers, session, ssoToken, col):
     print('[FETCHING NOTICES]', flush=True)
     try:
         r = session.post(TPSTUDENT_URL, data=dict(ssoToken=ssoToken, menu_id=11, module_id=26), headers=headers)
@@ -36,7 +31,6 @@ def fetch(headers, session, ssoToken):
     logging.info(f" Latest Saved Notice Index ~ {latest_index}")
         
     notices = []
-    logging.info(f" Notices uploaded within 2 minutes of current time will be skipped")
     for row in root.findall('row'):
         id_ = row.find('cell[1]').text.strip()
         year = root.findall('row')[0].find('cell[8]').text.split('"')[1].strip()
@@ -49,26 +43,10 @@ def fetch(headers, session, ssoToken):
             'Company': row.find('cell[4]').text.strip(),
         }
         
-        current_time = datetime.now()
-        notice_time = datetime.strptime(notice["Time"], '%d-%m-%Y %H:%M')
-        logging.info(f" Notice ID ~ {id_} | Notice Time ~ {notice_time} | Current Time ~ {current_time}")
-        
         if int(id_) > latest_index:
-            if notice_time + timedelta(minutes=2) < current_time:
-                notices.append(notice)
-                logging.info(f" [ADDED NOTICE ~ {id_}]: {notice['Subject']} | {notice['Company']} | {notice['Time']} | {has_attachment}")
-            else:
-                logging.info(f" [SKIPPED NOTICE ~ {id_}]: {notice['Subject']} | {notice['Company']} | {notice['Time']} | {has_attachment}")
+            notices.append(notice)
+            logging.info(f" [NEW NOTICE]: #{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']} | {notice['Time']} | {has_attachment}")
         else:
             break
             
-    return notices, session
-
-
-def save(notices):
-    try:
-        if notices: print('[SAVING NOTICES]', flush=True)
-        for notice in reversed(notices):
-            col.insert_one(notice)
-    except Exception as e:
-        logging.error(f" Failed to save notices ~ {str(e)}")
+    return notices
