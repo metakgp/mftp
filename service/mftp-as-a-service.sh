@@ -20,7 +20,23 @@ Options:
   restart                  Restart mftp service
   stop                     Stop mftp service  
   start                    Start mftp service
+  cronjob [OPTIONS]        Use mftp as a cronjob
+    Options:
+      enable NUM             Enable mftp cronjob after every NUM minutes (default is 2 minutes)
+      disable                Disable mftp cronjob
+      
 EOF
+}
+
+cronjob() {
+  period="$1"
+  crontab -l > mftp-cron.tmp
+  cron_expression="*/$period * * * *"
+  echo "$cron_expression "$MFTPD/mftp-cron.py"" >> mftp-cron.tmp
+  crontab mftp-cron.tmp
+  rm mftp-cron.tmp
+
+  echo "======================== <<: ENABLED CRONJOB :>> =========================" >> "$MFTPD"/logs.txt
 }
 
 case $1 in
@@ -64,13 +80,18 @@ case $1 in
   sudo systemctl start mftp
   ;;
 "cronjob")
-  action="$2"
-  if [[ "$action" == "enable" ]]; then
-    echo -e "enabling..."
-  elif [[ "$action" == "disable" ]]; then
+  if [[ "$2" == "enable" ]]; then
+    if [[ "$3" =~ ^[0-9]+$ ]]; then
+      cronjob $3
+    elif [[ -z "$3" ]]; then
+      cronjob 2
+    else
+      echo -e "${RED}[ERROR] ${WHITE} Invalid argument for \`${YELLOW}mftp cronjob enable${WHITE}\`"
+    fi
+  elif [[ "$2" == "disable" ]]; then
     echo "Disabling..."
   else 
-    echo "error"
+    echo -e "${RED}[ERROR] ${WHITE} Invalid argument for \`${YELLOW}mftp cronjob${WHITE}\`"
   fi
   ;;
 "*")
