@@ -63,6 +63,16 @@ case $1 in
 "start")
   sudo systemctl start mftp
   ;;
+"cronjob")
+  action="$2"
+  if [[ "$action" == "enable" ]]; then
+    echo -e "enabling..."
+  elif [[ "$action" == "disable" ]]; then
+    echo "Disabling..."
+  else 
+    echo "error"
+  fi
+  ;;
 "*")
   echo -e "${RED}[ERROR] ${WHITE} Invalid argument for \`${YELLOW}mftp${WHITE}\`"
 esac
