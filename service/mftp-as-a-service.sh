@@ -40,9 +40,7 @@ enable_cronjob() {
 }
 
 disable_crontab() {
-  crontab -l | grep -v "$MFTPD/mftp-cron.py" > mftp-cron.tmp
-  crontab mftp-cron.tmp
-  rm mftp-cron.tmp
+  crontab -l | grep -v "$MFTPD/mftp-cron.py" | crontab -
 }
 
 case $1 in
