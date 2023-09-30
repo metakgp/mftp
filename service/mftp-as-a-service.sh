@@ -41,6 +41,7 @@ enable_cronjob() {
 
 disable_crontab() {
   crontab -l | grep -v "$MFTPD/mftp-cron.py" | crontab -
+  echo "======================== <<: DISABLED CRONJOB :>> =========================" >> "$MFTPD"/logs.txt
 }
 
 case $1 in
