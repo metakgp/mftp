@@ -41,7 +41,6 @@
 - [Setup](#setup)
     - [Prerequisites](#prerequisites)
     - [Installation](#installation)
-        - [Setup MFTP as a Service](#setup-mftp-as-a-service)
 - [Usage](#usage)
     - [Using MFTP as a Service](#using-mftp-as-a-service)
 - [Maintainer(s)](#maintainers)
@@ -62,7 +61,7 @@
 </div>
 <br/>
 
-MFTP continuously monitors the CDC Noticeboard and forwards incoming notices to the configured email address, whether it's an individual account or a Google Group. It is also available as a service on linux systems.
+MFTP continuously monitors the CDC Noticeboard and forwards incoming notices to the configured email address, whether it's an individual account or a Google Group. It is also available as a service and as a cronjob on linux systems.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -88,7 +87,7 @@ The following requirements are to be satisfied for the project to function prope
   sudo apt update
   sudo apt install python3
   ```
-* [MongoDB clusters' URI](https://www.mongodb.com/docs/manual/reference/connection-string/). Creating an account on MongoDB Atlas and then create a cluster, give yourself access to that cluster and get the mongoDB connect URI.
+* [MongoDB clusters' URI](https://www.mongodb.com/docs/manual/reference/connection-string/). Create an account on MongoDB Atlas and then create a cluster, give yourself access to that cluster and get the mongoDB connect URI.
 * This project depends on [ERP Login module](https://github.com/proffapt/iitkgp-erp-login-pypi) by [Arpit Bhardwaj](https://github.com/proffapt) for the ERP Login workflow. Read its [documentation](https://github.com/proffapt/iitkgp-erp-login-pypi/blob/main/README.md) and setup your environment for it.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -141,15 +140,12 @@ _Now that the environment has been set up and configured to properly compile and
      MONGODB_URI = "%****%******%"
      ```
    - Update the values inside the `double quotes` ("). **DO NOT CHANGE VAR NAMES.**
-
-
-#### Setup MFTP as a Service
-
-For linux systems MFTP is available as a service . To configure it, execute the following commands after navigating into the root directory of the project (inside the mftp folder).
-```sh
-cd service/
-./configure-service.sh
-```
+5. Configure the mftp service
+   For linux systems MFTP is available as a service and as a cronjob. To configure it, execute the following commands after navigating into the root directory of the project (inside the mftp folder).
+   ```sh
+   cd service/
+   ./configure-service.sh
+   ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -186,6 +182,11 @@ Options:
   restart                  Restart mftp service
   stop                     Stop mftp service
   start                    Start mftp service
+  cronjob [OPTIONS]        Use mftp as a cronjob
+    Options:
+      enable [NUM]             Enable mftp cronjob after every NUM minutes (default is 2 minutes)
+      disable                  Disable mftp cronjob
+      status                   Check status of mftp cronjob
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
