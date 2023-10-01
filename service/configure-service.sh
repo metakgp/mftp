@@ -6,11 +6,6 @@ YELLOW=$(tput setaf 3)
 BLUE=$(tput setaf 4)
 WHITE=$(tput setaf 7)
 
-# Copying the service module to /usr/loca/bin
-cp mftp-as-a-service.sh ~/.local/bin/mftp &&\
-  echo -e "${GREEN}[+] ${BLUE}Installed MFTP as a service script${WHITE}" ||\
-  echo -e "${RED}[ERROR] ${BLUE}Failed to install MFTP as a service script${WHITE}"
-
 # Detecting the shell config file
 if [[ "$(basename $SHELL)" == "bash" ]]; then
   SHELL_RC=~/.bashrc
@@ -41,7 +36,8 @@ if [ $(grep -q 'USERNAME' systemd/mftp.service && echo true || echo false)  == "
   sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp.service
 fi
   
-if [ $(grep -q 'MAILSERVICE' systemd/mftp.service && echo true || echo false)  == "true" ]; then
+if [ $(grep -q 'MAILSERVICE' systemd/mftp.service && echo true || echo false)  == "true" ] ||\ 
+  [ $(grep -q 'MAILSERVICE' mftp-as-a-service.sh && echo true || echo false)  == "true" ]; then
   read -rp "${YELLOW}How do you want to send mail? ${WHITE}[${GREEN}smtp${WHITE}/${GREEN}gmail-api${WHITE}]${YELLOW}:${WHITE} " MAILSERVICE
   while [[ ! $MAILSERVICE =~ ^(smtp|gmail-api)$ ]]; do
     read -rp "${RED}Invalid option. ${YELLOW}Please enter '${GREEN}smtp${YELLOW}' or '${GREEN}gmail-api${YELLOW}':${WHITE} " MAILSERVICE 
@@ -49,6 +45,7 @@ if [ $(grep -q 'MAILSERVICE' systemd/mftp.service && echo true || echo false)  =
   echo -e "\n${YELLOW}[~] ${WHITE}You can change it later in ${GREEN}systemd/mftp.service${WHITE}\n"
   
   sed -i "s#MAILSERVICE#${MAILSERVICE:=smtp}#g" systemd/mftp.service
+  sed -i "s#MAILSERVICE#${MAILSERVICE:=smtp}#g" mftp-as-a-service.sh
 fi
 
 echo -e "${GREEN}[+] ${BLUE}Setting MFTP startup service${WHITE}"
@@ -60,3 +57,9 @@ sudo systemctl daemon-reload
 sudo systemctl enable mftp &&\
   echo -e "${GREEN}[+] ${BLUE}Enabled MFTP startup service${WHITE}" ||\
   echo -e "${RED}[ERROR] ${BLUE}Failed to enable MFTP startup service${WHITE}"
+
+# Copying the service module to /usr/loca/bin
+cp mftp-as-a-service.sh ~/.local/bin/mftp &&\
+  echo -e "${GREEN}[+] ${BLUE}Installed MFTP as a service script${WHITE}" ||\
+  echo -e "${RED}[ERROR] ${BLUE}Failed to install MFTP as a service script${WHITE}"
+
