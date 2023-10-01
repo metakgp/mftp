@@ -31,8 +31,8 @@ EOF
 enable_cronjob() {
   period="$1"
   crontab -l > mftp-cron.tmp
-  cron_expression="*/$period * * * *"
-  echo "$cron_expression "$MFTPD/mftp-cron.py"" >> mftp-cron.tmp
+  cron_expression="*/${period} * * * *"
+  echo "$cron_expression ${MFTPD}/mftp-cron.py" >> mftp-cron.tmp
   crontab mftp-cron.tmp
   rm mftp-cron.tmp
 
