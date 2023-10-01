@@ -86,7 +86,12 @@ case $1 in
 "cronjob")
   if [[ "$2" == "enable" ]]; then
     if [[ "$3" =~ ^[0-9]+$ ]] || [[ -z "$3" ]]; then
-      enable_cronjob "${3:-2}"
+      if ! crontab -l | grep -q "mftp-cron.py"; then
+        enable_cronjob "${3:-2}"
+        echo -e "${GREEN}[+] ${WHITE}Cronjob configured!"
+      else
+        echo -e "${YELLOW}[~] ${WHITE}Cronjob already configured"
+      fi
     else
       echo -e "${RED}[ERROR] ${WHITE} Invalid argument for \`${YELLOW}mftp cronjob enable${WHITE}\`"
     fi
