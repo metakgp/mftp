@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup as bs
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
-from env import FROM_EMAIL, FROM_EMAIL_PASS, TO_EMAIL
+from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S
 from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
 from notice import save as save_notice, get_latest_index
 
@@ -55,7 +55,7 @@ def send(mails, smtp, gmail_api, col, notices):
                     if has_idx_mutated(col, notices, i): break
 
                     try:
-                        server.sendmail(mail["From"], mail["To"], mail.as_string())
+                        server.sendmail(mail["From"], BCC_EMAIL_S, mail.as_string())
                         logging.info(f" [MAIL SENT] ~ {mail['Subject']}")
                         save_notice(col, notices, i) # Saving successfully sent notices into DB
                     except smtplib.SMTPException as e:
@@ -72,7 +72,7 @@ def format_notice(notices, session):
         message = MIMEMultipart()
         message["Subject"] = f"#{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']}"
         message["From"] = f'MFTP < {FROM_EMAIL} >'
-        message["To"] = TO_EMAIL
+        message["Bcc"] = ", ".join(BCC_EMAIL_S)
         
         try:
             body = parseBody(session, year, id_)
