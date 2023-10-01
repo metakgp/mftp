@@ -1,6 +1,7 @@
 #!/bin/bash
 
 RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
 WHITE=$(tput setaf 7)
 
@@ -24,6 +25,7 @@ Options:
     Options:
       enable [NUM]             Enable mftp cronjob after every NUM minutes (default is 2 minutes)
       disable                  Disable mftp cronjob
+      status                   Check status of mftp cronjob
       
 EOF
 }
@@ -43,7 +45,7 @@ disable_cronjob() {
   echo "==================== <<: DISABLED CRONJOB :>> ======================" >> "$MFTPD"/logs.txt
 }
 
-case $1 in
+case "$1" in
 "-h" | "--help")
   usage
   exit 0
@@ -84,9 +86,17 @@ case $1 in
   sudo systemctl start mftp
   ;;
 "cronjob")
-  if [[ "$2" == "enable" ]]; then
+  # Getting the status of configuration of mftp cronjob
+  if ! crontab -l | grep -q "mftp-cron.py"; then
+    cron_enabled="False"
+  else
+    cron_enabled="True"
+  fi
+  
+  case "$2" in
+  "enable")
     if [[ "$3" =~ ^[0-9]+$ ]] || [[ -z "$3" ]]; then
-      if ! crontab -l | grep -q "mftp-cron.py"; then
+      if [[ "$cron_enabled" == "False" ]]; then
         enable_cronjob "${3:-2}"
         echo -e "${GREEN}[+] ${WHITE}Cronjob configured!"
       else
@@ -95,11 +105,20 @@ case $1 in
     else
       echo -e "${RED}[ERROR] ${WHITE} Invalid argument for \`${YELLOW}mftp cronjob enable${WHITE}\`"
     fi
-  elif [[ "$2" == "disable" ]]; then
+    ;;
+  "disable")
     disable_cronjob
-  else 
+    ;;
+  "status")
+    if [[ "$cron_enabled" == "True" ]]; then
+      echo -e "${GREEN}[+] ${WHITE}Cronjob is configured!"
+    else
+      echo -e "${RED}[-] ${WHITE} Cronjob is not configured"
+    fi 
+    ;;
+  "*")
     echo -e "${RED}[ERROR] ${WHITE} Invalid argument for \`${YELLOW}mftp cronjob${WHITE}\`"
-  fi
+  esac
   ;;
 "*")
   echo -e "${RED}[ERROR] ${WHITE} Invalid argument for \`${YELLOW}mftp${WHITE}\`"
