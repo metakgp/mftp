@@ -86,10 +86,8 @@ case $1 in
   ;;
 "cronjob")
   if [[ "$2" == "enable" ]]; then
-    if [[ "$3" =~ ^[0-9]+$ ]]; then
-      enable_cronjob $3
-    elif [[ -z "$3" ]]; then
-      enable_cronjob 2
+    if [[ "$3" =~ ^[0-9]+$ ]] || [[ -z "$3" ]]; then
+      enable_cronjob "${3:-2}"
     else
       echo -e "${RED}[ERROR] ${WHITE} Invalid argument for \`${YELLOW}mftp cronjob enable${WHITE}\`"
     fi
