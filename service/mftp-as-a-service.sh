@@ -20,7 +20,27 @@ Options:
   restart                  Restart mftp service
   stop                     Stop mftp service  
   start                    Start mftp service
+  cronjob [OPTIONS]        Use mftp as a cronjob
+    Options:
+      enable [NUM]             Enable mftp cronjob after every NUM minutes (default is 2 minutes)
+      disable                  Disable mftp cronjob
+      
 EOF
+}
+
+enable_cronjob() {
+  period="$1"
+  crontab -l > mftp-cron.tmp
+  cron_expression="*/${period} * * * *"
+  echo "$cron_expression ${MFTPD}/service/mftp-cron.py" >> mftp-cron.tmp
+  crontab mftp-cron.tmp
+  rm mftp-cron.tmp
+  echo "===================== <<: ENABLED CRONJOB :>> ======================" >> "$MFTPD"/logs.txt
+}
+
+disable_cronjob() {
+  crontab -l | grep -v "${MFTPD}/service/mftp-cron.py" | crontab -
+  echo "==================== <<: DISABLED CRONJOB :>> ======================" >> "$MFTPD"/logs.txt
 }
 
 case $1 in
@@ -62,6 +82,19 @@ case $1 in
   ;;
 "start")
   sudo systemctl start mftp
+  ;;
+"cronjob")
+  if [[ "$2" == "enable" ]]; then
+    if [[ "$3" =~ ^[0-9]+$ ]] || [[ -z "$3" ]]; then
+      enable_cronjob "${3:-2}"
+    else
+      echo -e "${RED}[ERROR] ${WHITE} Invalid argument for \`${YELLOW}mftp cronjob enable${WHITE}\`"
+    fi
+  elif [[ "$2" == "disable" ]]; then
+    disable_cronjob
+  else 
+    echo -e "${RED}[ERROR] ${WHITE} Invalid argument for \`${YELLOW}mftp cronjob${WHITE}\`"
+  fi
   ;;
 "*")
   echo -e "${RED}[ERROR] ${WHITE} Invalid argument for \`${YELLOW}mftp${WHITE}\`"
