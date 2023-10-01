@@ -22,7 +22,7 @@ Options:
   start                    Start mftp service
   cronjob [OPTIONS]        Use mftp as a cronjob
     Options:
-      enable NUM             Enable mftp cronjob after every NUM minutes (default is 2 minutes)
+      enable [NUM]             Enable mftp cronjob after every NUM minutes (default is 2 minutes)
       disable                Disable mftp cronjob
       
 EOF
