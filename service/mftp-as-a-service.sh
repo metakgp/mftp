@@ -32,14 +32,14 @@ enable_cronjob() {
   period="$1"
   crontab -l > mftp-cron.tmp
   cron_expression="*/${period} * * * *"
-  echo "$cron_expression ${MFTPD}/mftp-cron.py" >> mftp-cron.tmp
+  echo "$cron_expression ${MFTPD}/service/mftp-cron.py" >> mftp-cron.tmp
   crontab mftp-cron.tmp
   rm mftp-cron.tmp
   echo "===================== <<: ENABLED CRONJOB :>> ======================" >> "$MFTPD"/logs.txt
 }
 
-disable_crontab() {
-  crontab -l | grep -v "$MFTPD/mftp-cron.py" | crontab -
+disable_cronjob() {
+  crontab -l | grep -v "$MFTPD/service/mftp-cron.py" | crontab -
   echo "==================== <<: DISABLED CRONJOB :>> ======================" >> "$MFTPD"/logs.txt
 }
 
@@ -91,7 +91,7 @@ case $1 in
       echo -e "${RED}[ERROR] ${WHITE} Invalid argument for \`${YELLOW}mftp cronjob enable${WHITE}\`"
     fi
   elif [[ "$2" == "disable" ]]; then
-    disable_crontab
+    disable_cronjob
   else 
     echo -e "${RED}[ERROR] ${WHITE} Invalid argument for \`${YELLOW}mftp cronjob${WHITE}\`"
   fi
