@@ -23,7 +23,7 @@ Options:
   cronjob [OPTIONS]        Use mftp as a cronjob
     Options:
       enable [NUM]             Enable mftp cronjob after every NUM minutes (default is 2 minutes)
-      disable                Disable mftp cronjob
+      disable                  Disable mftp cronjob
       
 EOF
 }
@@ -35,13 +35,12 @@ enable_cronjob() {
   echo "$cron_expression ${MFTPD}/mftp-cron.py" >> mftp-cron.tmp
   crontab mftp-cron.tmp
   rm mftp-cron.tmp
-
-  echo "======================== <<: ENABLED CRONJOB :>> =========================" >> "$MFTPD"/logs.txt
+  echo "===================== <<: ENABLED CRONJOB :>> ======================" >> "$MFTPD"/logs.txt
 }
 
 disable_crontab() {
   crontab -l | grep -v "$MFTPD/mftp-cron.py" | crontab -
-  echo "======================== <<: DISABLED CRONJOB :>> =========================" >> "$MFTPD"/logs.txt
+  echo "==================== <<: DISABLED CRONJOB :>> ======================" >> "$MFTPD"/logs.txt
 }
 
 case $1 in
