@@ -32,7 +32,7 @@ enable_cronjob() {
   period="$1"
   crontab -l > mftp-cron.tmp
   cron_expression="*/${period} * * * *"
-  echo "$cron_expression $(which python3) ${MFTPD}/mftp-cron.py --MAILSERVICE >>${MFTPD}/logs.txt 2>&1" >> mftp-cron.tmp
+  echo "$cron_expression cd ${MFTPD}; $(which python3) mftp-cron.py --MAILSERVICE >>logs.txt 2>&1" >> mftp-cron.tmp
   crontab mftp-cron.tmp
   rm mftp-cron.tmp
   echo "===================== <<: ENABLED CRONJOB :>> ======================" >> "$MFTPD"/logs.txt
