@@ -39,7 +39,7 @@ enable_cronjob() {
 }
 
 disable_cronjob() {
-  crontab -l | grep -v "$MFTPD/service/mftp-cron.py" | crontab -
+  crontab -l | grep -v "${MFTPD}/service/mftp-cron.py" | crontab -
   echo "==================== <<: DISABLED CRONJOB :>> ======================" >> "$MFTPD"/logs.txt
 }
 
