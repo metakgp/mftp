@@ -36,7 +36,7 @@ if [ $(grep -q 'USERNAME' systemd/mftp.service && echo true || echo false)  == "
   sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp.service
 fi
   
-if [ $(grep -q 'MAILSERVICE' systemd/mftp.service && echo true || echo false)  == "true" ] ||\ 
+if [ $(grep -q 'MAILSERVICE' systemd/mftp.service && echo true || echo false)  == "true" ] ||\
   [ $(grep -q 'MAILSERVICE' mftp-as-a-service.sh && echo true || echo false)  == "true" ]; then
   read -rp "${YELLOW}How do you want to send mail? ${WHITE}[${GREEN}smtp${WHITE}/${GREEN}gmail-api${WHITE}]${YELLOW}:${WHITE} " MAILSERVICE
   while [[ ! $MAILSERVICE =~ ^(smtp|gmail-api)$ ]]; do
