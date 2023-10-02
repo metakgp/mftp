@@ -23,19 +23,18 @@ else
 fi
 source "$SHELL_RC"
 
-# Only for linux
-# Configuring startup service for MFTP
+# Configuring variables mftp startup service
 echo -e "${GREEN}[+] ${BLUE}Configuring MFTP startup service${WHITE}"
 if [ $(grep -q 'USERNAME' systemd/mftp.service && echo true || echo false) == "true" ]; then
   sed -i "s#USERNAME#${USER}#g" systemd/mftp.service
 fi
-
 if [ $(grep -q 'USERNAME' systemd/mftp.service && echo true || echo false)  == "true" ] ||\
   [ $(grep -q 'MFTPD' systemd/mftp-startup-service.sh && echo true || echo false)  == "true" ]; then
   sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp-startup-service.sh
   sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp.service
 fi
   
+# Configuring email method
 if [ $(grep -q 'MAILSERVICE' systemd/mftp.service && echo true || echo false)  == "true" ] ||\
   [ $(grep -q 'MAILSERVICE' mftp-as-a-service.sh && echo true || echo false)  == "true" ]; then
   read -rp "${YELLOW}How do you want to send mail? ${WHITE}[${GREEN}smtp${WHITE}/${GREEN}gmail-api${WHITE}]${YELLOW}:${WHITE} " MAILSERVICE
@@ -54,11 +53,24 @@ sudo cp systemd/mftp.service /etc/systemd/system/
 sudo chmod 777 /etc/systemd/system/mftp.service
 sudo systemctl daemon-reload
 
-sudo systemctl enable mftp &&\
-  echo -e "${GREEN}[+] ${BLUE}Enabled MFTP startup service${WHITE}" ||\
-  echo -e "${RED}[ERROR] ${BLUE}Failed to enable MFTP startup service${WHITE}"
-
-# Copying the service module to /usr/loca/bin
+# Check if ~/.local/bin directory exists
+if [ ! -d "$HOME/.local/bin" ]; then
+  # Create ~/.local/bin directory
+  mkdir -p "$HOME/.local/bin"
+  echo -e "${GREEN}[+] ${BLUE}Created ${YELLOW}~/.local/bin${BLUE} directory${WHITE}"
+else
+  echo -e "${YELLOW}[~] ${YELLOW}~/.local/bin${BLUE} directory already exists${WHITE}"
+fi
+# Check if ~/.local/bin is already in PATH
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+  # Add ~/.local/bin to PATH
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$SHELL_RC"
+  echo -e "${GREEN}[+] ${BLUE}Added ${YELLOW}~/.local/bin${BLUE} to path${WHITE}"
+else
+  echo -e "${YELLOW}[~] ${YELLOW}~/.local/bin${BLUE} was already in path${WHITE}"
+fi
+source "$SHELL_RC"
+# Copying the service module to ~/.local/bin
 cp mftp-as-a-service.sh ~/.local/bin/mftp &&\
   echo -e "${GREEN}[+] ${BLUE}Installed MFTP as a service script${WHITE}" ||\
   echo -e "${RED}[ERROR] ${BLUE}Failed to install MFTP as a service script${WHITE}"
