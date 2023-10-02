@@ -28,23 +28,24 @@ echo -e "${GREEN}[+] ${BLUE}Configuring MFTP startup service${WHITE}"
 if [ $(grep -q 'USERNAME' systemd/mftp.service && echo true || echo false) == "true" ]; then
   sed -i "s#USERNAME#${USER}#g" systemd/mftp.service
 fi
-if [ $(grep -q 'USERNAME' systemd/mftp.service && echo true || echo false)  == "true" ] ||\
-  [ $(grep -q 'MFTPD' systemd/mftp-startup-service.sh && echo true || echo false)  == "true" ]; then
+if [ $(grep -q 'MFTPD' systemd/mftp-startup-service.sh && echo true || echo false)  == "true" ]; then
   sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp-startup-service.sh
   sed -i "s#MFTPD#${MFTPD}#g" systemd/mftp.service
 fi
   
 # Configuring email method
-if [ $(grep -q 'MAILSERVICE' systemd/mftp.service && echo true || echo false)  == "true" ] ||\
-  [ $(grep -q 'MAILSERVICE' mftp-as-a-service.sh && echo true || echo false)  == "true" ]; then
+if [ $(grep -q -e 'MAILSERVICE' -e 'gmail-api' -e 'smtp' systemd/mftp.service && echo true || echo false)  == "true" ] ||\
+  [ $(grep -q 'MAILSERVICE' -e 'gmail-api' -e 'smtp' mftp-as-a-service.sh && echo true || echo false)  == "true" ]; then
   read -rp "${YELLOW}How do you want to send mail? ${WHITE}[${GREEN}smtp${WHITE}/${GREEN}gmail-api${WHITE}]${YELLOW}:${WHITE} " MAILSERVICE
   while [[ ! $MAILSERVICE =~ ^(smtp|gmail-api)$ ]]; do
     read -rp "${RED}Invalid option. ${YELLOW}Please enter '${GREEN}smtp${YELLOW}' or '${GREEN}gmail-api${YELLOW}':${WHITE} " MAILSERVICE 
   done
-  echo -e "\n${YELLOW}[~] ${WHITE}You can change it later in ${GREEN}systemd/mftp.service${WHITE}\n"
+  echo -e "\n${YELLOW}[~] ${WHITE}You can change it later by running this script again${WHITE}\n"
   
-  sed -i "s#MAILSERVICE#${MAILSERVICE:=smtp}#g" systemd/mftp.service
-  sed -i "s#MAILSERVICE#${MAILSERVICE:=smtp}#g" mftp-as-a-service.sh
+  for string in "MAILSERVICE" "gmail-api" "smtp"; do
+    sed -i "s#${string}#${MAILSERVICE:=smtp}#g" systemd/mftp.service
+    sed -i "s#${string}#${MAILSERVICE:=smtp}#g" mftp-as-a-service.sh
+  done
 fi
 
 echo -e "${GREEN}[+] ${BLUE}Setting MFTP startup service${WHITE}"
