@@ -10,6 +10,7 @@ env.py
 
 # logs
 logs.txt
+.lsnif
 
 # configs
 mftp-service-aliases

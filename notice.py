@@ -1,10 +1,10 @@
+import os
 import logging
 from endpoints import *
-from pymongo import DESCENDING
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup as bs
     
-def fetch(headers, session, ssoToken, col):
+def fetch(headers, session, ssoToken, lsnif):
     print('[FETCHING NOTICES]', flush=True)
     try:
         r = session.post(TPSTUDENT_URL, data=dict(ssoToken=ssoToken, menu_id=11, module_id=26), headers=headers)
@@ -20,7 +20,7 @@ def fetch(headers, session, ssoToken, col):
     except Exception as e:
         logging.error(f" Failed to extract data from Noticeboard ~ {str(e)}")
 
-    latest_index = get_latest_index(col)
+    latest_index = get_latest_index(lsnif)
     logging.info(f" Latest Saved Notice Index ~ {latest_index}")
         
     notices = []
@@ -44,22 +44,27 @@ def fetch(headers, session, ssoToken, col):
     return notices
 
 
-def get_latest_index(col):
-    if len(list(col.find())) != 0:
-        try:
-            latest_document = col.find_one(sort=[('_id', DESCENDING)])
-        except Exception as e:
-            logging.error(f" Failed to fetch Latest Saved Notice Index ~ {str(e)}")
-        latest_index = int(latest_document['UID'].split('_')[0])
-    else:
+def get_latest_index(lsnif):
+    try:
+        with open(lsnif, 'r') as file:
+            file_content = file.read().strip()
+            latest_index = int(file_content)
+    except FileNotFoundError:
         latest_index = 0
     
     return latest_index
 
 
-def save(col, notices, i):
+def update_lsni(lsnif, notices, i):
+    lsni = notices[-i]['UID'].split('_')[0] # Latest Sent Notice Index
+
+    # Create file if it doesn't exist
+    if not os.path.exists(lsnif):
+        open(lsnif, 'w').close()
+
+    # Save the value of Latest Sent Notice Index
     try:
-        col.insert_one(notices[-i])
-        logging.info(f" [SAVED NOTICE #{notices[-i]['UID'].split('_')[0]}]")
+        with open(lsnif, 'w') as file:
+            file.write(lsni)
     except Exception as e:
-        logging.error(f" Failed to Save Notice : #{notices[-i]['UID'].split('_')[0]} ~ {str(e)}")
+        logging.error(f" Failed to Save Notice ~ #{lsni}")

@@ -7,10 +7,10 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S
 from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
-from notice import save as save_notice, get_latest_index
+from notice import update_lsni, get_latest_index
 
 
-def send(mails, smtp, gmail_api, col, notices):
+def send(mails, smtp, gmail_api, lsnif, notices):
     if mails: 
         print(f"[SENDING MAILS]", flush=True)
 
@@ -23,7 +23,7 @@ def send(mails, smtp, gmail_api, col, notices):
                 logging.error(f" Failed to generate GMAIL API creds ~ {str(e)}")
 
             for i, mail in enumerate(mails, 1):
-                if has_idx_mutated(col, notices, i): break
+                if has_idx_mutated(lsnif, notices, i): break
 
                 try:
                     response = service.users().messages().send(
@@ -35,7 +35,7 @@ def send(mails, smtp, gmail_api, col, notices):
                 
                 if 'id' in response:
                     logging.info(f" [MAIL SENT] ~ {mail['Subject']}")
-                    save_notice(col, notices, i) # Saving successfully sent notices into DB
+                    update_lsni(lsnif, notices, i)
                 else:
                     logging.error(f" Failed to Send Mail : {mail['Subject']} ~ {str(e)}")
         elif smtp:
@@ -52,12 +52,12 @@ def send(mails, smtp, gmail_api, col, notices):
                     logging.error(f" Failed to log in ~ {str(e)}")
 
                 for i, mail in enumerate(mails, 1): 
-                    if has_idx_mutated(col, notices, i): break
+                    if has_idx_mutated(lsnif, notices, i): break
 
                     try:
                         server.sendmail(mail["From"], BCC_EMAIL_S, mail.as_string())
                         logging.info(f" [MAIL SENT] ~ {mail['Subject']}")
-                        save_notice(col, notices, i) # Saving successfully sent notices into DB
+                        update_lsni(lsnif, notices, i)
                     except smtplib.SMTPException as e:
                         logging.error(f" Failed to Send Mail : {mail['Subject']} ~ {str(e)}")
 
@@ -119,13 +119,13 @@ def format_notice(notices, session):
     return mails
 
 
-def has_idx_mutated(col, notices, i):
-    lidx_from_db = int(get_latest_index(col))
-    cidx_from_to_send_mails = int(notices[-i]['UID'].split('_')[0])
-    difference_in_idx = cidx_from_to_send_mails - lidx_from_db
+def has_idx_mutated(lsnif, notices, i):
+    lidx_from_file = get_latest_index(lsnif) # Latest Index from File
+    cidx_from_to_send_mails = int(notices[-i]['UID'].split('_')[0]) # Current Index from to send mails
+    difference_in_idx = cidx_from_to_send_mails - lidx_from_file
 
     if difference_in_idx != 1: 
-        logging.error(f" Trying to send mail #{cidx_from_to_send_mails} while latest in database is #{lidx_from_db}")
+        logging.error(f" Trying to send mail #{cidx_from_to_send_mails} while latest in database is #{lidx_from_file}")
         return True
     
     return False
