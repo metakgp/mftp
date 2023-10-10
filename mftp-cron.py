@@ -6,10 +6,8 @@ import requests
 import argparse
 from datetime import datetime
 import iitkgp_erp_login.erp as erp
-from env import MONGODB_URI as uri
-from pymongo.mongo_client import MongoClient as mc
 
-col = mc(uri).mftp.notices # Notices' Collection
+lsnif = ".lsnif"
 headers = {
     'timeout': '20',
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/51.0.2704.79 Chrome/51.0.2704.79 Safari/537.36',
@@ -25,7 +23,7 @@ print(f"================ <<: {datetime.now()} :>> ================", flush=True)
 print('[ERP LOGIN]', flush=True)
 _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
      
-notices = notice.fetch(headers, session, ssoToken, col)
+notices = notice.fetch(headers, session, ssoToken, lsnif)
 mails = mail.format_notice(notices, session)
-mail.send(mails, args.smtp, args.gmail_api, col, notices)
+mail.send(mails, args.smtp, args.gmail_api, lsnif, notices)
     

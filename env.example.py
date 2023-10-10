@@ -14,4 +14,3 @@ FROM_EMAIL_PASS = "**********"
 # OTHER PARAMETERS
 BCC_EMAIL_S = ["xyz@googlegroups.com", "abc@googlegroups.com"] # Multiple mails for bcc
 # BCC_EMAIL_S = ["xyz@googlegroups.com"] # This is how you can set single mail in a list
-MONGODB_URI = "%****%******%"

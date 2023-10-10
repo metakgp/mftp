@@ -63,10 +63,12 @@
 
 MFTP continuously monitors the CDC Noticeboard and forwards incoming notices to the configured email address, whether it's an individual account or a Google Group. It is also available as a service and as a cronjob on linux systems.
 
-> **Warning** This tool is completely legal, but the way you use it can get you into legal trouble. Some things you **cannot** do are:
+> [!Warning]
+> This tool is completely legal, but the way you use it can get you into legal trouble. Some things you **cannot** do are:
 > - Use this tool to send CDC notifications to **any non-KGPian**.
 > - Use this tool on a wide scale or publicise its running instance without consent from the Placement Committee.
->> Please use this tool responsibly and within ethical and legal bounds. We do not promote violating company policies or laws. The extent of the punishment may very **from disciplinary action by the institute to blacklisting from CDC process**.
+>
+> Please use this tool responsibly and within ethical and legal bounds. We do not promote violating company policies or laws. The extent of the punishment may very **from disciplinary action by the institute to blacklisting from CDC process**.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -92,7 +94,6 @@ The following requirements are to be satisfied for the project to function prope
   sudo apt update
   sudo apt install python3
   ```
-* [MongoDB clusters' URI](https://www.mongodb.com/docs/manual/reference/connection-string/). Create an account on MongoDB Atlas and then create a cluster, give yourself access to that cluster and get the mongoDB connect URI.
 * This project depends on [ERP Login module](https://github.com/proffapt/iitkgp-erp-login-pypi) by [Arpit Bhardwaj](https://github.com/proffapt) for the ERP Login workflow. Read its [documentation](https://github.com/proffapt/iitkgp-erp-login-pypi/blob/main/README.md) and setup your environment for it.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -112,9 +113,9 @@ _Now that the environment has been set up and configured to properly compile and
 3. #### Sending Emails
     The tool provides two methods of sending emails.
 
-    > Why?<br/>
-    > Because on campus LAN port `465` (SMTP port) is blocked and if you want to host it on an internal server on the campus LAN, you will need another method than SMTP. <br/>
-    > However, it is preferred to use SMTP when hosting on external server as SMTP is the easiest of the two.
+	> [!Note]
+    > Since, port `465` (SMTP with SSL) on campus LAN is blocked and if you want to host mftp on an internal server on the campus LAN, it will need another method then SMTP. <br/>
+    > However, it is preferred to use SMTP when hosting on external server as SMTP is the convenient of the two.
 
     - ##### Using SMTP
       > `--smtp`
@@ -143,7 +144,6 @@ _Now that the environment has been set up and configured to properly compile and
      # OTHER PARAMETERS
      BCC_EMAIL_S = ["xyz@googlegroups.com", "abc@googlegroups.com"] # Multiple mails for bcc
      # BCC_EMAIL_S = ["xyz@googlegroups.com"] # This is how you can set single mail in a list
-     MONGODB_URI = "%****%******%"
      ```
    - Update the values inside the `double quotes` ("). **DO NOT CHANGE VAR NAMES.**
 5. Configure the mftp service
