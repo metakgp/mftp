@@ -129,21 +129,22 @@ _Now that the environment has been set up and configured to properly compile and
    - Copy `env.example.py` as `env.py`. It looks like this:
      ```python
      # ERP Credentials
-     ROLL_NUMBER = "XXYYXXXXX"
-     PASSWORD = "**********"
-     SECURITY_QUESTIONS_ANSWERS = {
+     ROLL_NUMBER = "XXYYXXXXX" # Institute Roll Number
+     PASSWORD = "**********" # ERP Password
+     SECURITY_QUESTIONS_ANSWERS = { # ERP Secret Questions and their Answers
          "Q1" : "A1",
          "Q2" : "A2",
          "Q3" : "A3",
      }
 
      # EMAIL CREDENTIALS
-     FROM_EMAIL = "abc@gmail.com"
-     FROM_EMAIL_PASS = "**********"
+     FROM_EMAIL = "abc@gmail.com" # Notification Sender Email-id
+     FROM_EMAIL_PASS = "**********" # App password for the above email-id
 
      # OTHER PARAMETERS
      BCC_EMAIL_S = ["xyz@googlegroups.com", "abc@googlegroups.com"] # Multiple mails for bcc
      # BCC_EMAIL_S = ["xyz@googlegroups.com"] # This is how you can set single mail in a list
+     KEEP_TOKEN_ALIVE_EMAIL = "xyz@gmail.com" # Email-id to send regular emails to keep the token alive
      ```
    - Update the values inside the `double quotes` ("). **DO NOT CHANGE VAR NAMES.**
 5. Configure the mftp service
