@@ -111,20 +111,21 @@ _Now that the environment has been set up and configured to properly compile and
    pip3 install -r requirements.txt
    ```
 3. #### Sending Emails
-    The tool provides two methods of sending emails.
 
-	> [!Note]
-    > Since, port `465` (SMTP with SSL) on campus LAN is blocked and if you want to host mftp on an internal server on the campus LAN, it will need another method then SMTP. <br/>
-    > However, it is preferred to use SMTP when hosting on external server as SMTP is the convenient of the two.
+> [!Note]
+> Since, port `465` (SMTP with SSL) on campus LAN is blocked and if you want to host mftp on an internal server on the campus LAN, it will need another method then SMTP. <br/>
+> However, it is preferred to use SMTP when hosting on external server as SMTP is the convenient of the two.
+   
+   The tool provides two methods of sending emails.
 
-    - ##### Using SMTP
-      > `--smtp`
-      - [Create an app password](https://support.google.com/accounts/answer/185833?hl=en) for the senders' email.
-      - After creating app password use it as your `FROM_EMAIL_PASS` value in  next step.
-    - ##### Using GMAIL API
-      > `--gmail-api`
-      - Follow this [quick start guide](https://developers.google.com/gmail/api/quickstart/python) to configure _gmail api_ on the senders' mail.
-      - After successfull configuration of gmail api, you can leave the value of `FROM_EMAIL_PASS` as it is in the next step.
+   - ##### Using SMTP
+     > `--smtp`
+     - [Create an app password](https://support.google.com/accounts/answer/185833?hl=en) for the senders' email.
+     - After creating app password use it as your `FROM_EMAIL_PASS` value in  next step.
+   - ##### Using GMAIL API
+     > `--gmail-api`
+     - Follow this [quick start guide](https://developers.google.com/gmail/api/quickstart/python) to configure _gmail api_ on the senders' mail.
+     - After successfull configuration of gmail api, you can leave the value of `FROM_EMAIL_PASS` as it is in the next step.
 4. Configuring environment variables
    - Copy `env.example.py` as `env.py`. It looks like this:
      ```python
