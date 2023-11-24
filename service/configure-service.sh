@@ -8,9 +8,9 @@ WHITE=$(tput setaf 7)
 
 # Detecting the shell config file
 if [[ "$(basename $SHELL)" == "bash" ]]; then
-  SHELL_RC=~/.bashrc
+  SHELL_RC=~/.profile
 elif [[ "$(basename $SHELL)" == "zsh" ]]; then
-  SHELL_RC=~/.zshrc
+  SHELL_RC=~/.zprofile
 fi
 
 DIRECTORY_CONFIGURED=$(grep -q 'MFTPD' "$SHELL_RC" && echo true || echo false)
