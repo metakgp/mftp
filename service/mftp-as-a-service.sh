@@ -34,14 +34,14 @@ enable_cronjob() {
   period="$1"
   crontab -l > mftp-cron.tmp
   cron_expression="*/${period} * * * *"
-  echo "$cron_expression cd ${MFTPD}; $(which python3) mftp-cron.py --MAILSERVICE >>logs.txt 2>&1" >> mftp-cron.tmp
+  echo "$cron_expression cd ${MFTPD}; $(which python3) mftp.py --cron --MAILSERVICE >>logs.txt 2>&1" >> mftp-cron.tmp
   crontab mftp-cron.tmp
   rm mftp-cron.tmp
   echo "===================== <<: ENABLED CRONJOB :>> ======================" >> "$MFTPD"/logs.txt
 }
 
 disable_cronjob() {
-  crontab -l | grep -v "mftp-cron.py" | crontab -
+  crontab -l | grep -v "mftp.py" | crontab -
   echo "==================== <<: DISABLED CRONJOB :>> ======================" >> "$MFTPD"/logs.txt
 }
 
@@ -87,7 +87,7 @@ case "$1" in
   ;;
 "cronjob")
   # Getting the status of configuration of mftp cronjob
-  if ! crontab -l | grep -q "mftp-cron.py"; then
+  if ! crontab -l | grep -q "mftp.py"; then
     cron_enabled="False"
   else
     cron_enabled="True"

@@ -1,0 +1,21 @@
+# IDE related
+.vscode/
+.idea/
+
+# Git related
+.git/
+.github/
+.gitignore
+
+# Github related
+LICENSE.txt
+README.md
+
+# Project related
+__pycache__/
+service/
+.session
+.lsnif
+logs.txt
+*.json
+env.*

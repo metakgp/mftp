@@ -37,18 +37,26 @@
 <summary>Table of Contents</summary>
 
 - [About The Project](#about-the-project)
+- [Using docker](#using-docker)
+    - [Prerequisites](#prerequisites-with-docker)
+    - [Installation](#installation-with-docker)
+    - [Usage](#usage-with-docker)
+        - [Docker Compose](#docker-compose)
+        - [Docker Command](#docker-command)
+        - [As a cronjob](#as-a-cronjob)
+            - [With Docker Compose](#with-docker-compose)
+            - [With Docker Command](#with-docker-command)
+- [Without using docker](#without-using-docker)
     - [Supports](#supports)
-- [Setup](#setup)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
-- [Usage](#usage)
-    - [Using MFTP as a Service](#using-mftp-as-a-service)
+    - [Prerequisites](#prerequisites-without-docker)
+    - [Installation](#installation-without-docker)
+    - [Usage](#usage-without-docker)
+        - [Using MFTP as a Service](#using-mftp-as-a-service)
 - [Maintainer(s)](#maintainers)
 - [Contact](#contact)
 - [Additional documentation](#additional-documentation)
 
 </details>
-
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -72,6 +80,126 @@ MFTP continuously monitors the CDC Noticeboard and forwards incoming notices to 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+## Using docker
+
+To set up a local instance of the application using docker, follow the steps below.
+
+<div id="prerequisites-with-docker"></div>
+
+### Prerequisites
+The following requirements are to be satisfied for the project to function properly:
+* [docker](https://docs.docker.com/get-docker/)
+* This project depends on [ERP Login module](https://github.com/proffapt/iitkgp-erp-login-pypi) by [Arpit Bhardwaj](https://github.com/proffapt) for the ERP Login workflow. Read its [documentation](https://github.com/proffapt/iitkgp-erp-login-pypi?tab=readme-ov-file#input) and setup your OTP fetching token mentioned in second point (`OTP_CHECK_INTERVAL`) of optional arguments.
+
+<div id="installation-with-docker"></div>
+
+### Installation
+
+1. Get the docker image
+   
+   You can get the docker image from either docker-hub or by buiilding it locally:
+   - Pull from docker-hub
+     ```sh
+     sudo docker pull proffapt/mftp
+     ```
+   - Build from Dockerfile
+       * Clone the repository and cd into it
+         ```sh
+         git clone https://github.com/metakgp/mftp
+         cd mftp
+         ```
+       * Build the image
+         ```sh
+         sudo docker build -t proffapt/mftp .
+         ```
+2. Create a directory which will contain your tokens and env.py, name it as `mftp_config`
+3. Follow the steps to [configure mail sending](#sending-emails)
+4. Follow the steps to [configure env variables](#configuring-environment-variables)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+<div id="usage-with-docker"></div>
+
+### Usage
+
+#### Docker Compose
+
+It is mandatory to provide both of the following `env variables` before the _docker-compose_ command.
+- `CONFIG`: Absolute path to `mftp_config` directory
+- `MODE`: Mode of sending mail - **smtp** or **gmail**
+
+```sh
+sudo CONFIG=/path/to/mftp_config MODE=smtp docker-compose up -d # Using SMTP for sending mails
+```
+
+```sh
+sudo CONFIG=/path/to/mftp_config MODE=gmail docker-compose up -d # Using Gmail API for sending mails
+```
+
+#### Docker Command
+
+It is mandatory to provide either of the following flags to the execution command.
+- `--smtp`: Using SMTP for sending mails
+  ```sh
+  sudo docker run -d \
+  -v /path/to/mftp_config/env.py:/mftp/env.py \
+  -v /path/to/mftp_config/token.json:/mftp/token.json \
+  -v /path/to/mftp_config/mail_send_token.json:/mftp/mail_send_token.json \
+  -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
+  -v /path/to/mftp_config/.session:/mftp/.session \
+  --restart=unless-stopped \
+  --name mftp \
+  proffapt/mftp --smtp
+  ```
+  
+- `--gmail-api`: Using Gmail API for sending mails
+    ```sh
+  sudo docker run -d \
+  -v /path/to/mftp_config/env.py:/mftp/env.py \
+  -v /path/to/mftp_config/token.json:/mftp/token.json \
+  -v /path/to/mftp_config/mail_send_token.json:/mftp/mail_send_token.json \
+  -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
+  -v /path/to/mftp_config/.session:/mftp/.session \
+  --restart=unless-stopped \
+  --name mftp \
+  proffapt/mftp --gmail-api
+  ```
+
+#### As a cronjob
+
+It is also possible to run these docker containers as a cronjob:
+- ##### With Docker Compose
+    - Comment out the line `restart: unless-stopped`
+    - Append ` --cron` into the `MODE` env variable. For example:
+        * Using Cronjob to run container and SMTP to send mails
+          ```sh
+          sudo CONFIG=/path/to/mftp_config MODE="smtp --cron" docker-compose up -d
+          ```
+        * Using Cronjob to run container and Gmail API to send mails
+          ```sh
+          sudo CONFIG=/path/to/mftp_config MODE="gmail --cron" docker-compose up -d
+          ```
+- ##### With Docker Command
+    - Append `--cron` at the end of any of [these](#docker-command) commands. For example:
+      ```sh
+        sudo docker run -d \
+        -v /path/to/mftp_config/env.py:/mftp/env.py \
+        -v /path/to/mftp_config/token.json:/mftp/token.json \
+        -v /path/to/mftp_config/mail_send_token.json:/mftp/mail_send_token.json \
+        -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
+        -v /path/to/mftp_config/.session:/mftp/.session \
+        --restart=unless-stopped \
+        --name mftp \
+        proffapt/mftp --gmail-api --cron
+        ```
+- Add the updated command with desired [cron expression](https://crontab.cronhub.io/) into your cronjob using [crontab -e](https://www.man7.org/linux/man-pages/man5/crontab.5.html)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+## Without using docker
+
+To set up a local instance of the application without using docker, follow the steps below.
+
 <div id="supports"></div>
 
 ### Supports:
@@ -83,9 +211,7 @@ MFTP continuously monitors the CDC Noticeboard and forwards incoming notices to 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-## Setup
-
-To set up a local instance of the application, follow the steps below.
+<div id="prerequisites-without-docker"></div>
 
 ### Prerequisites
 The following requirements are to be satisfied for the project to function properly:
@@ -98,13 +224,15 @@ The following requirements are to be satisfied for the project to function prope
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+<div id="installation-without-docker"></div>
+
 ### Installation
 
 _Now that the environment has been set up and configured to properly compile and run the project, the next step is to download and configure the project locally on your system._
 1. Clone the repository
    ```sh
-   git clone https://github.com/metakgp/MFTP.git
-   cd ./MFTP
+   git clone https://github.com/metakgp/mftp
+   cd mftp
    ```
 2. Install required dependencies
    ```sh
@@ -126,7 +254,10 @@ _Now that the environment has been set up and configured to properly compile and
      > `--gmail-api`
      - Follow this [quick start guide](https://developers.google.com/gmail/api/quickstart/python) to configure _gmail api_ on the senders' mail.
      - After successfull configuration of gmail api, you can leave the value of `FROM_EMAIL_PASS` as it is in the next step.
-4. Configuring environment variables
+     - Save the generated token as `mail_send_token.json`
+       
+4. #### Configuring environment variables
+
    - Copy `env.example.py` as `env.py`. It looks like this:
      ```python
      # ERP Credentials
@@ -159,17 +290,21 @@ _Now that the environment has been set up and configured to properly compile and
 
 
 <!-- USAGE EXAMPLES -->
-## Usage
+
+<div id="usage-without-docker"></div>
+
+### Usage
 
 It is mandatory to provide either of the following flags to the execution command.
-- `--smtp`
-- `--gmail-api`
-
-<!-- UPDATE -->
-```python
-python3 mftp.py --smtp        # Using SMTP for sending mails
-python3 mftp.py --gmail-api   # Using GMAIL API for sending mails
-```
+- `--smtp`: Using SMTP for sending mails
+  ```python
+  python3 mftp.py --smtp
+  ```
+  
+- `--gmail-api`: Using GMAIL API for sending mails
+  ```python
+  python3 mftp.py --gmail-api
+  ```
 
 #### Using MFTP as a Service
 
