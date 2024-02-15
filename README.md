@@ -125,15 +125,15 @@ The following requirements are to be satisfied for the project to function prope
 #### Docker Compose
 
 It is mandatory to provide both of the following `env variables` before the _docker-compose_ command.
-- `CONFIG`: Absolute path to `mftp_config` directory
-- `MODE`: Mode of sending mail - **smtp** or **gmail**
+- `MFTP_CONFIG`: Absolute path to `mftp_config` directory
+- `MFTP_MODE`: Mode of sending mail - **--smtp** or **--gmail-api**
 
 ```sh
-sudo CONFIG=/path/to/mftp_config MODE=smtp docker-compose up -d # Using SMTP for sending mails
+sudo CONFIG=/path/to/mftp_config MFTP_MODE=--smtp docker-compose up -d # Using SMTP for sending mails
 ```
 
 ```sh
-sudo CONFIG=/path/to/mftp_config MODE=gmail docker-compose up -d # Using Gmail API for sending mails
+sudo CONFIG=/path/to/mftp_config MFTP_MODE=--gmail-api docker-compose up -d # Using Gmail API for sending mails
 ```
 
 #### Docker Command
@@ -174,14 +174,14 @@ It is mandatory to provide either of the following flags to the execution comman
 It is also possible to run these docker containers as a cronjob:
 - ##### With Docker Compose
     - Comment out the line `restart: unless-stopped`
-    - Append ` --cron` into the `MODE` env variable. For example:
+    - Append ` --cron` into the `MFTP_MODE` env variable. For example:
         * Using Cronjob to run container and SMTP to send mails
           ```sh
-          sudo CONFIG=/path/to/mftp_config MODE="smtp --cron" docker-compose up -d
+          sudo CONFIG=/path/to/mftp_config MFTP_MODE="--smtp --cron" docker-compose up -d
           ```
         * Using Cronjob to run container and Gmail API to send mails
           ```sh
-          sudo CONFIG=/path/to/mftp_config MODE="gmail --cron" docker-compose up -d
+          sudo CONFIG=/path/to/mftp_config MFTP_MODE="--gmail-api --cron" docker-compose up -d
           ```
 - ##### With Docker Command
     - Append `--cron` at the end of any of [these](#docker-command) commands. For example:
