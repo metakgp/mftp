@@ -1,0 +1,14 @@
+
+version: "3.8"
+
+services:
+
+  mftp-doctor:
+    build:
+      context: ./mftp-doctor
+      dockerfile: Dockerfile
+    image: proffapt/mftp-doctor
+    container_name: mftp-doctor
+    command: ${DOCTOR:-}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
