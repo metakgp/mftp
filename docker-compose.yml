@@ -11,6 +11,8 @@ services:
     volumes:
       - $CONFIG/env.py:/mftp/env.py
       - $CONFIG/token.json:/mftp/token.json 
+      - $CONFIG/credentials.json:/mftp/credentials.json
       - $CONFIG/mail_send_token.json:/mftp/mail_send_token.json
+      - $CONFIG/mail_send_creds.json:/mftp/mail_send_creds.json
       - $CONFIG/.lsnif:/mftp/.lsnif
       - $CONFIG/.session:/mftp/.session

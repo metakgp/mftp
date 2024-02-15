@@ -144,7 +144,9 @@ It is mandatory to provide either of the following flags to the execution comman
   sudo docker run -d \
   -v /path/to/mftp_config/env.py:/mftp/env.py \
   -v /path/to/mftp_config/token.json:/mftp/token.json \
+  -v /path/to/mftp_config/credentials.json:/mftp/credentials.json \
   -v /path/to/mftp_config/mail_send_token.json:/mftp/mail_send_token.json \
+  -v /path/to/mftp_config/mail_send_creds.json:/mftp/mail_send_creds.json \
   -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
   -v /path/to/mftp_config/.session:/mftp/.session \
   --restart=unless-stopped \
@@ -157,7 +159,9 @@ It is mandatory to provide either of the following flags to the execution comman
   sudo docker run -d \
   -v /path/to/mftp_config/env.py:/mftp/env.py \
   -v /path/to/mftp_config/token.json:/mftp/token.json \
+  -v /path/to/mftp_config/credentials.json:/mftp/credentials.json \
   -v /path/to/mftp_config/mail_send_token.json:/mftp/mail_send_token.json \
+  -v /path/to/mftp_config/mail_send_creds.json:/mftp/mail_send_creds.json \
   -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
   -v /path/to/mftp_config/.session:/mftp/.session \
   --restart=unless-stopped \
@@ -185,7 +189,9 @@ It is also possible to run these docker containers as a cronjob:
         sudo docker run -d \
         -v /path/to/mftp_config/env.py:/mftp/env.py \
         -v /path/to/mftp_config/token.json:/mftp/token.json \
+        -v /path/to/mftp_config/credentials.json:/mftp/credentials.json \
         -v /path/to/mftp_config/mail_send_token.json:/mftp/mail_send_token.json \
+        -v /path/to/mftp_config/mail_send_creds.json:/mftp/mail_send_creds.json \
         -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
         -v /path/to/mftp_config/.session:/mftp/.session \
         --restart=unless-stopped \
