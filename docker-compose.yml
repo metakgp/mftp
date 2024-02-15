@@ -3,7 +3,9 @@ version: "3.8"
 services:
 
   mftp:
-    build: .
+    build:
+      context: ./mftp
+      dockerfile: Dockerfile
     image: proffapt/mftp
     container_name: mftp
     restart: unless-stopped

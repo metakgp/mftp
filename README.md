@@ -106,7 +106,7 @@ The following requirements are to be satisfied for the project to function prope
        * Clone the repository and cd into it
          ```sh
          git clone https://github.com/metakgp/mftp
-         cd mftp
+         cd mftp/mftp
          ```
        * Build the image
          ```sh
@@ -238,7 +238,7 @@ _Now that the environment has been set up and configured to properly compile and
 1. Clone the repository
    ```sh
    git clone https://github.com/metakgp/mftp
-   cd mftp
+   cd mftp/mftp
    ```
 2. Install required dependencies
    ```sh
