@@ -10,12 +10,12 @@ services:
     image: proffapt/mftp
     container_name: mftp
     restart: unless-stopped
-    command: --$MODE
+    command: $MFTP_MODE
     volumes:
-      - $CONFIG/env.py:/mftp/env.py
-      - $CONFIG/token.json:/mftp/token.json 
-      - $CONFIG/credentials.json:/mftp/credentials.json
-      - $CONFIG/mail_send_token.json:/mftp/mail_send_token.json
-      - $CONFIG/mail_send_creds.json:/mftp/mail_send_creds.json
-      - $CONFIG/.lsnif:/mftp/.lsnif
-      - $CONFIG/.session:/mftp/.session
+      - $MFTP_CONFIG/env.py:/mftp/env.py
+      - $MFTP_CONFIG/token.json:/mftp/token.json 
+      - $MFTP_CONFIG/credentials.json:/mftp/credentials.json
+      - $MFTP_CONFIG/mail_send_token.json:/mftp/mail_send_token.json
+      - $MFTP_CONFIG/mail_send_creds.json:/mftp/mail_send_creds.json
+      - $MFTP_CONFIG/.lsnif:/mftp/.lsnif
+      - $MFTP_CONFIG/.session:/mftp/.session

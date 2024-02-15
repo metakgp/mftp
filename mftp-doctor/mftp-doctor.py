@@ -4,6 +4,7 @@ import docker
 import logging
 import requests
 import argparse
+from env import TOPIC_URL, EMAIL
 
 def get_logs():
   client = docker.from_env()
@@ -29,7 +30,7 @@ def check_error(logs):
       logging.info(" ERROR(s) DETECTED!")
 
       try: 
-        resp = send_notification("https://ntfy.sh", "proffapt-mftp", logs)
+        resp = send_notification(logs)
       except Exception as e:
         logging.error(f" FAILED TO SEND NOTIFICATION : {str(e)}")
       finally:
@@ -38,18 +39,18 @@ def check_error(logs):
       logging.info(" NO ERROR(s) DETECTED!")
 
 
-def send_notification(ntfy_server_url, topic, logs):
-    topic_url = f"{ntfy_server_url}/{topic}"
-
+def send_notification(logs):
     headers = {
         "Priority": "5",
         "Tags": "warning,skull,rotating_light,mftp,error",
         "Title": "MFTP encountered an error",
-        "Markdown": "yes",
-        # "Email": "proffapt@gmail.com",
+        "Markdown": "yes"
     }
 
-    response = requests.post(topic_url, headers=headers,
+    if EMAIL:
+      headers["Email"] = EMAIL
+
+    response = requests.post(TOPIC_URL, headers=headers,
                              data=logs)
     return response.status_code
 

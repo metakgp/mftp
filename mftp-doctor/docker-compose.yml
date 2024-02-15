@@ -9,6 +9,7 @@ services:
       dockerfile: Dockerfile
     image: proffapt/mftp-doctor
     container_name: mftp-doctor
-    command: ${DOCTOR:-}
+    command: ${DOCTOR_MODE:-}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - $DOCTOR_CONFIG/env.py:/mftp-doctor/env.py
