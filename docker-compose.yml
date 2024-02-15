@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+
+  mftp:
+    build: .
+    image: proffapt/mftp
+    container_name: mftp
+    restart: unless-stopped
+    command: --$MODE
+    volumes:
+      - $CONFIG/env.py:/mftp/env.py
+      - $CONFIG/token.json:/mftp/token.json 
+      - $CONFIG/mail_send_token.json:/mftp/mail_send_token.json
+      - $CONFIG/.lsnif:/mftp/.lsnif
+      - $CONFIG/.session:/mftp/.session
