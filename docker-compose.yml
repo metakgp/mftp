@@ -18,3 +18,13 @@ services:
       - $CONFIG/mail_send_creds.json:/mftp/mail_send_creds.json
       - $CONFIG/.lsnif:/mftp/.lsnif
       - $CONFIG/.session:/mftp/.session
+    
+  mftp-doctor:
+    build:
+      context: ./mftp-doctor
+      dockerfile: Dockerfile
+    image: proffapt/mftp-doctor
+    container_name: mftp-doctor
+    command: ${DOCTOR:-}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
