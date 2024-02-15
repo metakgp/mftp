@@ -1,6 +1,9 @@
 # Base image of python v3.11.8
 FROM python:3.11.8
 
+# Configure IST timezone
+ENV TZ="Asia/Kolkata"
+
 # Setup the working directory as /mftp
 WORKDIR /mftp
 
