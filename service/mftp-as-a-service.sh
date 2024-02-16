@@ -11,10 +11,10 @@ Usage: ${0##*/} [COMMAND] [OPTIONS]
 
 Command:
   -h, --help                   Display this help and exit
-  logs [OPTIONS]               Display last 25 lines of log file
+  logs [OPTIONS]               Display last 25 lines of mftp log file
     Options:
-      clear                    Clear the log file
-      NUM                      Display last NUM lines of log file
+      clear                    Clear the mftp log file
+      NUM                      Display last NUM lines of mftp log file
   disable                      Disable mftp service  
   enable                       Enable mftp service
   status                       Check status of mftp service
@@ -33,6 +33,10 @@ Command:
       enable [NUM]             Enable doctor cronjob after every NUM minutes (default is 2 minutes)
       disable                  Disable doctor cronjob
       status                   Check status of doctor cronjob
+      logs [OPTIONS]           Display last 25 lines of doctor log file
+        Options:
+          clear                Clear the doctor log file
+          NUM                  Display last NUM lines of doctor log file
 
 EOF
 }
@@ -127,6 +131,21 @@ case "$1" in
     else
       echo -e "${RED}[-]${WHITE} Doctor Cron is not configured"
     fi 
+    ;;
+  "logs")
+    logfile="${MFTPD}/mftp-doctor/logs.txt"
+    if [[ "$3" == "clear" ]]; then
+      echo "" > "$logfile"
+      exit 0
+    elif [[ "$3" =~ ^[0-9]+$ ]] || [[ -z "$3" ]]; then
+      if [ -f "$logfile" ]; then
+        tail -f -n "${3:-25}" "$logfile"
+      else
+        echo -e "${RED}[ERROR] ${WHITE}Log file does not exist"
+      fi
+    else 
+      echo -e "${RED}[ERROR] ${WHITE} Invalid argument for \`${YELLOW}mftp doctor logs${WHITE}\`"
+    fi
     ;;
   esac
   ;;
