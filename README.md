@@ -55,14 +55,6 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-<div align="center">
-
-  <a href="https://github.com/metakgp/MFTP">
-	<img width="1200" alt="image" src="https://user-images.githubusercontent.com/86282911/265526168-8edc1b6f-4326-4d90-b2e5-f9742d0bed6e.png">
-  </a>
-</div>
-<br/>
-
 MFTP continuously monitors the CDC Noticeboard and forwards incoming notices to the configured email address, whether it's an individual account or a Google Group. It is also available as a service and as a cronjob on linux systems along with a [heath checkup utility](./mftp-doctor) to monitor and notify for any errors.
 
 > [!Warning]
@@ -85,6 +77,8 @@ The following requirements are to be satisfied for the project to function prope
 * [For mftp](https://github.com/metakgp/mftp/tree/mftp-doctor/mftp#prerequisites)
 * [For mftp doctor](https://github.com/metakgp/mftp/tree/mftp-doctor/mftp-doctor#prerequisites)
 
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 <div id="installation-with-docker"></div>
 
 ### Installation
@@ -103,6 +97,8 @@ The following requirements are to be satisfied for the project to function prope
 
 ### Usage
 
+<img width="1200" alt="image" src="https://github.com/metakgp/mftp/assets/86282911/f06c46b6-0471-49c2-bd6b-b7bdf765a277">
+
 It is mandatory to provide all of the following `env variables` before the _docker-compose_ command.
 - `MFTP_CONFIG`: Absolute path to `mftp_config` directory
 - `DOCTOR_CONFIG`: Absolute path to `doctor_config` directory
@@ -117,7 +113,7 @@ sudo MFTP_CONFIG=/path/to/mftp_config DOCTOR_CONFIG=/path/to/doctor_config MFTP_
 ```
 
 > [!NOTE]
-> This also is `DOCTOR_MODE` as on of the env variables, which is optional and considers one value only `--cron`. We will use it in the sub-section just next.
+> There also is `DOCTOR_MODE` as one of the environment variables, which is optional and considers one value only `--cron`. We will use it in the sub-section just next.
 
 #### As a cronjob
 
@@ -178,8 +174,8 @@ _Now that the environment has been set up and configured to properly compile and
    ```
 3. Follow the [installation steps for mftp](https://github.com/metakgp/mftp/tree/main/mftp#installation-1)
 4. Follow the [installation steps for mftp doctor](https://github.com/metakgp/mftp/tree/main/mftp-doctor#installation-1)
-5. Configure the mftp service
-   For linux systems MFTP & MFTP Doctor are available as a service and as cronjob. To configure it, execute the following commands after navigating into the root directory of the project (inside the mftp folder).
+5. Configure the mftp service.<br>
+   For linux systems, MFTP & MFTP Doctor are available as a service and as cronjob. To configure them, execute the following commands after navigating into the root directory of the project (inside the mftp folder).
    ```sh
    cd service/
    ./configure-service.sh
@@ -192,6 +188,8 @@ _Now that the environment has been set up and configured to properly compile and
 <div id="usage-without-docker"></div>
 
 ### Usage
+
+<img width="1200" alt="image" src="https://user-images.githubusercontent.com/86282911/265526168-8edc1b6f-4326-4d90-b2e5-f9742d0bed6e.png">
 
 After [configuring MFTP as a service](#setup-mftp-as-a-service), you can use the `mftp` command with several options to interact with the tool as a service.<br/> Following is the help menu for the service.
 
