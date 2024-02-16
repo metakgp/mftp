@@ -32,17 +32,17 @@ EOF
 
 enable_cronjob() {
   period="$1"
-  crontab -l > mftp-cron.tmp
+  crontab -l > "${2}-cron.tmp"
   cron_expression="*/${period} * * * *"
-  echo "$cron_expression cd ${MFTPD}; $(which python3) mftp.py --cron --MAILSERVICE >>logs.txt 2>&1" >> mftp-cron.tmp
-  crontab mftp-cron.tmp
-  rm mftp-cron.tmp
-  echo "===================== <<: ENABLED CRONJOB :>> ======================" >> "$MFTPD"/logs.txt
+  echo "$cron_expression cd ${MFTPD}/${2}; $(which python3) ${2}.py --cron --MAILSERVICE >>logs.txt 2>&1" >> "${2}-cron.tmp"
+  crontab "${2}-cron.tmp"
+  rm "${2}-cron.tmp"
+  echo "===================== <<: ENABLED CRONJOB :>> ======================" >> "${MFTPD}/${2}"/logs.txt
 }
 
 disable_cronjob() {
-  crontab -l | grep -v "mftp.py" | crontab -
-  echo "==================== <<: DISABLED CRONJOB :>> ======================" >> "$MFTPD"/logs.txt
+  crontab -l | grep -v "${1}.py" | crontab -
+  echo "==================== <<: DISABLED CRONJOB :>> ======================" >> "${MFTPD}/${1}"/logs.txt
 }
 
 case "$1" in
@@ -51,7 +51,6 @@ case "$1" in
   exit 0
   ;;
 "logs")
-  logfile="${MFTPD}/logs.txt"
   if [[ "$2" == "clear" ]]; then
     echo "" > "$logfile"
     exit 0
@@ -75,12 +74,12 @@ case "$1" in
   sudo systemctl status mftp
   ;;
 "restart")
-  echo "======================== <<: RESTARTED :>> =========================" >> "$MFTPD"/logs.txt
+  echo "======================== <<: RESTARTED :>> =========================" >> "$MFTPD"/mftp/logs.txt
   sudo systemctl restart mftp
   ;;
 "stop")
   sudo systemctl stop mftp &&\
-  echo "========================= <<: STOPPED :>> ==========================" >> "$MFTPD"/logs.txt
+  echo "========================= <<: STOPPED :>> ==========================" >> "$MFTPD"/mftp/logs.txt
   ;;
 "start")
   sudo systemctl start mftp
@@ -97,7 +96,7 @@ case "$1" in
   "enable")
     if [[ "$3" =~ ^[0-9]+$ ]] || [[ -z "$3" ]]; then
       if [[ "$cron_enabled" == "False" ]]; then
-        enable_cronjob "${3:-2}"
+        enable_cronjob "${3:-2}" "mftp"
         echo -e "${GREEN}[+] ${WHITE}Cronjob configured!"
       else
         echo -e "${YELLOW}[~] ${WHITE}Cronjob already configured"
@@ -107,7 +106,7 @@ case "$1" in
     fi
     ;;
   "disable")
-    disable_cronjob
+    disable_cronjob "mftp"
     ;;
   "status")
     if [[ "$cron_enabled" == "True" ]]; then
