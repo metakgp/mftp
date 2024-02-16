@@ -58,6 +58,7 @@ case "$1" in
   exit 0
   ;;
 "logs")
+  logfile="${MFTPD}/mftp/logs.txt"
   if [[ "$2" == "clear" ]]; then
     echo "" > "$logfile"
     exit 0
