@@ -14,14 +14,13 @@
 </div>
 
 <br />
+
 <div align="center">
   <!-- PROJECT LOGO -->
   <!-- <a href="https://github.com/metakgp/MFTP">
     <img width="140" alt="image" src="https://user-images.githubusercontent.com/86282911/206632284-cb260f57-c612-4ab5-b92b-2172c341ab23.png">
   </a> -->
-
   <h3 align="center">MFTP - My Freaking Training & Placements</h3>
-
   <p align="center">
     <i>CDC Noticeboard on Your Mail: Where Automatic Updates Turn Chaos into Pleasure!</i>
     <br />
@@ -41,17 +40,12 @@
     - [Prerequisites](#prerequisites-with-docker)
     - [Installation](#installation-with-docker)
     - [Usage](#usage-with-docker)
-        - [Docker Compose](#docker-compose)
-        - [Docker Command](#docker-command)
         - [As a cronjob](#as-a-cronjob)
-            - [With Docker Compose](#with-docker-compose)
-            - [With Docker Command](#with-docker-command)
 - [Without using docker](#without-using-docker)
     - [Supports](#supports)
     - [Prerequisites](#prerequisites-without-docker)
     - [Installation](#installation-without-docker)
     - [Usage](#usage-without-docker)
-        - [Using MFTP as a Service](#using-mftp-as-a-service)
 - [Maintainer(s)](#maintainers)
 - [Contact](#contact)
 - [Additional documentation](#additional-documentation)
@@ -69,7 +63,7 @@
 </div>
 <br/>
 
-MFTP continuously monitors the CDC Noticeboard and forwards incoming notices to the configured email address, whether it's an individual account or a Google Group. It is also available as a service and as a cronjob on linux systems.
+MFTP continuously monitors the CDC Noticeboard and forwards incoming notices to the configured email address, whether it's an individual account or a Google Group. It is also available as a service and as a cronjob on linux systems along with a [heath checkup utility](./mftp-doctor) to monitor and notify for any errors.
 
 > [!Warning]
 > This tool is completely legal, but the way you use it can get you into legal trouble. Some things you **cannot** do are:
@@ -88,33 +82,20 @@ To set up a local instance of the application using docker, follow the steps bel
 
 ### Prerequisites
 The following requirements are to be satisfied for the project to function properly:
-* [docker](https://docs.docker.com/get-docker/)
-* This project depends on [ERP Login module](https://github.com/proffapt/iitkgp-erp-login-pypi) by [Arpit Bhardwaj](https://github.com/proffapt) for the ERP Login workflow. Read its [documentation](https://github.com/proffapt/iitkgp-erp-login-pypi?tab=readme-ov-file#input) and setup your OTP fetching token mentioned in second point (`OTP_CHECK_INTERVAL`) of optional arguments.
+* [For mftp](https://github.com/metakgp/mftp/tree/mftp-doctor/mftp#prerequisites)
+* [For mftp doctor](https://github.com/metakgp/mftp/tree/mftp-doctor/mftp-doctor#prerequisites)
 
 <div id="installation-with-docker"></div>
 
 ### Installation
 
-1. Get the docker image
-   
-   You can get the docker image from either docker-hub or by buiilding it locally:
-   - Pull from docker-hub
-     ```sh
-     sudo docker pull proffapt/mftp
-     ```
-   - Build from Dockerfile
-       * Clone the repository and cd into it
-         ```sh
-         git clone https://github.com/metakgp/mftp
-         cd mftp/mftp
-         ```
-       * Build the image
-         ```sh
-         sudo docker build -t proffapt/mftp .
-         ```
-2. Create a directory which will contain your tokens and env.py, name it as `mftp_config`
-3. Follow the steps to [configure mail sending](#sending-emails)
-4. Follow the steps to [configure env variables](#configuring-environment-variables)
+1. Clone the repository and cd into it
+   ```sh
+   git clone https://github.com/metakgp/mftp
+   cd mftp
+   ```
+2. Follow the [installation steps for mftp with docker](https://github.com/metakgp/mftp/tree/main/mftp#installation)
+3. Follow the [installation steps for mftp doctor with docker](https://github.com/metakgp/mftp/tree/main/mftp-doctor#installation)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -122,82 +103,36 @@ The following requirements are to be satisfied for the project to function prope
 
 ### Usage
 
-#### Docker Compose
-
-It is mandatory to provide both of the following `env variables` before the _docker-compose_ command.
+It is mandatory to provide all of the following `env variables` before the _docker-compose_ command.
 - `MFTP_CONFIG`: Absolute path to `mftp_config` directory
+- `DOCTOR_CONFIG`: Absolute path to `doctor_config` directory
 - `MFTP_MODE`: Mode of sending mail - **--smtp** or **--gmail-api**
 
 ```sh
-sudo CONFIG=/path/to/mftp_config MFTP_MODE=--smtp docker-compose up -d # Using SMTP for sending mails
+sudo MFTP_CONFIG=/path/to/mftp_config DOCTOR_CONFIG=/path/to/doctor_config MFTP_MODE="--smtp" docker-compose up -d # Using SMTP for sending mails
 ```
 
 ```sh
-sudo CONFIG=/path/to/mftp_config MFTP_MODE=--gmail-api docker-compose up -d # Using Gmail API for sending mails
+sudo MFTP_CONFIG=/path/to/mftp_config DOCTOR_CONFIG=/path/to/doctor_config MFTP_MODE="--gmail-api" docker-compose up -d # Using Gmail API for sending mails
 ```
 
-#### Docker Command
-
-It is mandatory to provide either of the following flags to the execution command.
-- `--smtp`: Using SMTP for sending mails
-  ```sh
-  sudo docker run -d \
-  -v /path/to/mftp_config/env.py:/mftp/env.py \
-  -v /path/to/mftp_config/token.json:/mftp/token.json \
-  -v /path/to/mftp_config/credentials.json:/mftp/credentials.json \
-  -v /path/to/mftp_config/mail_send_token.json:/mftp/mail_send_token.json \
-  -v /path/to/mftp_config/mail_send_creds.json:/mftp/mail_send_creds.json \
-  -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
-  -v /path/to/mftp_config/.session:/mftp/.session \
-  --restart=unless-stopped \
-  --name mftp \
-  proffapt/mftp --smtp
-  ```
-  
-- `--gmail-api`: Using Gmail API for sending mails
-    ```sh
-  sudo docker run -d \
-  -v /path/to/mftp_config/env.py:/mftp/env.py \
-  -v /path/to/mftp_config/token.json:/mftp/token.json \
-  -v /path/to/mftp_config/credentials.json:/mftp/credentials.json \
-  -v /path/to/mftp_config/mail_send_token.json:/mftp/mail_send_token.json \
-  -v /path/to/mftp_config/mail_send_creds.json:/mftp/mail_send_creds.json \
-  -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
-  -v /path/to/mftp_config/.session:/mftp/.session \
-  --restart=unless-stopped \
-  --name mftp \
-  proffapt/mftp --gmail-api
-  ```
+> [!NOTE]
+> This also is `DOCTOR_MODE` as on of the env variables, which is optional and considers one value only `--cron`. We will use it in the sub-section just next.
 
 #### As a cronjob
 
 It is also possible to run these docker containers as a cronjob:
-- ##### With Docker Compose
-    - Comment out the line `restart: unless-stopped`
-    - Append ` --cron` into the `MFTP_MODE` env variable. For example:
-        * Using Cronjob to run container and SMTP to send mails
-          ```sh
-          sudo CONFIG=/path/to/mftp_config MFTP_MODE="--smtp --cron" docker-compose up -d
-          ```
-        * Using Cronjob to run container and Gmail API to send mails
-          ```sh
-          sudo CONFIG=/path/to/mftp_config MFTP_MODE="--gmail-api --cron" docker-compose up -d
-          ```
-- ##### With Docker Command
-    - Append `--cron` at the end of any of [these](#docker-command) commands. For example:
+
+- Comment out the line `restart: unless-stopped` in [docker-compose.yml](./docker-compose.yml)
+- Append ` --cron` into the `MFTP_MODE` env variable and set `DOCTOR_MODE` to `--cron` as well. As follows:
+    * Using Cronjob to run containers and SMTP to send mails
       ```sh
-        sudo docker run -d \
-        -v /path/to/mftp_config/env.py:/mftp/env.py \
-        -v /path/to/mftp_config/token.json:/mftp/token.json \
-        -v /path/to/mftp_config/credentials.json:/mftp/credentials.json \
-        -v /path/to/mftp_config/mail_send_token.json:/mftp/mail_send_token.json \
-        -v /path/to/mftp_config/mail_send_creds.json:/mftp/mail_send_creds.json \
-        -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
-        -v /path/to/mftp_config/.session:/mftp/.session \
-        --restart=unless-stopped \
-        --name mftp \
-        proffapt/mftp --gmail-api --cron
-        ```
+      sudo MFTP_CONFIG=/path/to/mftp_config DOCTOR_CONFIG=/path/to/doctor_config MFTP_MODE="--smtp --cron" DOCTOR_MODE="--cron" docker-compose up -d
+      ```
+    * Using Cronjob to run containers and Gmail API to send mails
+      ```sh
+      sudo MFTP_CONFIG=/path/to/mftp_config DOCTOR_CONFIG=/path/to/doctor_config MFTP_MODE="--gmail-api --cron" DOCTOR_MODE="--cron" docker-compose up -d
+      ```
 - Add the updated command with desired [cron expression](https://crontab.cronhub.io/) into your cronjob using [crontab -e](https://www.man7.org/linux/man-pages/man5/crontab.5.html)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -221,12 +156,9 @@ To set up a local instance of the application without using docker, follow the s
 
 ### Prerequisites
 The following requirements are to be satisfied for the project to function properly:
-* [python3](https://www.python.org/downloads/) `>=python3.10`
-  ```sh
-  sudo apt update
-  sudo apt install python3
-  ```
-* This project depends on [ERP Login module](https://github.com/proffapt/iitkgp-erp-login-pypi) by [Arpit Bhardwaj](https://github.com/proffapt) for the ERP Login workflow. Read its [documentation](https://github.com/proffapt/iitkgp-erp-login-pypi/blob/main/README.md) and setup your environment for it.
+
+* [For mftp](https://github.com/metakgp/mftp/tree/main/mftp#prerequisites-1)
+* [For mftp doctor](https://github.com/metakgp/mftp/tree/main/mftp-doctor#prerequisites-1)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -238,55 +170,16 @@ _Now that the environment has been set up and configured to properly compile and
 1. Clone the repository
    ```sh
    git clone https://github.com/metakgp/mftp
-   cd mftp/mftp
+   cd mftp
    ```
 2. Install required dependencies
    ```sh
    pip3 install -r requirements.txt
    ```
-3. #### Sending Emails
-
-> [!Note]
-> Since, port `465` (SMTP with SSL) on campus LAN is blocked and if you want to host mftp on an internal server on the campus LAN, it will need another method then SMTP. <br/>
-> However, it is preferred to use SMTP when hosting on external server as SMTP is the convenient of the two.
-   
-   The tool provides two methods of sending emails.
-
-   - ##### Using SMTP
-     > `--smtp`
-     - [Create an app password](https://support.google.com/accounts/answer/185833?hl=en) for the senders' email.
-     - After creating app password use it as your `FROM_EMAIL_PASS` value in  next step.
-   - ##### Using GMAIL API
-     > `--gmail-api`
-     - Follow this [quick start guide](https://developers.google.com/gmail/api/quickstart/python) to configure _gmail api_ on the senders' mail.
-     - After successfull configuration of gmail api, you can leave the value of `FROM_EMAIL_PASS` as it is in the next step.
-     - Save the generated token as `mail_send_token.json`
-       
-4. #### Configuring environment variables
-
-   - Copy `env.example.py` as `env.py`. It looks like this:
-     ```python
-     # ERP Credentials
-     ROLL_NUMBER = "XXYYXXXXX" # Institute Roll Number
-     PASSWORD = "**********" # ERP Password
-     SECURITY_QUESTIONS_ANSWERS = { # ERP Secret Questions and their Answers
-         "Q1" : "A1",
-         "Q2" : "A2",
-         "Q3" : "A3",
-     }
-
-     # EMAIL CREDENTIALS
-     FROM_EMAIL = "abc@gmail.com" # Notification Sender Email-id
-     FROM_EMAIL_PASS = "**********" # App password for the above email-id
-
-     # OTHER PARAMETERS
-     BCC_EMAIL_S = ["xyz@googlegroups.com", "abc@googlegroups.com"] # Multiple mails for bcc
-     # BCC_EMAIL_S = ["xyz@googlegroups.com"] # This is how you can set single mail in a list
-     KEEP_TOKEN_ALIVE_EMAIL = "xyz@gmail.com" # Email-id to send regular emails to keep the token alive
-     ```
-   - Update the values inside the `double quotes` ("). **DO NOT CHANGE VAR NAMES.**
+3. Follow the [installation steps for mftp](https://github.com/metakgp/mftp/tree/main/mftp#installation-1)
+4. Follow the [installation steps for mftp doctor](https://github.com/metakgp/mftp/tree/main/mftp-doctor#installation-1)
 5. Configure the mftp service
-   For linux systems MFTP is available as a service and as a cronjob. To configure it, execute the following commands after navigating into the root directory of the project (inside the mftp folder).
+   For linux systems MFTP & MFTP Doctor are available as a service and as cronjob. To configure it, execute the following commands after navigating into the root directory of the project (inside the mftp folder).
    ```sh
    cd service/
    ./configure-service.sh
@@ -294,48 +187,45 @@ _Now that the environment has been set up and configured to properly compile and
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
 <!-- USAGE EXAMPLES -->
 
 <div id="usage-without-docker"></div>
 
 ### Usage
 
-It is mandatory to provide either of the following flags to the execution command.
-- `--smtp`: Using SMTP for sending mails
-  ```python
-  python3 mftp.py --smtp
-  ```
-  
-- `--gmail-api`: Using GMAIL API for sending mails
-  ```python
-  python3 mftp.py --gmail-api
-  ```
-
-#### Using MFTP as a Service
-
 After [configuring MFTP as a service](#setup-mftp-as-a-service), you can use the `mftp` command with several options to interact with the tool as a service.<br/> Following is the help menu for the service.
 
 ```graphql
-Usage: mftp [OPTIONS]
+Usage: mftp [COMMAND] [OPTIONS]
 
-Options:
-  -h, --help               Display this help and exit
-  logs [OPTIONS]           Display last 25 lines of log file
+Command:
+  -h, --help                   Display this help and exit
+  logs [OPTIONS]               Display last 25 lines of mftp log file
     Options:
-      clear                 Clear the log file
-      NUM                   Display last NUM lines of log file
-  disable                  Disable mftp service
-  enable                   Enable mftp service
-  status                   Check status of mftp service
-  restart                  Restart mftp service
-  stop                     Stop mftp service
-  start                    Start mftp service
-  cronjob [OPTIONS]        Use mftp as a cronjob
+      clear                    Clear the mftp log file
+      NUM                      Display last NUM lines of mftp log file
+  disable                      Disable mftp service
+  enable                       Enable mftp service
+  status                       Check status of mftp service
+  restart                      Restart mftp service
+  stop                         Stop mftp service
+  start                        Start mftp service
+
+  cronjob [OPTIONS]            Use mftp as a cronjob
     Options:
       enable [NUM]             Enable mftp cronjob after every NUM minutes (default is 2 minutes)
       disable                  Disable mftp cronjob
       status                   Check status of mftp cronjob
+
+  doctor [OPTIONS]             Use mftp doctor as a cronjob
+    Options:
+      enable [NUM]             Enable doctor cronjob after every NUM minutes (default is 2 minutes)
+      disable                  Disable doctor cronjob
+      status                   Check status of doctor cronjob
+      logs [OPTIONS]           Display last 25 lines of doctor log file
+        Options:
+          clear                Clear the doctor log file
+          NUM                  Display last NUM lines of doctor log file
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
