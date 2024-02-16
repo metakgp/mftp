@@ -17,7 +17,7 @@ DIRECTORY_CONFIGURED=$(grep -q 'MFTPD' "$SHELL_RC" && echo true || echo false)
 if [ "$DIRECTORY_CONFIGURED" == "false" ]; then
   # Storing the location where mftp is installed to be used in service module
   echo -e "${GREEN}[+] ${BLUE}Configuring MFTP Directory location${WHITE}"
-  echo "export MFTPD=$(dirname $(pwd))/mftp" >> "$SHELL_RC"
+  echo "export MFTPD=$(dirname $(pwd))" >> "$SHELL_RC"
 else
   echo -e "${YELLOW}[-] ${BLUE}MFTP Directory already configured${WHITE}"
 fi
