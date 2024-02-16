@@ -74,8 +74,8 @@ To set up a local instance of the application using docker, follow the steps bel
 
 ### Prerequisites
 The following requirements are to be satisfied for the project to function properly:
-* [For mftp](https://github.com/metakgp/mftp/tree/mftp-doctor/mftp#prerequisites)
-* [For mftp doctor](https://github.com/metakgp/mftp/tree/mftp-doctor/mftp-doctor#prerequisites)
+* [For mftp](https://github.com/metakgp/mftp/blob/main/mftp/README.md#prerequisites)
+* [For mftp doctor](https://github.com/metakgp/mftp/blob/main/mftp-doctor/README.md#prerequisites)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -88,8 +88,8 @@ The following requirements are to be satisfied for the project to function prope
    git clone https://github.com/metakgp/mftp
    cd mftp
    ```
-2. Follow the [installation steps for mftp with docker](https://github.com/metakgp/mftp/tree/main/mftp#installation)
-3. Follow the [installation steps for mftp doctor with docker](https://github.com/metakgp/mftp/tree/main/mftp-doctor#installation)
+2. Follow the [installation steps for mftp with docker](https://github.com/metakgp/mftp/blob/main/mftp/README.md#installation)
+3. Follow the [installation steps for mftp doctor with docker](https://github.com/metakgp/mftp/blob/main/mftp-doctor/README.md#installation)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -153,8 +153,8 @@ To set up a local instance of the application without using docker, follow the s
 ### Prerequisites
 The following requirements are to be satisfied for the project to function properly:
 
-* [For mftp](https://github.com/metakgp/mftp/tree/main/mftp#prerequisites-1)
-* [For mftp doctor](https://github.com/metakgp/mftp/tree/main/mftp-doctor#prerequisites-1)
+* [For mftp](https://github.com/metakgp/mftp/blob/main/mftp/README.md#prerequisites-1)
+* [For mftp doctor](https://github.com/metakgp/mftp/blob/main/mftp-doctor/README.md#prerequisites-1)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -172,9 +172,9 @@ _Now that the environment has been set up and configured to properly compile and
    ```sh
    pip3 install -r requirements.txt
    ```
-3. Follow the [installation steps for mftp](https://github.com/metakgp/mftp/tree/main/mftp#installation-1)
-4. Follow the [installation steps for mftp doctor](https://github.com/metakgp/mftp/tree/main/mftp-doctor#installation-1)
-5. Configure the mftp service.<br>
+3. Follow the [installation steps for mftp](https://github.com/metakgp/mftp/blob/main/mftp/README.md#installation-1)
+4. Follow the [installation steps for mftp doctor](https://github.com/metakgp/mftp/blob/main/mftp-doctor/README.md#installation-1)
+5. ##### Configure the mftp service
    For linux systems, MFTP & MFTP Doctor are available as a service and as cronjob. To configure them, execute the following commands after navigating into the root directory of the project (inside the mftp folder).
    ```sh
    cd service/
@@ -191,7 +191,7 @@ _Now that the environment has been set up and configured to properly compile and
 
 <img width="1200" alt="image" src="https://user-images.githubusercontent.com/86282911/265526168-8edc1b6f-4326-4d90-b2e5-f9742d0bed6e.png">
 
-After [configuring MFTP as a service](#setup-mftp-as-a-service), you can use the `mftp` command with several options to interact with the tool as a service.<br/> Following is the help menu for the service.
+After [configuring MFTP as a service](#configure-the-mftp-service), you can use the `mftp` command with several options to interact with the tool as a service.<br/> Following is the help menu for the service.
 
 ```graphql
 Usage: mftp [COMMAND] [OPTIONS]
