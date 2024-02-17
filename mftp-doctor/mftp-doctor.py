@@ -25,8 +25,12 @@ def parse_latest_runtime_logs(logs):
 
     delim = " :>> ================"
     parts = last_part_with_timestamp.split(delim)
-    timestamp = parts[0].strip()
-    latest_runtime_logs = parts[1].strip()
+    if len(parts) == 2:
+      timestamp = parts[0].strip()
+      latest_runtime_logs = parts[1].strip()
+    else:
+      timestamp = "NULL"
+      latest_runtime_logs = "NO PREVIOUS LOGS AVAILABLE"
     
     return timestamp, latest_runtime_logs
 
