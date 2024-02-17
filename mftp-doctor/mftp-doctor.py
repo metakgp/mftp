@@ -4,6 +4,7 @@ import docker
 import logging
 import requests
 import argparse
+from datetime import datetime
 from env import TOPIC_URL, EMAIL
 
 def get_logs():
@@ -18,9 +19,16 @@ def get_logs():
 
 
 def parse_latest_runtime_logs(logs):
-    delim = " ================"
+    delim = "================ <<:"
     parts = logs.split(delim)
-    return parts[-1].strip()
+    last_part_with_timestamp = parts[-1].strip()
+
+    delim = " :>> ================"
+    parts = last_part_with_timestamp.split(delim)
+    timestamp = parts[0].strip()
+    latest_runtime_logs = parts[1].strip()
+    
+    return timestamp, latest_runtime_logs
 
 
 def check_error(logs):
@@ -63,18 +71,24 @@ def parse_args():
 
 def health_check():
   logs = get_logs()
-  latest_runtime_logs = parse_latest_runtime_logs(logs)
-  logging.info(f" [LATEST RUNTIME LOGS] \n\n=============\n{latest_runtime_logs}\n=============\n")
+  timestamp, latest_runtime_logs = parse_latest_runtime_logs(logs)
+
+  delim = ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+  logging.info(f" [ LATEST RUNTIME LOGS | {timestamp} ] \n{delim}\n{latest_runtime_logs}\n{delim}")
+
   check_error(latest_runtime_logs)
 
 
 args = parse_args()
 logging.basicConfig(level=logging.INFO)
 while True:
+  now = datetime.now()
+  print(f"================ <<: {now.strftime('%H:%M:%S %d-%m-%Y')} :>> ================", flush=True)
+
   health_check()
 
   if args.cron:
     break
 
-  logging.info(" [PAUSED FOR 2 MINUTES]")
+  print("[PAUSED FOR 2 MINUTES]", flush=True)
   time.sleep(120)
