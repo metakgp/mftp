@@ -5,7 +5,7 @@ services:
 
   mftp:
     build:
-      context: ./mftp
+      context: .
       dockerfile: Dockerfile
     image: proffapt/mftp
     container_name: mftp

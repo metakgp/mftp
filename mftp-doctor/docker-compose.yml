@@ -5,7 +5,7 @@ services:
 
   mftp-doctor:
     build:
-      context: ./mftp-doctor
+      context: .
       dockerfile: Dockerfile
     image: proffapt/mftp-doctor
     container_name: mftp-doctor
