@@ -8,7 +8,6 @@ services:
       dockerfile: Dockerfile
     image: proffapt/mftp
     container_name: mftp
-    restart: unless-stopped
     command: $MFTP_MODE
     volumes:
       - $MFTP_CONFIG/env.py:/mftp/env.py
