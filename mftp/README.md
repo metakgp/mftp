@@ -221,7 +221,7 @@ _Now that the environment has been set up and configured to properly compile and
      # OTHER PARAMETERS
      BCC_EMAIL_S = ["xyz@googlegroups.com", "abc@googlegroups.com"] # Multiple mails for bcc
      # BCC_EMAIL_S = ["xyz@googlegroups.com"] # This is how you can set single mail in a list
-     KEEP_TOKEN_ALIVE_EMAIL = "xyz@gmail.com" # Email-id to send regular emails to keep the token alive
+     #KEEP_TOKEN_ALIVE_EMAIL = "xyz@gmail.com" # Email-id to send regular emails to keep the token alive
      ```
    - Update the values inside the `double quotes` ("). **DO NOT CHANGE VAR NAMES.**
 
