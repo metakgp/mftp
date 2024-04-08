@@ -28,7 +28,6 @@ while True:
 
   print('[ERP LOGIN]', flush=True)
   _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
-      
   notices = notice.fetch(headers, session, ssoToken, lsnif)
   mails = mail.format_notice(notices, session)
   mail.send(mails, args.smtp, args.gmail_api, lsnif, notices)
