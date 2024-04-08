@@ -2,7 +2,7 @@ import env
 import mail
 import time
 import notice
-import gmailapi
+
 import requests
 import argparse
 from datetime import datetime
@@ -25,12 +25,10 @@ while True:
   now = datetime.now()
   print(f"================ <<: {now.strftime('%H:%M:%S %d-%m-%Y')} :>> ================", flush=True)
 
-  if args.gmail_api and now.strftime("%H:%M") == "08:00":
-    gmailapi.keep_token_alive()
 
   print('[ERP LOGIN]', flush=True)
   _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
-    
+      
   notices = notice.fetch(headers, session, ssoToken, lsnif)
   mails = mail.format_notice(notices, session)
   mail.send(mails, args.smtp, args.gmail_api, lsnif, notices)
