@@ -4,6 +4,7 @@
     width: 0;
     height: 0;
 }
+
 .PWABadge-toast {
     position: fixed;
     right: 0;
@@ -17,9 +18,11 @@
     box-shadow: 3px 4px 5px 0 #8885;
     background-color: white;
 }
+
 .PWABadge-toast-message {
     margin-bottom: 8px;
 }
+
 .PWABadge-toast-button {
     border: 1px solid #8885;
     outline: none;
