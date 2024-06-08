@@ -162,7 +162,7 @@ def generate_send_service():
     if os.path.exists("mail_send_token.json"):
         creds = Credentials.from_authorized_user_file("mail_send_token.json", SCOPES)
 
-    if not creds or not creds.valid: #valid for 6 months
+    if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
