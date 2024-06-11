@@ -5,6 +5,7 @@ import notice
 import gmailapi
 import requests
 import argparse
+import ntfy
 from datetime import datetime
 import iitkgp_erp_login.erp as erp
 
@@ -32,8 +33,11 @@ while True:
   _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
     
   notices = notice.fetch(headers, session, ssoToken, lsnif)
-  mails = mail.format_notice(notices, session)
-  mail.send(mails, args.smtp, args.gmail_api, lsnif, notices)
+  # mails = mail.format_notice(notices, session)
+  # mail.send(mails, args.smtp, args.gmail_api, lsnif, notices)
+
+  notifications = ntfy.format_notice(notices, session)
+  ntfy.send(notifications, lsnif, notices)
 
   if args.cron:
     break
