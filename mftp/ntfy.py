@@ -19,7 +19,6 @@ def format_notice(notices, session):
     if notices: print('[FORMATTING NOTIFICATIONS]', flush=True)
 
     notifications=[]
-
     for notice in reversed(notices):
         id_, year = notice['UID'].split('_')
 
@@ -31,12 +30,13 @@ def format_notice(notices, session):
 
         priority = ntfy_priority(subject=notice['Subject'])
 
-        notifications.append(
-            {"Title":  f"#{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']}",
-                "Body": body,
-                "Tags": f"{notice['Type']}, {notice['Subject']}, {notice['Company']}",
-                "Priority": priority,
-                "Links": links})
+        notifications.append({
+            "Title":  f"#{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']}",
+            "Body": body,
+            "Tags": f"{notice['Type']}, {notice['Subject']}, {notice['Company']}",
+            "Priority": priority,
+            "Links": links
+        })
   
     return notifications
 
@@ -51,14 +51,14 @@ def send(notifications, lsnif, notices):
                 requests.post(f"{NTFY_BASE_URL}/${NTFY_TOPIC}",
                     data=notification["Body"],
                     headers={
-                        "Title": notification["Title"],
-                        "Tags": notification["Tags"],
-                        "Priority": notification["Priority"],
-                        "Icon": "https://miro.medium.com/v2/resize:fit:600/1*O94LHxqfD_JGogOKyuBFgA.jpeg",
-                        "Action": notification["Links"]})
+                                "Title": notification["Title"],
+                                "Tags": notification["Tags"],
+                                "Priority": notification["Priority"],
+                                "Icon": "https://miro.medium.com/v2/resize:fit:600/1*O94LHxqfD_JGogOKyuBFgA.jpeg",
+                                "Action": notification["Links"]
+                    })
                 update_lsni(lsnif, notices, i)
                 logging.info(f" [NOTIFICATION SENT] ~ {notification['Title']}")
-
             except Exception as e:
                 logging.error(f" Failed to send notification: {notification['Title']} ~ {str(e)}")
 
@@ -84,9 +84,8 @@ def parseLinks(data, id_):
 
     for i, link in enumerate(links, 1):
         if i == 4: break
+        elif i > 1: actions = actions + "; "
 
-        if i > 1:
-            actions = actions + "; "
         body = body.replace(link, f'<LINK {i}>')
         template = action_template
         actions = actions + template.format(i, link)
