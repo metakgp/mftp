@@ -3,8 +3,8 @@ import logging
 import requests
 from bs4 import BeautifulSoup as bs
 from endpoints import NOTICE_CONTENT_URL
-from env import NTFY_BASE_URL, NTFY_TOPIC
 from notice import update_lsni, has_idx_mutated
+from env import NTFY_BASE_URL, NTFY_TOPIC, NTFY_TOPIC_ICON
 
 def ntfy_priority(subject):
     match subject:
@@ -16,7 +16,7 @@ def ntfy_priority(subject):
     return priority
 
 def format_notice(notices, session):
-    if notices: print('[FORMATTING NOTIFICATIONS]', flush=True)
+    if notices: print(f'[FORMATTING NOTIFICATIONS]', flush=True)
 
     notifications=[]
     for notice in reversed(notices):
@@ -30,6 +30,16 @@ def format_notice(notices, session):
 
         priority = ntfy_priority(subject=notice['Subject'])
 
+        # TODO: Handling attachment
+        try:
+            attachment = parseAttachment(session, year, id_)
+        except Exception as e:
+            logging.error(f" Failed to parse mail attachment ~ {str(e)}")
+
+        if len(attachment) != 0:
+            # Logic to add attachment stuff
+            pass
+
         notifications.append({
             "Title":  f"#{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']}",
             "Body": body,
@@ -42,7 +52,7 @@ def format_notice(notices, session):
 
 def send(notifications, lsnif, notices):
     if notifications:
-        print("[SENDING NOTIFICATIONS]", flush=True)
+        print(f"[SENDING NOTIFICATIONS]", flush=True)
 
         for i, notification in enumerate(notifications, 1):
             if has_idx_mutated(lsnif, notices, i): break
@@ -54,9 +64,11 @@ def send(notifications, lsnif, notices):
                                 "Title": notification["Title"],
                                 "Tags": notification["Tags"],
                                 "Priority": notification["Priority"],
-                                "Icon": "https://miro.medium.com/v2/resize:fit:600/1*O94LHxqfD_JGogOKyuBFgA.jpeg",
+                                "Icon": NTFY_TOPIC_ICON,
                                 "Action": notification["Links"]
-                    })
+                    }
+                )
+                # TODO: Handle repsone
                 update_lsni(lsnif, notices, i)
                 logging.info(f" [NOTIFICATION SENT] ~ {notification['Title']}")
             except Exception as e:

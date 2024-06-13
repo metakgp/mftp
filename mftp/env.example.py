@@ -18,3 +18,4 @@ BCC_EMAIL_S = ["xyz@googlegroups.com", "abc@googlegroups.com"] # Multiple mails 
 # NTFY
 NTFY_BASE_URL = "https://ntfy.sh"
 NTFY_TOPIC = "mftp"
+NTFY_TOPIC_ICON = "https://miro.medium.com/v2/resize:fit:600/1*O94LHxqfD_JGogOKyuBFgA.jpeg"
