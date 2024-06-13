@@ -1,9 +1,19 @@
 import re
+import logging
 import requests
 from bs4 import BeautifulSoup as bs
-import logging
 from endpoints import NOTICE_CONTENT_URL
+from env import NTFY_BASE_URL, NTFY_TOPIC
 from notice import update_lsni, has_idx_mutated
+
+def ntfy_priority(subject):
+    match subject:
+        case 'Urgent':
+            priority="5"
+        case _:
+            priority="3"
+    
+    return priority
 
 def format_notice(notices, session):
     if notices: print('[FORMATTING NOTIFICATIONS]', flush=True)
@@ -19,11 +29,7 @@ def format_notice(notices, session):
         except Exception as e:
             logging.error(f" Failed to parse notification body ~ {str(e)}")
 
-        match notice['Subject']:
-            case 'Urgent':
-                priority="5"
-            case _:
-                priority="3"
+        priority = ntfy_priority(subject=notice['Subject'])
 
         notifications.append(
             {"Title":  f"#{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']}",
@@ -42,7 +48,7 @@ def send(notifications, lsnif, notices):
             if has_idx_mutated(lsnif, notices, i): break
 
             try:
-                requests.post("http://172.18.0.2:8000/mftp",
+                requests.post(f"{NTFY_BASE_URL}/${NTFY_TOPIC}",
                     data=notification["Body"],
                     headers={
                         "Title": notification["Title"],
