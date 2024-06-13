@@ -15,6 +15,29 @@ def ntfy_priority(subject):
     
     return priority
 
+def ntfy_emoji(subject):
+    match subject:
+        case 'Urgent':
+            emoji="exclamation"
+        case 'CV Submission':
+            emoji="rotating_light"
+        case 'Result':
+            emoji="newspaper"
+        case 'Shortlist':
+            emoji="postbox"
+        case 'Date extension':
+            emoji="date"
+        case 'PPT/Workshop/Seminars etc':
+            emoji="briefcase"
+        case 'Schedule':
+            emoji="calendar"
+        case 'Re-schedule':
+            emoji="spiral_calendar"
+        case _:
+            emoji=""
+    
+    return emoji
+
 def format_notice(notices, session):
     if notices: print(f'[FORMATTING NOTIFICATIONS]', flush=True)
 
@@ -28,7 +51,9 @@ def format_notice(notices, session):
         except Exception as e:
             logging.error(f" Failed to parse notification body ~ {str(e)}")
 
+        # NTFY specific features
         priority = ntfy_priority(subject=notice['Subject'])
+        emoji = ntfy_emoji(subject=notifications['Subject'])
 
         # TODO: Handling attachment
         try:
@@ -43,7 +68,7 @@ def format_notice(notices, session):
         notifications.append({
             "Title":  f"#{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']}",
             "Body": body,
-            "Tags": f"{notice['Type']}, {notice['Subject']}, {notice['Company']}",
+            "Tags": f"{emoji}, {notice['Type']}, {notice['Subject']}, {notice['Company']}",
             "Priority": priority,
             "Links": links
         })
