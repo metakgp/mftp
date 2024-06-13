@@ -5,9 +5,9 @@ from bs4 import BeautifulSoup as bs
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
+from notice import update_lsni, has_idx_mutated
 from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S
 from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
-from notice import update_lsni, get_latest_index
 
 
 def send(mails, smtp, gmail_api, lsnif, notices):
@@ -117,18 +117,6 @@ def format_notice(notices, session):
         mails.append(message)
 
     return mails
-
-
-def has_idx_mutated(lsnif, notices, i):
-    lidx_from_file = get_latest_index(lsnif) # Latest Index from File
-    cidx_from_to_send_mails = int(notices[-i]['UID'].split('_')[0]) # Current Index from to send mails
-    difference_in_idx = cidx_from_to_send_mails - lidx_from_file
-
-    if difference_in_idx != 1: 
-        logging.error(f" Trying to send mail #{cidx_from_to_send_mails} while latest in database is #{lidx_from_file}")
-        return True
-    
-    return False
 
 
 def parseBody(session, year, id_):

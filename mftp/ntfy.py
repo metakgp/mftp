@@ -2,8 +2,8 @@ import re
 import requests
 from bs4 import BeautifulSoup as bs
 import logging
-from notice import update_lsni, get_latest_index
 from endpoints import NOTICE_CONTENT_URL
+from notice import update_lsni, has_idx_mutated
 
 def format_notice(notices, session):
     if notices: print('[FORMATTING NOTIFICATIONS]', flush=True)
@@ -86,14 +86,3 @@ def parseLinks(data, id_):
         actions = actions + template.format(i, link)
 
     return body, actions
-
-def has_idx_mutated(lsnif, notices, i):
-    lidx_from_file = get_latest_index(lsnif) # Latest Index from File
-    cidx_from_to_send_notifs = int(notices[-i]['UID'].split('_')[0]) # Current Index from to send notifications
-    difference_in_idx = cidx_from_to_send_notifs - lidx_from_file
-
-    if difference_in_idx != 1:
-        logging.error(f" Trying to send mail #{cidx_from_to_send_notifs} while latest in database is #{lidx_from_file}")
-        return True
-
-    return False
