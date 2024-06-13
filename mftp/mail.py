@@ -32,6 +32,7 @@ def send(mails, smtp, gmail_api, lsnif, notices):
                     ).execute()
                 except Exception as e:
                     logging.error(f"  Failed to send request to GMAIL API ~ {str(e)}")
+                    break
                 
                 if 'id' in response:
                     logging.info(f" [MAIL SENT] ~ {mail['Subject']}")

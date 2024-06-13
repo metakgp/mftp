@@ -95,6 +95,7 @@ def send(notifications, lsnif, notices):
                 )
             except Exception as e:
                 logging.error(f" Failed to request NTFY SERVER: {notification['Title']} ~ {str(e)}")
+                break
 
             if response.status_code == 200:
                 logging.info(f" [NOTIFICATION SENT] ~ {notification['Title']}")
