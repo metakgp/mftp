@@ -53,17 +53,17 @@ def format_notice(notices, session):
 
         # NTFY specific features
         priority = ntfy_priority(subject=notice['Subject'])
-        emoji = ntfy_emoji(subject=notifications['Subject'])
+        emoji = ntfy_emoji(subject=notice['Subject'])
 
         # TODO: Handling attachment
-        try:
-            attachment = parseAttachment(session, year, id_)
-        except Exception as e:
-            logging.error(f" Failed to parse mail attachment ~ {str(e)}")
+        # try:
+        #     attachment = parseAttachment(session, year, id_)
+        # except Exception as e:
+        #     logging.error(f" Failed to parse mail attachment ~ {str(e)}")
 
-        if len(attachment) != 0:
-            # Logic to add attachment stuff
-            pass
+        # if len(attachment) != 0:
+        #     # Logic to add attachment stuff
+        #     pass
 
         notifications.append({
             "Title":  f"#{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']}",
@@ -86,11 +86,11 @@ def send(notifications, lsnif, notices):
                 requests.post(f"{NTFY_BASE_URL}/${NTFY_TOPIC}",
                     data=notification["Body"],
                     headers={
-                                "Title": notification["Title"],
-                                "Tags": notification["Tags"],
-                                "Priority": notification["Priority"],
-                                "Icon": NTFY_TOPIC_ICON,
-                                "Action": notification["Links"]
+                        "Title": notification["Title"],
+                        "Tags": notification["Tags"],
+                        "Priority": notification["Priority"],
+                        "Icon": NTFY_TOPIC_ICON,
+                        "Action": notification["Links"]
                     }
                 )
                 # TODO: Handle repsone
