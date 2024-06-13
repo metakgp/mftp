@@ -2,7 +2,7 @@ import re
 import requests
 from bs4 import BeautifulSoup as bs
 import logging
-from notice import update_lsni
+from notice import update_lsni, get_latest_index
 from endpoints import NOTICE_CONTENT_URL
 
 def format_notice(notices, session):
@@ -33,6 +33,8 @@ def format_notice(notices, session):
 
 def send(notifications, lsnif, notices):
   for i, notification in enumerate(notifications, 1): 
+    if has_idx_mutated(lsnif, notices, i): break
+
     try:
       requests.post("http://172.18.0.2:8000/mftp",
         data=notification["Body"],
@@ -43,7 +45,6 @@ def send(notifications, lsnif, notices):
           "Icon": "https://miro.medium.com/v2/resize:fit:600/1*O94LHxqfD_JGogOKyuBFgA.jpeg",
           "Action": notification["Links"]})
       update_lsni(lsnif, notices, i)
-      print(f'Sent notification {notification["Title"]}')
     except Exception as e:
       logging.error(f"Failed to send notification to ntfy server ~ {str(e)}")  
 
@@ -78,3 +79,14 @@ def parseLinks(data, id_):
     actions = actions + template.format(i, link)
 
   return body, actions
+
+def has_idx_mutated(lsnif, notices, i):
+    lidx_from_file = get_latest_index(lsnif) # Latest Index from File
+    cidx_from_to_send_notifs = int(notices[-i]['UID'].split('_')[0]) # Current Index from to send notifications
+    difference_in_idx = cidx_from_to_send_notifs - lidx_from_file
+
+    if difference_in_idx != 1:
+        logging.error(f" Trying to send mail #{cidx_from_to_send_notifs} while latest in database is #{lidx_from_file}")
+        return True
+
+    return False
