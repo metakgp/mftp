@@ -1,10 +1,11 @@
+import os
 import re
 import logging
 import requests
 from bs4 import BeautifulSoup as bs
-from endpoints import NOTICE_CONTENT_URL
 from notice import update_lsni, has_idx_mutated
-from env import NTFY_BASE_URL, NTFY_TOPIC, NTFY_TOPIC_ICON
+from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
+from env import NTFY_BASE_URL, NTFY_TOPIC, NTFY_TOPIC_ICON 
 
 def ntfy_priority(subject):
     match subject:
@@ -47,7 +48,7 @@ def format_notice(notices, session):
 
         try:
             data = parseBody(notice, session, year, id_)
-            body, links = parseLinks(data, id_)
+            body, links = parseLinks(data)
         except Exception as e:
             logging.error(f" Failed to parse notification body ~ {str(e)}")
 
@@ -55,23 +56,27 @@ def format_notice(notices, session):
         priority = ntfy_priority(subject=notice['Subject'])
         emoji = ntfy_emoji(subject=notice['Subject'])
 
-        # TODO: Handling attachment
-        # try:
-        #     attachment = parseAttachment(session, year, id_)
-        # except Exception as e:
-        #     logging.error(f" Failed to parse mail attachment ~ {str(e)}")
-
-        # if len(attachment) != 0:
-        #     # Logic to add attachment stuff
-        #     pass
-
-        notifications.append({
+        notification = {
             "Title":  f"#{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']}",
             "Body": body,
             "Tags": f"{emoji}, {notice['Type']}, {notice['Subject']}, {notice['Company']}",
             "Priority": priority,
             "Links": links
-        })
+        }
+
+        try:
+            attachment = parseAttachment(session, year, id_)
+        except Exception as e:
+            logging.error(f" Failed to parse mail attachment ~ {str(e)}")
+
+        if len(attachment) != 0:
+            # TODO: Handling attachment
+            notification['Attachment'] = attachment
+            logging.info(f" [PDF ATTACHED] On notice #{id_} of length ~ {len(attachment)}")
+        else: 
+            notification['Attachment'] = None
+
+        notifications.append(notification)
   
     return notifications
 
@@ -83,15 +88,20 @@ def send(notifications, lsnif, notices):
             if has_idx_mutated(lsnif, notices, i): break
 
             try:
+                headers={
+                    "Title": notification["Title"],
+                    "Tags": notification["Tags"],
+                    "Priority": notification["Priority"],
+                    "Icon": NTFY_TOPIC_ICON,
+                    "Action": notification["Links"],
+                }
+
+                if notification['Attachment']:
+                    pass
+
                 response = requests.post(f"{NTFY_BASE_URL}/{NTFY_TOPIC}",
-                    data=notification["Body"],
-                    headers={
-                        "Title": notification["Title"],
-                        "Tags": notification["Tags"],
-                        "Priority": notification["Priority"],
-                        "Icon": NTFY_TOPIC_ICON,
-                        "Action": notification["Links"]
-                    }
+                    data= notification['Body'],
+                    headers = headers
                 )
             except Exception as e:
                 logging.error(f" Failed to request NTFY SERVER: {notification['Title']} ~ {str(e)}")
@@ -103,6 +113,14 @@ def send(notifications, lsnif, notices):
             else: 
                 logging.error(f" Failed to send notification: {notification['Title']} ~ {response.text}")
                 break
+
+def parseAttachment(session, year, id_):
+    stream = session.get(ATTACHMENT_URL.format(year, id_), stream=True)
+    attachment = b''
+    for chunk in stream.iter_content(4096):
+        attachment += chunk
+    
+    return attachment
 
 def parseBody(notice, session, year, id_):
     content = session.get(NOTICE_CONTENT_URL.format(year, id_))
@@ -117,7 +135,7 @@ def parseBody(notice, session, year, id_):
 
     return body
 
-def parseLinks(data, id_):
+def parseLinks(data):
     body = data
     links = re.findall(r'(https?://[^\s]+)', data)
     links = list(set(result.lower() for result in links))
