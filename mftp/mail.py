@@ -37,7 +37,8 @@ def send(mails, smtp, gmail_api, lsnif, notices):
                     logging.info(f" [MAIL SENT] ~ {mail['Subject']}")
                     update_lsni(lsnif, notices, i)
                 else:
-                    logging.error(f" Failed to Send Mail : {mail['Subject']} ~ {str(e)}")
+                    logging.error(f" Failed to Send Mail : {mail['Subject']} ~ {response}")
+                    break
         elif smtp:
             import smtplib, ssl
             context = ssl.create_default_context()

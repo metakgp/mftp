@@ -83,7 +83,7 @@ def send(notifications, lsnif, notices):
             if has_idx_mutated(lsnif, notices, i): break
 
             try:
-                requests.post(f"{NTFY_BASE_URL}/${NTFY_TOPIC}",
+                response = requests.post(f"{NTFY_BASE_URL}/${NTFY_TOPIC}",
                     data=notification["Body"],
                     headers={
                         "Title": notification["Title"],
@@ -93,11 +93,15 @@ def send(notifications, lsnif, notices):
                         "Action": notification["Links"]
                     }
                 )
-                # TODO: Handle repsone
-                update_lsni(lsnif, notices, i)
-                logging.info(f" [NOTIFICATION SENT] ~ {notification['Title']}")
             except Exception as e:
-                logging.error(f" Failed to send notification: {notification['Title']} ~ {str(e)}")
+                logging.error(f" Failed to request NTFY SERVER: {notification['Title']} ~ {str(e)}")
+
+            if response.status_code == 200:
+                logging.info(f" [NOTIFICATION SENT] ~ {notification['Title']}")
+                update_lsni(lsnif, notices, i)
+            else: 
+                logging.error(f" Failed to send notification: {notification['Title']} ~ {response.text}")
+                break
 
 def parseBody(notice, session, year, id_):
     content = session.get(NOTICE_CONTENT_URL.format(year, id_))
