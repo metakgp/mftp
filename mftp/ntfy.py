@@ -77,13 +77,13 @@ def format_notice(notices, session):
 
 def send(notifications, lsnif, notices):
     if notifications:
-        print(f"[SENDING NOTIFICATIONS]", flush=True)
+        print(f"[SENDING NOTIFICATIONS] ~ {NTFY_BASE_URL}/{NTFY_TOPIC}", flush=True)
 
         for i, notification in enumerate(notifications, 1):
             if has_idx_mutated(lsnif, notices, i): break
 
             try:
-                response = requests.post(f"{NTFY_BASE_URL}/${NTFY_TOPIC}",
+                response = requests.post(f"{NTFY_BASE_URL}/{NTFY_TOPIC}",
                     data=notification["Body"],
                     headers={
                         "Title": notification["Title"],
