@@ -102,12 +102,10 @@ def send(notifications, lsnif, notices):
 
                 query_params = f"message={quote(notification['Body'])}"
                 if notification['Attachment']:
-                    query_params += f"&filename={quote(notification['Attachment'])}"
+                    query_params += f"&filename={notification['Attachment']}"
 
-                response = requests.put(
-                    f"{NTFY_BASE_URL}/{NTFY_TOPIC}?{query_params}", 
-                    headers=headers
-                )
+                request_url = f"{NTFY_BASE_URL}/{NTFY_TOPIC}?{query_params}"
+                response = requests.put(request_url, headers=headers)
             except Exception as e:
                 logging.error(f" Failed to request NTFY SERVER: {notification['Title']} ~ {str(e)}")
                 break
