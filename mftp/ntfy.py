@@ -1,3 +1,4 @@
+import os
 import re
 import logging
 import requests
@@ -70,15 +71,10 @@ def format_notice(notices, session):
             logging.error(f" Failed to parse mail attachment ~ {str(e)}")
 
         if len(attachment) != 0:
-            file_path = f"{year}-{id_}.pdf"
-            try:
-                with open(file_path, 'wb') as file:
-                    file.write(attachment)
-                logging.info(f" [PDF SAVED] For notice #{id_} of length ~ {len(attachment)}")
-
-                notification['Attachment'] = file_path
-            except Exception as e:
-                logging.error(f" Failed to save attachment for notice #{id_} ~ {str(e)}")
+            file_name = f"{year}-{id_}.pdf"
+            if save_file(file_name, attachment): 
+                notification['Attachment'] = file_name
+            else: 
                 break
         else: 
             notification['Attachment'] = None
@@ -115,6 +111,8 @@ def send(notifications, lsnif, notices):
             except Exception as e:
                 logging.error(f" Failed to request NTFY SERVER: {notification['Title']} ~ {str(e)}")
                 break
+            finally:
+                if notification['Attachment'] and not delete_file(notification['Attachment']): break
 
             if response.status_code == 200:
                 logging.info(f" [NOTIFICATION SENT] ~ {notification['Title']}")
@@ -122,6 +120,26 @@ def send(notifications, lsnif, notices):
             else: 
                 logging.error(f" Failed to send notification: {notification['Title']} ~ {response.text}")
                 break
+
+def save_file(file_name: str, attachment):
+    try:
+        with open(file_name, 'wb') as file:
+            file.write(attachment)
+
+        logging.info(f" [PDF SAVED] For notice #{file_name.split('.')[0].split('-')[-1]} of length ~ {len(attachment)}")
+        return True
+    except Exception as e:
+        logging.error(f" Failed to save attachment for notice #{file_name.split('.')[0].split('-')[-1]} ~ {str(e)}")
+        return False
+
+def delete_file(file_name):
+    try:
+        os.remove(file_name)
+        logging.info(f" [PDF DELETED] ~ {file_name}")
+        return True
+    except Exception as e:
+        logging.error(f" Failed to delete the pdf {file_name} ~ {str(e)}")
+        return False
 
 def parseAttachment(session, year, id_):
     stream = session.get(ATTACHMENT_URL.format(year, id_), stream=True)
