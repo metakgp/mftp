@@ -1,7 +1,7 @@
-import os
 import re
 import logging
 import requests
+from urllib.parse import quote
 from bs4 import BeautifulSoup as bs
 from notice import update_lsni, has_idx_mutated
 from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
@@ -70,9 +70,16 @@ def format_notice(notices, session):
             logging.error(f" Failed to parse mail attachment ~ {str(e)}")
 
         if len(attachment) != 0:
-            # TODO: Handling attachment
-            notification['Attachment'] = attachment
-            logging.info(f" [PDF ATTACHED] On notice #{id_} of length ~ {len(attachment)}")
+            file_path = f"{year}-{id_}.pdf"
+            try:
+                with open(file_path, 'wb') as file:
+                    file.write(attachment)
+                logging.info(f" [PDF SAVED] For notice #{id_} of length ~ {len(attachment)}")
+
+                notification['Attachment'] = file_path
+            except Exception as e:
+                logging.error(f" Failed to save attachment for notice #{id_} ~ {str(e)}")
+                break
         else: 
             notification['Attachment'] = None
 
@@ -94,14 +101,16 @@ def send(notifications, lsnif, notices):
                     "Priority": notification["Priority"],
                     "Icon": NTFY_TOPIC_ICON,
                     "Action": notification["Links"],
+                    "Markdown": "true"
                 }
 
+                query_params = f"message={quote(notification['Body'])}"
                 if notification['Attachment']:
-                    pass
+                    query_params += f"&filename={quote(notification['Attachment'])}"
 
-                response = requests.post(f"{NTFY_BASE_URL}/{NTFY_TOPIC}",
-                    data= notification['Body'],
-                    headers = headers
+                response = requests.put(
+                    f"{NTFY_BASE_URL}/{NTFY_TOPIC}?{query_params}", 
+                    headers=headers
                 )
             except Exception as e:
                 logging.error(f" Failed to request NTFY SERVER: {notification['Title']} ~ {str(e)}")
