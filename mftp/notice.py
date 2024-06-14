@@ -68,3 +68,15 @@ def update_lsni(lsnif, notices, i):
             file.write(lsni)
     except Exception as e:
         logging.error(f" Failed to Save Notice ~ #{lsni}")
+
+
+def has_idx_mutated(lsnif, notices, i):
+    lidx_from_file = get_latest_index(lsnif) # Latest Index from File
+    cidx_from_to_send_notifs = int(notices[-i]['UID'].split('_')[0]) # Current Index from to send notifications
+    difference_in_idx = cidx_from_to_send_notifs - lidx_from_file
+
+    if difference_in_idx != 1:
+        logging.error(f' Trying to send mail #{cidx_from_to_send_notifs} while latest in database is #{lidx_from_file}')
+        return True
+
+    return False

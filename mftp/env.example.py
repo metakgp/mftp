@@ -1,4 +1,4 @@
-# ERP Credentials
+# ERP Credentials (MUST)
 ROLL_NUMBER = "XXYYXXXXX" # Institute Roll Number
 PASSWORD = "**********" # ERP Password
 SECURITY_QUESTIONS_ANSWERS = { # ERP Secret Questions and their Answers
@@ -7,10 +7,15 @@ SECURITY_QUESTIONS_ANSWERS = { # ERP Secret Questions and their Answers
     "Q3" : "A3",
 }
 
-# EMAIL CREDENTIALS
+# EMAIL (via SMTP)
+## Senders' Credentials
 FROM_EMAIL = "abc@gmail.com" # Notification Sender Email-id
 FROM_EMAIL_PASS = "**********" # App password for the above email-id
-
-# OTHER PARAMETERS
+## EMAIL - Receiver's Address
 BCC_EMAIL_S = ["xyz@googlegroups.com", "abc@googlegroups.com"] # Multiple mails for bcc
 # BCC_EMAIL_S = ["xyz@googlegroups.com"] # This is how you can set single mail in a list
+
+# NTFY
+NTFY_BASE_URL = "https://ntfy.sh"
+NTFY_TOPIC = "mftp"
+NTFY_TOPIC_ICON = "https://miro.medium.com/v2/resize:fit:600/1*O94LHxqfD_JGogOKyuBFgA.jpeg"

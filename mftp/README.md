@@ -60,7 +60,7 @@ The following requirements are to be satisfied for the project to function prope
          sudo docker build -t proffapt/mftp .
          ```
 2. Create a directory which will contain your tokens and env.py, name it as `mftp_config`
-3. Follow the steps to [configure mail sending](#sending-emails)
+3. Follow the steps to [configure mail sending](#sending-emails). **Skip this step if you wish to use method not involving mails, for example, ntfy**
 4. Follow the steps to [configure env variables](#configuring-environment-variables)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -73,7 +73,7 @@ The following requirements are to be satisfied for the project to function prope
 
 It is mandatory to provide both of the following `env variables` before the _docker-compose_ command.
 - `MFTP_CONFIG`: Absolute path to `mftp_config` directory
-- `MFTP_MODE`: Mode of sending mail - **--smtp** or **--gmail-api**
+- `MFTP_MODE`: Mode of sending mail - **--smtp**, **--gmail-api** and **--ntfy**
 
 ```sh
 sudo MFTP_CONFIG=/path/to/mftp_config MFTP_MODE=--smtp docker-compose up -d # Using SMTP for sending mails
@@ -81,6 +81,10 @@ sudo MFTP_CONFIG=/path/to/mftp_config MFTP_MODE=--smtp docker-compose up -d # Us
 
 ```sh
 sudo MFTP_CONFIG=/path/to/mftp_config MFTP_MODE=--gmail-api docker-compose up -d # Using Gmail API for sending mails
+```
+
+```sh
+sudo MFTP_CONFIG=/path/to/mftp_config MFTP_MODE=--ntfy docker-compose up -d # Using Gmail API for sending mails
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -118,6 +122,21 @@ It is mandatory to provide either of the following flags to the execution comman
   proffapt/mftp --gmail-api
   ```
 
+- `--ntfy`: Using NTFY to serve notification
+    ```sh
+  sudo docker run -d \
+  -v /path/to/mftp_config/env.py:/mftp/env.py \
+  -v /path/to/mftp_config/token.json:/mftp/token.json \
+  -v /path/to/mftp_config/credentials.json:/mftp/credentials.json \
+  -v /path/to/mftp_config/mail_send_token.json:/mftp/mail_send_token.json \
+  -v /path/to/mftp_config/mail_send_creds.json:/mftp/mail_send_creds.json \
+  -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
+  -v /path/to/mftp_config/.session:/mftp/.session \
+  --restart=unless-stopped \
+  --name mftp \
+  proffapt/mftp --ntfy
+  ```
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 #### As a cronjob
@@ -133,6 +152,10 @@ It is also possible to run these docker containers as a cronjob:
         * Using Cronjob to run container and Gmail API to send mails
           ```sh
           sudo MFTP_CONFIG=/path/to/mftp_config MFTP_MODE="--gmail-api --cron" docker-compose up -d
+          ```
+        * Using Cronjob to run container and ntfy to send mails
+          ```sh
+          sudo MFTP_CONFIG=/path/to/mftp_config MFTP_MODE="--ntfy --cron" docker-compose up -d
           ```
 - ##### With Docker Command
     - Remove `--restart=unless-stopped` flag & append `--cron` at the end of any of [these](#docker-command) commands. For example:
@@ -205,7 +228,7 @@ _Now that the environment has been set up and configured to properly compile and
 
    - Copy `env.example.py` as `env.py`. It looks like this:
      ```python
-     # ERP Credentials
+     # ERP Credentials (MUST)
      ROLL_NUMBER = "XXYYXXXXX" # Institute Roll Number
      PASSWORD = "**********" # ERP Password
      SECURITY_QUESTIONS_ANSWERS = { # ERP Secret Questions and their Answers
@@ -214,13 +237,18 @@ _Now that the environment has been set up and configured to properly compile and
          "Q3" : "A3",
      }
 
-     # EMAIL CREDENTIALS
+     # EMAIL (via SMTP)
+     ## Senders' Credentials
      FROM_EMAIL = "abc@gmail.com" # Notification Sender Email-id
      FROM_EMAIL_PASS = "**********" # App password for the above email-id
-
-     # OTHER PARAMETERS
+     ## EMAIL - Receiver's Address
      BCC_EMAIL_S = ["xyz@googlegroups.com", "abc@googlegroups.com"] # Multiple mails for bcc
      # BCC_EMAIL_S = ["xyz@googlegroups.com"] # This is how you can set single mail in a list
+
+     # NTFY
+     NTFY_BASE_URL = "https://ntfy.sh"
+     NTFY_TOPIC = "mftp"
+     NTFY_TOPIC_ICON = "https://miro.medium.com/v2/resize:fit:600/1*O94LHxqfD_JGogOKyuBFgA.jpeg"
      ```
    - Update the values inside the `double quotes` ("). **DO NOT CHANGE VAR NAMES.**
 
@@ -244,10 +272,16 @@ It is mandatory to provide either of the following flags to the execution comman
   python3 mftp.py --gmail-api
   ```
 
+- `--ntfy`: Using NTFY for serving notifications
+  ```python
+  python3 mftp.py --ntfy
+  ```
+
 It is also possible to bypass the continuous loop - which executes the code after every 2 minutes - using the `--cron` argument:
 ```python
 python3 mftp.py --smtp --cron
 python3 mftp.py --gmail-api --cron
+python3 mftp.py --ntfy --cron
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>

@@ -5,6 +5,7 @@ import notice
 
 import requests
 import argparse
+import ntfy
 from datetime import datetime
 import iitkgp_erp_login.erp as erp
 
@@ -18,6 +19,7 @@ session = requests.Session()
 parser = argparse.ArgumentParser(description='One stop mailing solution for CDC NoticeBoard at IIT KGP')
 parser.add_argument('--smtp', action="store_true", help='Use SMTP for sending the mails', required=False)
 parser.add_argument('--gmail-api', action="store_true", help='Use GMAIL API for sending the mails', required=False)
+parser.add_argument('--ntfy', action="store_true", help='Use NTFY to broadcast notifications', required=False)
 parser.add_argument('--cron', action="store_true", help='Act as cronjob, bypass the continuous loop', required=False)
 args = parser.parse_args()
 
@@ -30,8 +32,12 @@ while True:
   _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
   
   notices = notice.fetch(headers, session, ssoToken, lsnif)
-  mails = mail.format_notice(notices, session)
-  mail.send(mails, args.smtp, args.gmail_api, lsnif, notices)
+  if args.ntfy:
+    notifications = ntfy.format_notice(notices, session)
+    ntfy.send(notifications, lsnif, notices)
+  else:
+    mails = mail.format_notice(notices, session)
+    mail.send(mails, args.smtp, args.gmail_api, lsnif, notices)
 
   if args.cron:
     break
