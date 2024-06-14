@@ -102,7 +102,7 @@ The following requirements are to be satisfied for the project to function prope
 It is mandatory to provide all of the following `env variables` before the _docker-compose_ command.
 - `MFTP_CONFIG`: Absolute path to `mftp_config` directory
 - `DOCTOR_CONFIG`: Absolute path to `doctor_config` directory
-- `MFTP_MODE`: Mode of sending mail - **--smtp** or **--gmail-api**
+- `MFTP_MODE`: Mode of sending mail - **--smtp**, **--gmail-api** or **--ntfy**
 
 ```sh
 sudo MFTP_CONFIG=/path/to/mftp_config DOCTOR_CONFIG=/path/to/doctor_config MFTP_MODE="--smtp" docker-compose up -d # Using SMTP for sending mails
@@ -110,6 +110,10 @@ sudo MFTP_CONFIG=/path/to/mftp_config DOCTOR_CONFIG=/path/to/doctor_config MFTP_
 
 ```sh
 sudo MFTP_CONFIG=/path/to/mftp_config DOCTOR_CONFIG=/path/to/doctor_config MFTP_MODE="--gmail-api" docker-compose up -d # Using Gmail API for sending mails
+```
+
+```sh
+sudo MFTP_CONFIG=/path/to/mftp_config DOCTOR_CONFIG=/path/to/doctor_config MFTP_MODE="--ntfy" docker-compose up -d # Using NTFY for serving notifications
 ```
 
 > [!NOTE]
@@ -128,6 +132,10 @@ It is also possible to run these docker containers as a cronjob:
     * Using Cronjob to run containers and Gmail API to send mails
       ```sh
       sudo MFTP_CONFIG=/path/to/mftp_config DOCTOR_CONFIG=/path/to/doctor_config MFTP_MODE="--gmail-api --cron" DOCTOR_MODE="--cron" docker-compose up -d
+      ```
+    * Using Cronjob to run containers and NTFY to serve notifications
+      ```sh
+      sudo MFTP_CONFIG=/path/to/mftp_config DOCTOR_CONFIG=/path/to/doctor_config MFTP_MODE="--ntfy --cron" DOCTOR_MODE="--cron" docker-compose up -d
       ```
 - Add the updated command with desired [cron expression](https://crontab.cronhub.io/) into your cronjob using [crontab -e](https://www.man7.org/linux/man-pages/man5/crontab.5.html)
 
