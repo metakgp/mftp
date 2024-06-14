@@ -62,7 +62,8 @@ def format_notice(notices, session):
             "Body": body,
             "Tags": f"{emoji}, {notice['Type']}, {notice['Subject']}, {notice['Company']}",
             "Priority": priority,
-            "Links": links
+            "Links": links,
+            "Attachment":  f"{id_}-{notice['Type'].replace(' ', '_')}-{notice['Subject'].replace(' ', '_')}-{notice['Company'].replace(' ', '_')}.pdf"
         }
 
         try:
@@ -71,7 +72,7 @@ def format_notice(notices, session):
             logging.error(f" Failed to parse mail attachment ~ {str(e)}")
 
         if len(attachment) != 0:
-            file_name = f"{year}-{id_}.pdf"
+            file_name = notification['Attachment']
             if save_file(file_name, attachment): 
                 notification['Attachment'] = file_name
             else: 
@@ -104,11 +105,11 @@ def send(notifications, lsnif, notices):
                 }
 
                 if notification['Attachment']:
-                    headers['Filename'] = "Attachment.pdf"
+                    headers['Filename'] = notification['Attachment']
                     response = requests.put(
                         request_url, 
                         headers=headers,
-                        data=open(notification["Attachment"], 'rb')
+                        data=open(notification['Attachment'], 'rb')
                     )
                 else:
                     response = requests.put(request_url, headers=headers)
@@ -131,10 +132,10 @@ def save_file(file_name: str, attachment):
         with open(file_name, 'wb') as file:
             file.write(attachment)
 
-        logging.info(f" [PDF SAVED] For notice #{file_name.split('.')[0].split('-')[-1]} of length ~ {len(attachment)}")
+        logging.info(f" [PDF SAVED] For notice #{file_name.split('-')[0]} of length ~ {len(attachment)}")
         return True
     except Exception as e:
-        logging.error(f" Failed to save attachment for notice #{file_name.split('.')[0].split('-')[-1]} ~ {str(e)}")
+        logging.error(f" Failed to save attachment for notice #{file_name.split('-')[0]} ~ {str(e)}")
         return False
 
 def delete_file(file_name):
