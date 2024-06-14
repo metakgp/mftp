@@ -91,6 +91,9 @@ def send(notifications, lsnif, notices):
             if has_idx_mutated(lsnif, notices, i): break
 
             try:
+                query_params = f"message={quote(notification['Body'])}"
+                request_url = f"{NTFY_BASE_URL}/{NTFY_TOPIC}?{query_params}"
+
                 headers={
                     "Title": notification["Title"],
                     "Tags": notification["Tags"],
@@ -100,12 +103,16 @@ def send(notifications, lsnif, notices):
                     "Markdown": "true"
                 }
 
-                query_params = f"message={quote(notification['Body'])}"
                 if notification['Attachment']:
-                    query_params += f"&filename={notification['Attachment']}"
+                    headers['Filename'] = "Attachment.pdf"
+                    response = requests.put(
+                        request_url, 
+                        headers=headers,
+                        data=open(notification["Attachment"], 'rb')
+                    )
+                else:
+                    response = requests.put(request_url, headers=headers)
 
-                request_url = f"{NTFY_BASE_URL}/{NTFY_TOPIC}?{query_params}"
-                response = requests.put(request_url, headers=headers)
             except Exception as e:
                 logging.error(f" Failed to request NTFY SERVER: {notification['Title']} ~ {str(e)}")
                 break
