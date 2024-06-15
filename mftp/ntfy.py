@@ -1,12 +1,13 @@
 import os
 import re
+import base64
 import logging
 import requests
 from urllib.parse import quote
 from bs4 import BeautifulSoup as bs
 from notice import update_lsni, has_idx_mutated
 from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
-from env import NTFY_BASE_URL, NTFY_TOPIC, NTFY_TOPIC_ICON 
+from env import NTFY_BASE_URL, NTFY_TOPIC, NTFY_TOPIC_ICON, NTFY_USER, NTFY_PASS
 
 def ntfy_priority(subject):
     match subject:
@@ -103,6 +104,8 @@ def send(notifications, lsnif, notices):
                     "Action": notification["Links"],
                     "Markdown": "true"
                 }
+                if NTFY_USER and NTFY_PASS:
+                    headers['Authorization'] = f"Basic {str(base64.b64encode(bytes(NTFY_USER + ':' + NTFY_PASS, 'utf-8')), 'utf-8')}"
 
                 if notification['Attachment']:
                     headers['Filename'] = notification['Attachment']

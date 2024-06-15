@@ -18,4 +18,8 @@ BCC_EMAIL_S = ["xyz@googlegroups.com", "abc@googlegroups.com"] # Multiple mails 
 # NTFY
 NTFY_BASE_URL = "https://ntfy.sh"
 NTFY_TOPIC = "mftp"
+## Optional: only if you want a custom icon
 NTFY_TOPIC_ICON = "https://miro.medium.com/v2/resize:fit:600/1*O94LHxqfD_JGogOKyuBFgA.jpeg"
+## Optional: only if the topic is restricted
+NTFY_USER = "testuser"
+NTFY_PASS = "fakepassword"

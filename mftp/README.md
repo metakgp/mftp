@@ -248,7 +248,11 @@ _Now that the environment has been set up and configured to properly compile and
      # NTFY
      NTFY_BASE_URL = "https://ntfy.sh"
      NTFY_TOPIC = "mftp"
+     ## Optional: only if you want a custom icon
      NTFY_TOPIC_ICON = "https://miro.medium.com/v2/resize:fit:600/1*O94LHxqfD_JGogOKyuBFgA.jpeg"
+     ## Optional: only if the topic is restricted
+     NTFY_USER = "testuser"
+     NTFY_PASS = "fakepassword"
      ```
    - Update the values inside the `double quotes` ("). **DO NOT CHANGE VAR NAMES.**
 
