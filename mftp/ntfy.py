@@ -174,7 +174,6 @@ def parseBody(notice, session, year, id_):
 def parseLinks(data):
     body = data
     links = re.findall(r'(https?://[^\s]+)', data)
-    links = list(set(result.lower() for result in links))
     action_template = "view, Link {}, {}"
     actions = ""
 
