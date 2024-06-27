@@ -1,0 +1,52 @@
+name: Continuous Deployment Pipeline
+
+on:
+    push:
+        branches:
+            - "main"
+        paths-ignore:
+            - "**.md"
+            - "LICENSE"
+
+jobs:
+    push:
+        name: Push Stage
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Sync local repo with remote repo
+              uses: appleboy/ssh-action@master
+              env:
+                  PROJECT_DIR: ${{ secrets.PROJECT_DIR }}
+              with:
+                  host: ${{ secrets.SSH_HOSTNAME }}
+                  username: ${{ secrets.SSH_USERNAME }}
+                  key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  passphrase: ${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}
+                  envs: PROJECT_DIR
+                  script_stop: true
+                  script: |
+                      cd "${PROJECT_DIR}/"
+                      sudo git fetch origin
+                      sudo git reset --hard origin/main
+
+    build:
+        name: Build Stage
+        needs: push
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Build the latest container(s)
+              uses: appleboy/ssh-action@master
+              env:
+                  PROJECT_DIR: ${{ secrets.PROJECT_DIR }}
+              with:
+                  host: ${{ secrets.SSH_HOSTNAME }}
+                  username: ${{ secrets.SSH_USERNAME }}
+                  key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  passphrase: ${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}
+                  envs: PROJECT_DIR
+                  script_stop: true
+                  script: |
+                      cd "${PROJECT_DIR}/"
+                      sudo docker compose --env-file .env build
