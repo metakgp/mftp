@@ -70,7 +70,7 @@ def format_notice(notices, session):
         try:
             attachment = parseAttachment(session, year, id_)
         except Exception as e:
-            logging.error(f" Failed to parse mail attachment ~ {str(e)}")
+            logging.error(f" Failed to parse attachment ~ {str(e)}")
 
         if len(attachment) != 0:
             file_name = notification['Attachment']

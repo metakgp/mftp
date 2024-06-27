@@ -34,13 +34,17 @@ def fetch(headers, session, ssoToken, lsnif):
             'Subject': row.find('cell[3]').text.strip(),
             'Company': row.find('cell[4]').text.strip(),
         }
+
+        if int(id_) < latest_index:
+            logging.info(f' [NEW SESSION DETECTED] Requesting {lsnif} reset')
+            latest_index = 0
         
         if int(id_) > latest_index:
             notices.append(notice)
             logging.info(f" [NEW NOTICE]: #{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']} | {notice['Time']}")
         else:
             break
-            
+
     return notices
 
 
@@ -71,12 +75,15 @@ def update_lsni(lsnif, notices, i):
 
 
 def has_idx_mutated(lsnif, notices, i):
-    lidx_from_file = get_latest_index(lsnif) # Latest Index from File
     cidx_from_to_send_notifs = int(notices[-i]['UID'].split('_')[0]) # Current Index from to send notifications
-    difference_in_idx = cidx_from_to_send_notifs - lidx_from_file
+    if cidx_from_to_send_notifs == 1:
+        logging.info(f' [NEW SESSION DETECTED] Approving {lsnif} reset')
+        return False
 
+    lidx_from_file = get_latest_index(lsnif) # Latest Index from File
+    difference_in_idx = cidx_from_to_send_notifs - lidx_from_file
     if difference_in_idx != 1:
-        logging.error(f' Trying to send mail #{cidx_from_to_send_notifs} while latest in database is #{lidx_from_file}')
+        logging.error(f' Trying to send notif #{cidx_from_to_send_notifs} while latest in database is #{lidx_from_file}')
         return True
 
     return False
