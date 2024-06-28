@@ -23,3 +23,5 @@ NTFY_TOPIC_ICON = "https://miro.medium.com/v2/resize:fit:600/1*O94LHxqfD_JGogOKy
 ## Optional: only if the topic is restricted
 NTFY_USER = "testuser"
 NTFY_PASS = "fakepassword"
+## Optional (specific to metakgp [naarad] architecture): Heimdall security token
+HEIMDALL_COOKIE = '17ab96bd8ffbe8ca58a78657a918558'

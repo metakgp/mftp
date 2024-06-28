@@ -7,7 +7,7 @@ from urllib.parse import quote
 from bs4 import BeautifulSoup as bs
 from notice import update_lsni, has_idx_mutated
 from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
-from env import NTFY_BASE_URL, NTFY_TOPIC, NTFY_TOPIC_ICON, NTFY_USER, NTFY_PASS
+from env import NTFY_BASE_URL, NTFY_TOPIC, NTFY_TOPIC_ICON, NTFY_USER, NTFY_PASS, HEIMDALL_COOKIE
 
 def ntfy_priority(subject):
     match subject:
@@ -107,15 +107,20 @@ def send(notifications, lsnif, notices):
                 if NTFY_USER and NTFY_PASS:
                     headers['Authorization'] = f"Basic {str(base64.b64encode(bytes(NTFY_USER + ':' + NTFY_PASS, 'utf-8')), 'utf-8')}"
 
+                cookies = {}
+                if HEIMDALL_COOKIE:
+                    cookies = {'heimdall': HEIMDALL_COOKIE}
+
                 if notification['Attachment']:
                     headers['Filename'] = notification['Attachment']
                     response = requests.put(
                         request_url, 
                         headers=headers,
-                        data=open(notification['Attachment'], 'rb')
+                        data=open(notification['Attachment'], 'rb'),
+                        cookies=cookies
                     )
                 else:
-                    response = requests.put(request_url, headers=headers)
+                    response = requests.put(request_url, headers=headers, cookies=cookies)
 
             except Exception as e:
                 logging.error(f" Failed to request NTFY SERVER: {notification['Title']} ~ {str(e)}")
