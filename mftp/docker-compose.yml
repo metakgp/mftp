@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: proffapt/mftp
+    image: metakgporg/mftp
     container_name: mftp
     restart: unless-stopped
     command: $MFTP_MODE

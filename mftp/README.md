@@ -47,7 +47,7 @@ The following requirements are to be satisfied for the project to function prope
    You can get the docker image from either docker-hub or by buiilding it locally:
    - Pull from docker-hub
      ```sh
-     sudo docker pull proffapt/mftp
+     sudo docker pull metakgporg/mftp
      ```
    - Build from Dockerfile
        * Clone the repository and cd into it
@@ -57,7 +57,7 @@ The following requirements are to be satisfied for the project to function prope
          ```
        * Build the image
          ```sh
-         sudo docker build -t proffapt/mftp .
+         sudo docker build -t metakgporg/mftp .
          ```
 2. Create a directory which will contain your tokens and env.py, name it as `mftp_config`
 3. Follow the steps to [configure mail sending](#sending-emails). **Skip this step if you wish to use method not involving mails, for example, ntfy**
@@ -104,7 +104,7 @@ It is mandatory to provide either of the following flags to the execution comman
   -v /path/to/mftp_config/.session:/mftp/.session \
   --restart=unless-stopped \
   --name mftp \
-  proffapt/mftp --smtp
+  metakgporg/mftp --smtp
   ```
   
 - `--gmail-api`: Using Gmail API for sending mails
@@ -119,7 +119,7 @@ It is mandatory to provide either of the following flags to the execution comman
   -v /path/to/mftp_config/.session:/mftp/.session \
   --restart=unless-stopped \
   --name mftp \
-  proffapt/mftp --gmail-api
+  metakgporg/mftp --gmail-api
   ```
 
 - `--ntfy`: Using NTFY to serve notification
@@ -134,7 +134,7 @@ It is mandatory to provide either of the following flags to the execution comman
   -v /path/to/mftp_config/.session:/mftp/.session \
   --restart=unless-stopped \
   --name mftp \
-  proffapt/mftp --ntfy
+  metakgporg/mftp --ntfy
   ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -169,7 +169,7 @@ It is also possible to run these docker containers as a cronjob:
         -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
         -v /path/to/mftp_config/.session:/mftp/.session \
         --name mftp \
-        proffapt/mftp --gmail-api --cron
+        metakgporg/mftp --gmail-api --cron
         ```
 - Add the updated command with desired [cron expression](https://crontab.cronhub.io/) into your cronjob using [crontab -e](https://www.man7.org/linux/man-pages/man5/crontab.5.html)
 

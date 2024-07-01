@@ -6,7 +6,7 @@ services:
     build:
       context: ./mftp
       dockerfile: Dockerfile
-    image: proffapt/mftp
+    image: metakgporg/mftp
     container_name: mftp
     command: $MFTP_MODE
     volumes:
@@ -22,7 +22,7 @@ services:
     build:
       context: ./mftp-doctor
       dockerfile: Dockerfile
-    image: proffapt/mftp-doctor
+    image: metakgporg/mftp-doctor
     container_name: mftp-doctor
     command: ${DOCTOR_MODE:-}
     volumes:

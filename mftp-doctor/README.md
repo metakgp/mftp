@@ -46,7 +46,7 @@ The following requirements are to be satisfied for the project to function prope
    You can get the docker image from either docker-hub or by buiilding it locally:
    - Pull from docker-hub
      ```sh
-     sudo docker pull proffapt/mftp-doctor
+     sudo docker pull metakgporg/mftp-doctor
      ```
    - Build from Dockerfile
        * Clone the repository and cd into it
@@ -56,7 +56,7 @@ The following requirements are to be satisfied for the project to function prope
          ```
        * Build the image
          ```sh
-         sudo docker build -t proffapt/mftp-doctor .
+         sudo docker build -t metakgporg/mftp-doctor .
          ```
 2. Create a directory which will contain your env.py, name it as `doctor_config`
 3. Follow the steps to [configure env variables](#configuring-environment-variables)
@@ -87,7 +87,7 @@ This container requires access to hosts' `docker.sock` to check logs of `mftp` c
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /path/to/doctor_config/env.py:/mftp-doctor/env.py \
   --name mftp-doctor \
-  proffapt/mftp-doctor
+  metakgporg/mftp-doctor
   ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -107,7 +107,7 @@ It is also possible to run these docker containers as a cronjob:
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v /path/to/doctor_config/env.py:/mftp-doctor/env.py \
         --name mftp-doctor \
-        proffapt/mftp-doctor --cron
+        metakgporg/mftp-doctor --cron
         ```
 - Add the updated command with desired [cron expression](https://crontab.cronhub.io/) into your cronjob using [crontab -e](https://www.man7.org/linux/man-pages/man5/crontab.5.html)
 
