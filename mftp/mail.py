@@ -95,6 +95,10 @@ def format_notice(notices, session):
                     <div style="text-align: right; font-style: italic;">
                         ({notice['Time']})
                     </div>
+                    <div>
+                        <hr>
+                        <b>DISCLAIMER</b>: MFTP is unofficial. Not affiliated with CDC, ERP, or Placement Committee. Do not rely solely on MFTP for updates. MFTP-related issues cannot be used as arguments with official authorities.
+                    </div>
                 </div>
             </body>
         </html>

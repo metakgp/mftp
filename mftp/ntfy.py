@@ -51,6 +51,15 @@ def format_notice(notices, session):
         try:
             data = parseBody(notice, session, year, id_)
             body, links = parseLinks(data)
+            body += '''
+--------------
+
+⚠️ DISCLAIMER ⚠️
+
+MFTP is unofficial. Not affiliated with CDC, ERP, or Placement Committee. Do not rely solely on MFTP for updates. MFTP-related issues cannot be used as arguments with official authorities.
+
+--------------
+            '''
         except Exception as e:
             logging.error(f" Failed to parse notification body ~ {str(e)}")
 
@@ -80,7 +89,7 @@ def format_notice(notices, session):
                 break
         else: 
             notification['Attachment'] = None
-
+        
         notifications.append(notification)
   
     return notifications
@@ -102,7 +111,7 @@ def send(notifications, lsnif, notices):
                     "Priority": notification["Priority"],
                     "Icon": NTFY_TOPIC_ICON,
                     "Action": notification["Links"],
-                    "Markdown": "true"
+                    "Markdown": "false"
                 }
                 if NTFY_USER and NTFY_PASS:
                     headers['Authorization'] = f"Basic {str(base64.b64encode(bytes(NTFY_USER + ':' + NTFY_PASS, 'utf-8')), 'utf-8')}"
