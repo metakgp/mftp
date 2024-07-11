@@ -10,13 +10,13 @@ services:
     container_name: mftp
     command: $MFTP_MODE
     volumes:
-      - $MFTP_CONFIG/env.py:/mftp/env.py
-      - $MFTP_CONFIG/token.json:/mftp/token.json 
-      - $MFTP_CONFIG/credentials.json:/mftp/credentials.json
-      - $MFTP_CONFIG/mail_send_token.json:/mftp/mail_send_token.json
-      - $MFTP_CONFIG/mail_send_creds.json:/mftp/mail_send_creds.json
-      - $MFTP_CONFIG/.lsnif:/mftp/.lsnif
-      - $MFTP_CONFIG/.session:/mftp/.session
+      - $MFTP_CONFIG/env.py:/app/env.py
+      - $MFTP_CONFIG/token.json:/app/token.json 
+      - $MFTP_CONFIG/credentials.json:/app/credentials.json
+      - $MFTP_CONFIG/mail_send_token.json:/app/mail_send_token.json
+      - $MFTP_CONFIG/mail_send_creds.json:/app/mail_send_creds.json
+      - $MFTP_CONFIG/.lsnif:/app/.lsnif
+      - $MFTP_CONFIG/.session:/app/.session
     
   mftp-doctor:
     build:
@@ -27,4 +27,4 @@ services:
     command: ${DOCTOR_MODE:-}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - $DOCTOR_CONFIG/env.py:/mftp-doctor/env.py
+      - $DOCTOR_CONFIG/env.py:/app/env.py
