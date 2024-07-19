@@ -73,7 +73,7 @@ MFTP is unofficial. Not affiliated with CDC, ERP, or Placement Committee. Do not
             "Tags": f"{emoji}, {notice['Type']}, {notice['Subject']}, {notice['Company']}",
             "Priority": priority,
             "Links": links,
-            "Attachment":  f"{id_}-{notice['Type'].replace(' ', '_')}-{notice['Subject'].replace(' ', '_')}-{notice['Company'].replace(' ', '_')}.pdf"
+            "Attachment":  f"{id_}-{notice['Type']}-{notice['Subject']}-{notice['Company']}.pdf".replace(' ', '_').replace('/', '_')
         }
 
         try:
