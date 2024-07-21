@@ -35,11 +35,10 @@ def fetch(headers, session, ssoToken, lsnif):
             'Company': row.find('cell[4]').text.strip(),
         }
 
-        if int(id_) < latest_index:
+        if int(id_) == 1:
             logging.info(f' [NEW SESSION DETECTED] Requesting {lsnif} reset')
             latest_index = 0
-        
-        if int(id_) > latest_index:
+        elif int(id_) > latest_index:
             notices.append(notice)
             logging.info(f" [NEW NOTICE]: #{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']} | {notice['Time']}")
         else:
