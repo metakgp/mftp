@@ -47,6 +47,59 @@ def fetch(headers, session, ssoToken, lsnif):
     return notices
 
 
+def get_latest_subscribers(lsnsf):
+    try:
+        with open(lsnsf, 'r') as file:
+            successful_subscribers= file.read()
+        
+        return successful_subscribers.split(' ')
+    except Exception as e:
+        logging.error(f" Failed to Read `{lsnsf}` file")
+
+
+def reset_lsns(lsnsf):
+    try:
+        with open(lsnsf, 'w') as file:
+            file.write(f'')
+    except Exception as e:
+        logging.error(f" Failed to Reset `{lsnsf}` file")
+
+
+def update_lsns(lsnsf, ntfy_topic):
+    # Create file if it doesn't exist
+    if not os.path.exists(lsnsf):
+        open(lsnsf, 'w').close()
+
+    # Save the value of Latest Sent Notice Subscriber in the list
+    # which is a list os subscribers separated by space
+    try:
+        with open(lsnsf, 'r') as file:
+            existing_subscribers= file.read()
+
+        with open(lsnsf, 'w') as file:
+            file.write(f'{ntfy_topic} {existing_subscribers}')
+    except Exception as e:
+        logging.error(f" Failed to Save Subscriber ~ {ntfy_topic}")
+
+
+def filter_subscribers(notice, subscribers):
+    filtered_subscribers = []
+
+    for subscriber in subscribers:
+        filters = subscribers[subscriber]
+
+        if len(filters) == 0:
+            filtered_subscribers.append(subscriber)
+
+        for filter in filters:
+            filter_value = filters[filter]
+
+            if notice[filter] == filter_value:
+                filtered_subscribers.append(subscriber)
+
+    return filtered_subscribers
+
+
 def get_latest_index(lsnif):
     try:
         with open(lsnif, 'r') as file:

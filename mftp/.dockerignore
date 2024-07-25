@@ -16,6 +16,7 @@ __pycache__/
 service/
 .session
 .lsnif
+.ntfy.lsnsf
 logs.txt
 *.json
 env.*

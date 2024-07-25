@@ -101,6 +101,7 @@ It is mandatory to provide either of the following flags to the execution comman
   -v /path/to/mftp_config/mail_send_token.json:/mftp/mail_send_token.json \
   -v /path/to/mftp_config/mail_send_creds.json:/mftp/mail_send_creds.json \
   -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
+  -v /path/to/mftp_config/.ntfy.lsnsf:/mftp/.ntfy.lsnsf \
   -v /path/to/mftp_config/.session:/mftp/.session \
   --restart=unless-stopped \
   --name mftp \
@@ -116,6 +117,7 @@ It is mandatory to provide either of the following flags to the execution comman
   -v /path/to/mftp_config/mail_send_token.json:/mftp/mail_send_token.json \
   -v /path/to/mftp_config/mail_send_creds.json:/mftp/mail_send_creds.json \
   -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
+  -v /path/to/mftp_config/.ntfy.lsnsf:/mftp/.ntfy.lsnsf \
   -v /path/to/mftp_config/.session:/mftp/.session \
   --restart=unless-stopped \
   --name mftp \
@@ -131,6 +133,7 @@ It is mandatory to provide either of the following flags to the execution comman
   -v /path/to/mftp_config/mail_send_token.json:/mftp/mail_send_token.json \
   -v /path/to/mftp_config/mail_send_creds.json:/mftp/mail_send_creds.json \
   -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
+  -v /path/to/mftp_config/.ntfy.lsnsf:/mftp/.ntfy.lsnsf \
   -v /path/to/mftp_config/.session:/mftp/.session \
   --restart=unless-stopped \
   --name mftp \
@@ -167,6 +170,7 @@ It is also possible to run these docker containers as a cronjob:
         -v /path/to/mftp_config/mail_send_token.json:/mftp/mail_send_token.json \
         -v /path/to/mftp_config/mail_send_creds.json:/mftp/mail_send_creds.json \
         -v /path/to/mftp_config/.lsnif:/mftp/.lsnif \
+        -v /path/to/mftp_config/.ntfy.lsnsf:/mftp/.ntfy.lsnsf \
         -v /path/to/mftp_config/.session:/mftp/.session \
         --name mftp \
         metakgporg/mftp --gmail-api --cron

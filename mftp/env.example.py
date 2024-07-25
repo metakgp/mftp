@@ -2,9 +2,9 @@
 ROLL_NUMBER = "XXYYXXXXX" # Institute Roll Number
 PASSWORD = "**********" # ERP Password
 SECURITY_QUESTIONS_ANSWERS = { # ERP Secret Questions and their Answers
-    "Q1" : "A1",
-    "Q2" : "A2",
-    "Q3" : "A3",
+    "Q1": "A1",
+    "Q2": "A2",
+    "Q3": "A3",
 }
 
 # EMAIL (via SMTP)
@@ -17,7 +17,20 @@ BCC_EMAIL_S = ["xyz@googlegroups.com", "abc@googlegroups.com"] # Multiple mails 
 
 # NTFY
 NTFY_BASE_URL = "https://ntfy.sh"
-NTFY_TOPIC = "mftp"
+## This is a list of ntfy topics, with their respective filters,
+## for the logic to determine which message is to be sent on which topic
+NTFY_TOPICS = {
+    "mftp-test": {},
+    "mftp-placement-test": {
+        "Type": "PLACEMENT",
+    },
+    "mftp-internship-test": {
+        "Type": "INTERNSHIP",
+    },
+    "mftp-ppo-test": {
+        "Subject": "PPO",
+    },
+}
 ## Optional: only if you want a custom icon
 NTFY_TOPIC_ICON = "https://miro.medium.com/v2/resize:fit:600/1*O94LHxqfD_JGogOKyuBFgA.jpeg"
 ## Optional: only if the topic is restricted

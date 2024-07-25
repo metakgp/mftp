@@ -5,9 +5,11 @@ import logging
 import requests
 from urllib.parse import quote
 from bs4 import BeautifulSoup as bs
-from notice import update_lsni, has_idx_mutated
 from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
-from env import NTFY_BASE_URL, NTFY_TOPIC, NTFY_TOPIC_ICON, NTFY_USER, NTFY_PASS, HEIMDALL_COOKIE
+from env import NTFY_BASE_URL, NTFY_TOPICS, NTFY_TOPIC_ICON, NTFY_USER, NTFY_PASS, HEIMDALL_COOKIE
+from notice import filter_subscribers, get_latest_subscribers, reset_lsns, update_lsni, has_idx_mutated, update_lsns
+
+lsnsf = '.ntfy.lsnsf'
 
 def ntfy_priority(subject):
     match subject:
@@ -76,6 +78,10 @@ MFTP is unofficial. Not affiliated with CDC, ERP, or Placement Committee. Do not
             "Attachment":  f"{id_}-{notice['Type']}-{notice['Subject']}-{notice['Company']}.pdf".replace(' ', '_').replace('/', '_')
         }
 
+        # NTFY TOPICS LIST: Based on filters
+        notification["NTFY_TOPICS"] = filter_subscribers(notice, NTFY_TOPICS)
+
+        # Handling attachments
         try:
             attachment = parseAttachment(session, year, id_)
         except Exception as e:
@@ -96,52 +102,69 @@ MFTP is unofficial. Not affiliated with CDC, ERP, or Placement Committee. Do not
 
 def send(notifications, lsnif, notices):
     if notifications:
-        print(f"[SENDING NOTIFICATIONS] ~ {NTFY_BASE_URL}/{NTFY_TOPIC}", flush=True)
+        print(f"[SENDING NOTIFICATIONS]", flush=True)
 
         for i, notification in enumerate(notifications, 1):
             if has_idx_mutated(lsnif, notices, i): break
 
-            try:
-                query_params = f"message={quote(notification['Body'])}"
-                request_url = f"{NTFY_BASE_URL}/{NTFY_TOPIC}?{query_params}"
+            notification_sent_to_all_subscribers = True
 
-                headers={
-                    "Title": notification["Title"],
-                    "Tags": notification["Tags"],
-                    "Priority": notification["Priority"],
-                    "Icon": NTFY_TOPIC_ICON,
-                    "Action": notification["Links"],
-                    "Markdown": "false"
-                }
-                if NTFY_USER and NTFY_PASS:
-                    headers['Authorization'] = f"Basic {str(base64.b64encode(bytes(NTFY_USER + ':' + NTFY_PASS, 'utf-8')), 'utf-8')}"
+            ntfy_topics = notification['NTFY_TOPICS']
+            latest_successful_subscribers = get_latest_subscribers(lsnsf)
+            if len(latest_successful_subscribers) != 0:
+                ntfy_topics = [subscirber for subscirber in ntfy_topics if subscirber not in latest_successful_subscribers]
 
-                cookies = {}
-                if HEIMDALL_COOKIE:
-                    cookies = {'heimdall': HEIMDALL_COOKIE}
+            for ntfy_topic in ntfy_topics:
+                try:
+                    query_params = f"message={quote(notification['Body'])}"
+                    request_url = f"{NTFY_BASE_URL}/{ntfy_topic}?{query_params}"
 
-                if notification['Attachment']:
-                    headers['Filename'] = notification['Attachment']
-                    response = requests.put(
-                        request_url, 
-                        headers=headers,
-                        data=open(notification['Attachment'], 'rb'),
-                        cookies=cookies
-                    )
-                else:
-                    response = requests.put(request_url, headers=headers, cookies=cookies)
+                    headers={
+                        "Title": notification["Title"],
+                        "Tags": notification["Tags"],
+                        "Priority": notification["Priority"],
+                        "Icon": NTFY_TOPIC_ICON,
+                        "Action": notification["Links"],
+                        "Markdown": "false"
+                    }
+                    if NTFY_USER and NTFY_PASS:
+                        headers['Authorization'] = f"Basic {str(base64.b64encode(bytes(NTFY_USER + ':' + NTFY_PASS, 'utf-8')), 'utf-8')}"
 
-            except Exception as e:
-                logging.error(f" Failed to request NTFY SERVER: {notification['Title']} ~ {str(e)}")
-                break
-            finally:
-                if notification['Attachment'] and not delete_file(notification['Attachment']): break
+                    cookies = {}
+                    if HEIMDALL_COOKIE:
+                        cookies = {'heimdall': HEIMDALL_COOKIE}
 
-            if response.status_code == 200:
-                logging.info(f" [NOTIFICATION SENT] ~ {notification['Title']}")
+                    if notification['Attachment']:
+                        headers['Filename'] = notification['Attachment']
+                        response = requests.put(
+                            request_url, 
+                            headers=headers,
+                            data=open(notification['Attachment'], 'rb'),
+                            cookies=cookies
+                        )
+                    else:
+                        response = requests.put(request_url, headers=headers, cookies=cookies)
+                except Exception as e:
+                    logging.error(f" Failed to request NTFY SERVER: {notification['Title']} ~ {str(e)}")
+                    notification_sent_to_all_subscribers = False
+                    break
+
+                if response.status_code == 200:
+                    logging.info(f" [NOTIFICATION SENT] ~ `{notification['Title'].split(' | ')[0]} -> {ntfy_topic}`")
+                    update_lsns(lsnsf, ntfy_topic)
+                else: 
+                    logging.error(f" Failed to send notification: `{notification['Title'].split(' | ')[0]} -> {ntfy_topic}` ~ {response.text}")
+                    notification_sent_to_all_subscribers = False
+                    break
+            
+            # Delete attachment files
+            if notification['Attachment']:
+                delete_file(notification['Attachment'])
+
+            if notification_sent_to_all_subscribers:
+                reset_lsns(lsnsf)
                 update_lsni(lsnif, notices, i)
             else: 
-                logging.error(f" Failed to send notification: {notification['Title']} ~ {response.text}")
                 break
 
 def save_file(file_name: str, attachment):
