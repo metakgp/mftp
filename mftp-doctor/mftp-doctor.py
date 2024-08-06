@@ -2,6 +2,7 @@ import re
 import time
 import docker
 import logging
+from flask import request
 import requests
 import argparse
 from datetime import datetime
@@ -52,6 +53,9 @@ def check_error(logs):
 
 
 def send_notification(logs):
+    query_params = f"message={logs}"
+    request_url = f"{TOPIC_URL}?{query_params}"
+
     headers = {
         "Priority": "5",
         "Tags": "warning,skull,rotating_light,mftp,error",
@@ -62,8 +66,7 @@ def send_notification(logs):
     if EMAIL:
       headers["Email"] = EMAIL
 
-    response = requests.post(TOPIC_URL, headers=headers,
-                             data=logs)
+    response = requests.put(request_url, headers=headers)
     return response.status_code
 
 
