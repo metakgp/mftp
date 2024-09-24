@@ -2,7 +2,6 @@ import re
 import time
 import docker
 import logging
-from flask import request
 import requests
 import argparse
 from datetime import datetime
