@@ -52,6 +52,7 @@ def format_notice(notices, session):
 
         try:
             data = parseBody(notice, session, year, id_)
+            notice['Body'] = data
             body, links = parseLinks(data)
             body += '''
 --------------
@@ -90,6 +91,8 @@ MFTP is unofficial. Not affiliated with CDC, ERP, or Placement Committee. Do not
             break
 
         if len(attachment) != 0:
+            notice['Attachment'] = attachment
+
             file_name = notification['Attachment']
             if save_file(file_name, attachment): 
                 notification['Attachment'] = file_name
@@ -104,6 +107,7 @@ MFTP is unofficial. Not affiliated with CDC, ERP, or Placement Committee. Do not
 
 
 def send(notifications, notice_db):
+    print('[SENDING NOTIFICATIONS]', flush=True)
 
     for notif in notifications:
         notification = notif.get('formatted_notice')
@@ -115,9 +119,6 @@ def send(notifications, notice_db):
         latest_successful_subscribers = notice_db.get_successful_ntfy_subscribers(original_notice['UID'])
         if len(latest_successful_subscribers) != 0:
             ntfy_topics = [subscirber for subscirber in ntfy_topics if subscirber not in latest_successful_subscribers]
-
-        if ntfy_topics:
-            print('[SENDING NOTIFICATIONS]', flush=True)
 
         for ntfy_topic in ntfy_topics:
             try:

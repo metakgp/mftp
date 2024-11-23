@@ -78,6 +78,7 @@ def format_notice(notices, session):
         
         try:
             body = parseBody(session, year, id_)
+            notice['Body'] = body
         except Exception as e:
             logging.error(f" Failed to parse mail body ~ {str(e)}")
             break
@@ -115,6 +116,8 @@ def format_notice(notices, session):
             break
 
         if len(attachment) != 0:
+            notice['Attachment'] = attachment
+
             file = MIMEBase('application', 'octet-stream')
             file.set_payload(attachment)
             encoders.encode_base64(file)
