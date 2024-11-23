@@ -1,5 +1,3 @@
-version: "3"
-
 services:
     mftp:
         build:
@@ -10,11 +8,48 @@ services:
         restart: unless-stopped
         command: $MFTP_MODE
         volumes:
-            - $MFTP_CONFIG/env.py:/mftp/env.py
-            - $MFTP_CONFIG/token.json:/mftp/token.json
-            - $MFTP_CONFIG/credentials.json:/mftp/credentials.json
-            - $MFTP_CONFIG/mail_send_token.json:/mftp/mail_send_token.json
-            - $MFTP_CONFIG/mail_send_creds.json:/mftp/mail_send_creds.json
-            - $MFTP_CONFIG/.lsnif:/mftp/.lsnif
-            - $MFTP_CONFIG/.ntfy.lsnsf:/mftp/.ntfy.lsnsf
-            - $MFTP_CONFIG/.session:/mftp/.session
+            - $MFTP_CONFIG/env.py:/app/env.py
+            - $MFTP_CONFIG/token.json:/app/token.json
+            - $MFTP_CONFIG/credentials.json:/app/credentials.json
+            - $MFTP_CONFIG/mail_send_token.json:/app/mail_send_token.json
+            - $MFTP_CONFIG/mail_send_creds.json:/app/mail_send_creds.json
+            - $MFTP_CONFIG/.lsnif:/app/.lsnif
+            - $MFTP_CONFIG/.ntfy.lsnsf:/app/.ntfy.lsnsf
+            - $MFTP_CONFIG/.session:/app/.session
+        depends_on:
+            - db
+        networks:
+            - mftp_network
+
+    db:
+        image: mongo:latest
+        container_name: mftp-db
+        restart: unless-stopped
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+            - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
+        ports:
+            - "27017:27017"
+        volumes:
+            - mongodb_data:/data/db
+            - mongodb_config:/data/configdb
+        networks:
+            - mftp_network
+        command: ["--auth", "--bind_ip_all"]
+        healthcheck:
+            test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+            interval: 10s
+            timeout: 10s
+            retries: 5
+            start_period: 40s
+
+volumes:
+    mongodb_data:
+        driver: local
+    mongodb_config:
+        driver: local
+
+networks:
+    mftp_network:
+        driver: bridge

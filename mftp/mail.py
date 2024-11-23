@@ -5,69 +5,69 @@ from bs4 import BeautifulSoup as bs
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
-from notice import update_lsni, handle_new_session
 from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S
 from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
 
 
-def send(mails, smtp, gmail_api, lsnif, notices):
-    if mails: 
-        print(f"[SENDING MAILS]", flush=True)
+def send(mails, smtp, gmail_api, notice_db):
+    print('[SENDING MAILS]', flush=True)
 
-        if gmail_api:
-            import base64
-            
+    if gmail_api:
+        import base64
+        
+        try:
+            service = generate_send_service()
+        except Exception as e:
+            logging.error(f" Failed to generate GMAIL API creds ~ {str(e)}")
+            return
+
+        for notif in mails:
+            mail = notif.get('formatted_notice')
             try:
-                service = generate_send_service()
+                response = service.users().messages().send(
+                    userId="me", 
+                    body={"raw": base64.urlsafe_b64encode(mail.as_bytes()).decode()}
+                ).execute()
             except Exception as e:
-                logging.error(f" Failed to generate GMAIL API creds ~ {str(e)}")
+                logging.error(f"  Failed to send request to GMAIL API : {mail['Subject']} ~ {str(e)}")
+                break
+            
+            if 'id' in response:
+                logging.info(f" [MAIL SENT] ~ {mail['Subject']}")
+                notice_db.save_notice(notif['original_notice'])
+            else:
+                logging.error(f" Failed to Send Mail : {mail['Subject']} ~ {response}")
+                break
+    elif smtp:
+        import ssl
+        import smtplib
+        context = ssl.create_default_context()
 
-            for i, mail in enumerate(mails, 1):
-                handle_new_session(lsnif, notices, i)
+        logging.info(" [Connecting to smtp.google.com] ...")
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+            logging.info(" [Connected!]")
+            try:
+                server.login(FROM_EMAIL, FROM_EMAIL_PASS)
+                logging.info(" [Logged In!]")
+            except Exception as e:
+                logging.error(f" Failed to log in ~ {str(e)}")
+                return
 
+            for notif in mails: 
+                mail = notif.get('formatted_notice')
                 try:
-                    response = service.users().messages().send(
-                        userId="me", 
-                        body={"raw": base64.urlsafe_b64encode(mail.as_bytes()).decode()}
-                    ).execute()
-                except Exception as e:
-                    logging.error(f"  Failed to send request to GMAIL API ~ {str(e)}")
-                    break
-                
-                if 'id' in response:
+                    server.sendmail(mail["From"], BCC_EMAIL_S, mail.as_string())
                     logging.info(f" [MAIL SENT] ~ {mail['Subject']}")
-                    update_lsni(lsnif, notices, i)
-                else:
-                    logging.error(f" Failed to Send Mail : {mail['Subject']} ~ {response}")
+                    notice_db.save_notice(notif['original_notice'])
+                except smtplib.SMTPException as e:
+                    logging.error(f" Failed to Send Mail : {mail['Subject']} ~ {str(e)}")
                     break
-        elif smtp:
-            import smtplib, ssl
-            context = ssl.create_default_context()
-
-            logging.info(" [Connecting to smtp.google.com] ...")
-            with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-                logging.info(" [Connected!]")
-                try:
-                    server.login(FROM_EMAIL, FROM_EMAIL_PASS)
-                    logging.info(" [Logged In!]")
-                except Exception as e:
-                    logging.error(f" Failed to log in ~ {str(e)}")
-
-                for i, mail in enumerate(mails, 1): 
-                    handle_new_session(lsnif, notices, i)
-
-                    try:
-                        server.sendmail(mail["From"], BCC_EMAIL_S, mail.as_string())
-                        logging.info(f" [MAIL SENT] ~ {mail['Subject']}")
-                        update_lsni(lsnif, notices, i)
-                    except smtplib.SMTPException as e:
-                        logging.error(f" Failed to Send Mail : {mail['Subject']} ~ {str(e)}")
 
 
 def format_notice(notices, session):
-    if notices: print('[FORMATTING MAILS]', flush=True)
+    print('[FORMATTING MAILS]', flush=True)
 
-    mails = []
+    formatted_notifs = []
     for notice in reversed(notices):
         id_, year = notice['UID'].split('_')
         
@@ -80,6 +80,7 @@ def format_notice(notices, session):
             body = parseBody(session, year, id_)
         except Exception as e:
             logging.error(f" Failed to parse mail body ~ {str(e)}")
+            break
 
         # Hyperlinking any link with <click here> to reduce link clutter
         body = re.sub(r"(https?://[^\s]+)", r'<a href="\1">click here</a>', body)
@@ -111,6 +112,7 @@ def format_notice(notices, session):
             attachment = parseAttachment(session, year, id_)
         except Exception as e:
             logging.error(f" Failed to parse mail attachment ~ {str(e)}")
+            break
 
         if len(attachment) != 0:
             file = MIMEBase('application', 'octet-stream')
@@ -120,9 +122,9 @@ def format_notice(notices, session):
             message.attach(file)
             logging.info(f" [PDF ATTACHED] On notice #{id_} of length ~ {len(attachment)}")
             
-        mails.append(message)
+        formatted_notifs.append({"formatted_notice": message, "original_notice": notice})
 
-    return mails
+    return formatted_notifs
 
 
 def parseBody(session, year, id_):
@@ -168,3 +170,4 @@ def generate_send_service():
             token.write(creds.to_json())
 
     return build("gmail", "v1", credentials=creds)
+

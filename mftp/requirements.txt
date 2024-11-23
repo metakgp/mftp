@@ -1,3 +1,4 @@
 lxml==4.9.3
 dnspython==2.4.2
+pymongo==4.10.1
 iitkgp_erp_login
