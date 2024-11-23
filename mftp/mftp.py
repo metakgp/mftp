@@ -2,8 +2,7 @@ import db
 import env
 import mail
 import time
-# TODO: fix
-# import ntfy
+import ntfy
 import notice
 
 import requests

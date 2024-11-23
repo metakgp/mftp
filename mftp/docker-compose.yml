@@ -13,8 +13,6 @@ services:
             - $MFTP_CONFIG/credentials.json:/app/credentials.json
             - $MFTP_CONFIG/mail_send_token.json:/app/mail_send_token.json
             - $MFTP_CONFIG/mail_send_creds.json:/app/mail_send_creds.json
-            - $MFTP_CONFIG/.lsnif:/app/.lsnif
-            - $MFTP_CONFIG/.ntfy.lsnsf:/app/.ntfy.lsnsf
             - $MFTP_CONFIG/.session:/app/.session
         depends_on:
             - db
