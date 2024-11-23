@@ -7,6 +7,13 @@ SECURITY_QUESTIONS_ANSWERS = { # ERP Secret Questions and their Answers
     "Q3": "A3",
 }
 
+# MONGODB Credentials (MUST)
+MONGO_ROOT_USERNAME = "mftp"
+MONGO_ROOT_PASSWORD = "ptfm"
+MONGO_DATABASE = "mftp"
+MONGO_PORT = "27017"
+MONGO_URI = f'mongodb://{MONGO_ROOT_USERNAME}:{MONGO_ROOT_PASSWORD}@db:{MONGO_PORT}'
+
 # EMAIL (via SMTP)
 ## Senders' Credentials
 FROM_EMAIL = "abc@gmail.com" # Notification Sender Email-id
