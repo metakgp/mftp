@@ -7,6 +7,7 @@ __pycache__/
 *.json
 .session
 env.py
+.env
 
 # logs
 logs.txt

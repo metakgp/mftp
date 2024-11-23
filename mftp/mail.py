@@ -54,7 +54,7 @@ def send(mails, smtp, gmail_api, lsnif, notices):
                     logging.error(f" Failed to log in ~ {str(e)}")
 
                 for i, mail in enumerate(mails, 1): 
-                    handle_new_session(lsnif, notices, if
+                    handle_new_session(lsnif, notices, i)
 
                     try:
                         server.sendmail(mail["From"], BCC_EMAIL_S, mail.as_string())
