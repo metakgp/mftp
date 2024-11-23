@@ -34,7 +34,7 @@ while True:
   notice_db = db.NoticeDB(config={
     'uri': env.MONGO_URI,
     'db_name': env.MONGO_DATABASE
-  }, collection_name='AY_2024-25')
+  }, collection_name=env.MONGO_COLLECTION)
   notice_db.connect()
 
   notices = notice.fetch(headers, session, ssoToken, notice_db)
