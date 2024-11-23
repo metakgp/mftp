@@ -31,10 +31,9 @@ while True:
   print('[ERP LOGIN]', flush=True)
   _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
   
-  # TODO: Update uri with vars (.env)
   notice_db = db.NoticeDB(config={
-    'uri': 'mongodb://proff-mftp:JmN8fX6h7iiVFAF@db:27017',
-    'db_name': 'mftp'
+    'uri': env.MONGO_URI,
+    'db_name': env.MONGO_DATABASE
   }, collection_name='AY_2024-25')
   notice_db.connect()
 
