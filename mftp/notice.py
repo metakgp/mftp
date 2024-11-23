@@ -1,10 +1,13 @@
-import os
 import logging
-from endpoints import *
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup as bs
+from endpoints import TPSTUDENT_URL, NOTICEBOARD_URL, NOTICES_URL
+
+
+LAST_NOTICES_CHECK_COUNT = 30
+
     
-def fetch(headers, session, ssoToken, lsnif):
+def fetch(headers, session, ssoToken, notice_db):
     print('[FETCHING NOTICES]', flush=True)
     try:
         r = session.post(TPSTUDENT_URL, data=dict(ssoToken=ssoToken, menu_id=11, module_id=26), headers=headers)
@@ -12,6 +15,7 @@ def fetch(headers, session, ssoToken, lsnif):
         r = session.get(NOTICES_URL, headers=headers)
     except Exception as e:
         logging.error(f" Failed to navigate to Noticeboard ~ {str(e)}")
+        return []
 
     try:
         soup = bs(r.text, features="xml")
@@ -19,12 +23,13 @@ def fetch(headers, session, ssoToken, lsnif):
         root = ET.fromstring(xml)
     except Exception as e:
         logging.error(f" Failed to extract data from Noticeboard ~ {str(e)}")
+        return []
 
-    latest_index = get_latest_index(lsnif)
-    logging.info(f" Latest Saved Notice Index ~ {latest_index}")
-        
-    notices = []
-    for row in root.findall('row'):
+    latest_notices = []
+    for i, row in enumerate(root.findall('row')):
+        if i >= LAST_NOTICES_CHECK_COUNT:
+            break
+
         id_ = row.find('cell[1]').text.strip()
         year = root.findall('row')[0].find('cell[8]').text.split('"')[1].strip()
         notice = {
@@ -35,99 +40,16 @@ def fetch(headers, session, ssoToken, lsnif):
             'Company': row.find('cell[4]').text.strip(),
         }
 
-        if int(id_) == 1:
-            logging.info(f' [NEW SESSION DETECTED] Requesting {lsnif} reset')
-            latest_index = 0
-        elif int(id_) > latest_index:
-            notices.append(notice)
-            logging.info(f" [NEW NOTICE]: #{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']} | {notice['Time']}")
-        else:
-            break
-
-    return notices
-
-
-def get_latest_subscribers(lsnsf):
-    try:
-        with open(lsnsf, 'r') as file:
-            successful_subscribers= file.read()
-        
-        return successful_subscribers.split(' ')
-    except Exception as e:
-        logging.error(f" Failed to Read `{lsnsf}` file")
-
-
-def reset_lsns(lsnsf):
-    try:
-        with open(lsnsf, 'w') as file:
-            file.write(f'')
-    except Exception as e:
-        logging.error(f" Failed to Reset `{lsnsf}` file")
-
-
-def update_lsns(lsnsf, ntfy_topic):
-    # Create file if it doesn't exist
-    if not os.path.exists(lsnsf):
-        open(lsnsf, 'w').close()
-
-    # Save the value of Latest Sent Notice Subscriber in the list
-    # which is a list os subscribers separated by space
-    try:
-        with open(lsnsf, 'r') as file:
-            existing_subscribers= file.read()
-
-        with open(lsnsf, 'w') as file:
-            file.write(f'{ntfy_topic} {existing_subscribers}')
-    except Exception as e:
-        logging.error(f" Failed to Save Subscriber ~ {ntfy_topic}")
-
-
-def filter_subscribers(notice, subscribers):
-    filtered_subscribers = []
-
-    for subscriber in subscribers:
-        filters = subscribers[subscriber]
-
-        if len(filters) == 0:
-            filtered_subscribers.append(subscriber)
-
-        for filter in filters:
-            filter_value = filters[filter]
-
-            if notice[filter] == filter_value:
-                filtered_subscribers.append(subscriber)
-
-    return filtered_subscribers
-
-
-def get_latest_index(lsnif):
-    try:
-        with open(lsnif, 'r') as file:
-            file_content = file.read().strip()
-            latest_index = int(file_content)
-    except FileNotFoundError:
-        latest_index = 0
+        latest_notices.append(notice)
     
-    return latest_index
+    # This is done to reduce DB queries
+    # Get all first X notices from ERP in latest_notices
+    # Check if these notices exist in the DB using their UIDs in a single query
+    # Get new notice uids, filter out new notices from latest_notices based on uids
+    new_notice_uids = notice_db.find_new_notices([notice['UID'] for notice in latest_notices])
+    new_notices = [notice for notice in latest_notices if notice['UID'] in new_notice_uids]
+    for notice in new_notices:
+        logging.info(f" [NEW NOTICE]: #{notice['UID'].split('_')[0]} | {notice['Type']} | {notice['Subject']} | {notice['Company']} | {notice['Time']}")
 
+    return new_notices
 
-def update_lsni(lsnif, notices, i):
-    lsni = notices[-i]['UID'].split('_')[0] # Latest Sent Notice Index
-
-    # Create file if it doesn't exist
-    if not os.path.exists(lsnif):
-        open(lsnif, 'w').close()
-
-    # Save the value of Latest Sent Notice Index
-    try:
-        with open(lsnif, 'w') as file:
-            file.write(lsni)
-    except Exception as e:
-        logging.error(f" Failed to Save Notice ~ #{lsni}")
-
-
-def handle_new_session(lsnif, notices, i):
-    cidx_from_to_send_notifs = int(notices[-i]['UID'].split('_')[0]) # Current Index from to send notifications
-    if cidx_from_to_send_notifs == 1:
-        logging.info(f' [NEW SESSION DETECTED] Approving {lsnif} reset')
-    

@@ -1,15 +1,16 @@
+import db
 import env
 import mail
 import time
+# TODO: fix
+# import ntfy
 import notice
 
 import requests
 import argparse
-import ntfy
 from datetime import datetime
 import iitkgp_erp_login.erp as erp
 
-lsnif = ".lsnif"
 headers = {
   'timeout': '20',
   'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/51.0.2704.79 Chrome/51.0.2704.79 Safari/537.36',
@@ -31,16 +32,28 @@ while True:
   print('[ERP LOGIN]', flush=True)
   _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
   
-  notices = notice.fetch(headers, session, ssoToken, lsnif)
-  if args.ntfy:
-    notifications = ntfy.format_notice(notices, session)
-    ntfy.send(notifications, lsnif, notices)
+  # TODO: Update uri with vars (.env)
+  notice_db = db.NoticeDB(config={
+    'uri': 'mongodb://proff-mftp:JmN8fX6h7iiVFAF@db:27017',
+    'db_name': 'mftp'
+  }, collection_name='AY_2024-25')
+  notice_db.connect()
+
+  notices = notice.fetch(headers, session, ssoToken, notice_db)
+  if notices:
+    if args.ntfy:
+      notifications = ntfy.format_notice(notices, session)
+      if notifications:
+          ntfy.send(notifications, notice_db)
+    else:
+      mails = mail.format_notice(notices, session)
+      if mails:
+          mail.send(mails, args.smtp, args.gmail_api, notice_db)
   else:
-    mails = mail.format_notice(notices, session)
-    mail.send(mails, args.smtp, args.gmail_api, lsnif, notices)
+    print('[NO NEW NOTICES]', flush=True)
 
   if args.cron:
     break
 
-  print("[PAUSED FOR 2 MINUTES]", flush=True)
+  print('[PAUSED FOR 2 MINUTES]', flush=True)
   time.sleep(120)

@@ -17,6 +17,33 @@ services:
             - $MFTP_CONFIG/.lsnif:/app/.lsnif
             - $MFTP_CONFIG/.ntfy.lsnsf:/app/.ntfy.lsnsf
             - $MFTP_CONFIG/.session:/app/.session
+        depends_on:
+            - db
+        networks:
+            - mftp_network
+
+    db:
+        image: mongo:latest
+        container_name: mftp-db
+        restart: unless-stopped
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+            - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
+        ports:
+            - "27017:27017"
+        volumes:
+            - mongodb_data:/data/db
+            - mongodb_config:/data/configdb
+        networks:
+            - mftp_network
+        command: ["--auth", "--bind_ip_all"]
+        healthcheck:
+            test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+            interval: 10s
+            timeout: 10s
+            retries: 5
+            start_period: 40s
 
     mftp-doctor:
         build:
@@ -28,3 +55,14 @@ services:
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
             - $DOCTOR_CONFIG/env.py:/app/env.py
+
+volumes:
+    mongodb_data:
+        driver: local
+    mongodb_config:
+        driver: local
+
+networks:
+    mftp_network:
+        driver: bridge
+
