@@ -7,7 +7,7 @@ from urllib.parse import quote
 from bs4 import BeautifulSoup as bs
 from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
 from env import NTFY_BASE_URL, NTFY_TOPICS, NTFY_TOPIC_ICON, NTFY_USER, NTFY_PASS, HEIMDALL_COOKIE
-from notice import filter_subscribers, get_latest_subscribers, reset_lsns, update_lsni, has_idx_mutated, update_lsns
+from notice import filter_subscribers, get_latest_subscribers, reset_lsns, update_lsni, handle_new_session, update_lsns
 
 lsnsf = '.ntfy.lsnsf'
 
@@ -105,7 +105,7 @@ def send(notifications, lsnif, notices):
         print(f"[SENDING NOTIFICATIONS]", flush=True)
 
         for i, notification in enumerate(notifications, 1):
-            if has_idx_mutated(lsnif, notices, i): break
+            handle_new_session(lsnif, notices, i)
 
             notification_sent_to_all_subscribers = True
 

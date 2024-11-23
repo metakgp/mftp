@@ -126,16 +126,8 @@ def update_lsni(lsnif, notices, i):
         logging.error(f" Failed to Save Notice ~ #{lsni}")
 
 
-def has_idx_mutated(lsnif, notices, i):
+def handle_new_session(lsnif, notices, i):
     cidx_from_to_send_notifs = int(notices[-i]['UID'].split('_')[0]) # Current Index from to send notifications
     if cidx_from_to_send_notifs == 1:
         logging.info(f' [NEW SESSION DETECTED] Approving {lsnif} reset')
-        return False
-
-    lidx_from_file = get_latest_index(lsnif) # Latest Index from File
-    difference_in_idx = cidx_from_to_send_notifs - lidx_from_file
-    if difference_in_idx != 1:
-        logging.error(f' Trying to send notif #{cidx_from_to_send_notifs} while latest in database is #{lidx_from_file}')
-        return True
-
-    return False
+    

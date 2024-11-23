@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup as bs
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
-from notice import update_lsni, has_idx_mutated
+from notice import update_lsni, handle_new_session
 from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S
 from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
 
@@ -23,7 +23,7 @@ def send(mails, smtp, gmail_api, lsnif, notices):
                 logging.error(f" Failed to generate GMAIL API creds ~ {str(e)}")
 
             for i, mail in enumerate(mails, 1):
-                if has_idx_mutated(lsnif, notices, i): break
+                handle_new_session(lsnif, notices, i)
 
                 try:
                     response = service.users().messages().send(
@@ -54,7 +54,7 @@ def send(mails, smtp, gmail_api, lsnif, notices):
                     logging.error(f" Failed to log in ~ {str(e)}")
 
                 for i, mail in enumerate(mails, 1): 
-                    if has_idx_mutated(lsnif, notices, i): break
+                    handle_new_session(lsnif, notices, if
 
                     try:
                         server.sendmail(mail["From"], BCC_EMAIL_S, mail.as_string())
