@@ -89,20 +89,23 @@ def format_companies(ssoToken, companies):
                 <div align="center">
                     !! Click <a href="{companies_url}" target="_blank">here</a>, in order to enable the links below !!
                 </div>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background-color: #f2f2f2;">
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Company</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Role</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">CTC</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">End Date</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Interview Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {company_rows}
-                    </tbody>
-                </table>
+                <br>
+                <div align="center">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #f2f2f2;">
+                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Company</th>
+                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Role</th>
+                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">CTC</th>
+                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">End Date</th>
+                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Interview Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {company_rows}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </body>
     </html>

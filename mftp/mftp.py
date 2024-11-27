@@ -4,11 +4,12 @@ import mail
 import time
 import ntfy
 import notice
+import company
 
 import requests
 import argparse
-from datetime import datetime
 import iitkgp_erp_login.erp as erp
+from datetime import datetime, timedelta
 
 headers = {
   'timeout': '20',
@@ -23,12 +24,23 @@ parser.add_argument('--ntfy', action="store_true", help='Use NTFY to broadcast n
 parser.add_argument('--cron', action="store_true", help='Act as cronjob, bypass the continuous loop', required=False)
 args = parser.parse_args()
 
+# Initialize the last execution time for companies email logic
+# Set it to run immediately on the first iteration
+last_companies_email_time = datetime.now() - timedelta(hours=1)
+
 while True:
   now = datetime.now()
   print(f"================ <<: {now.strftime('%H:%M:%S %d-%m-%Y')} :>> ================", flush=True)
 
   print('[ERP LOGIN]', flush=True)
   _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
+
+  if now - last_companies_email_time >= timedelta(hours=1):
+    companies = company.fetch(session, headers, ssoToken)
+    open_not_applied_companies = company.filter(companies, "OPEN_N")
+    companies_update_mail = mail.format_companies(session.cookies.get('ssoToken'), open_not_applied_companies)
+    mail.send_companies(companies_update_mail, args.gmail_api, args.smtp)
+    last_companies_email_time = now
 
   notice_db = db.NoticeDB(config={
     'uri': env.MONGO_URI,
@@ -39,9 +51,9 @@ while True:
   notices = notice.fetch(headers, session, ssoToken, notice_db)
   if notices:
     if args.ntfy:
-      notifications = ntfy.format_notice(notices)
+      notifications = ntfy.format_notices(notices)
       if notifications:
-          ntfy.send(notifications, notice_db)
+          ntfy.send_notices(notifications, notice_db)
     else:
       mails = mail.format_notices(notices)
       if mails:
