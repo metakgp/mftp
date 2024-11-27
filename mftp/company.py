@@ -54,7 +54,7 @@ def fetch(session, headers, ssoToken):
         company_additional_details = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/AdmFilePDF.htm?type=COM&year={year}&com_id={com_id}"
         ppt = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/AdmFilePDF.htm?type=PPT&year={year}&com_id={com_id}"
         jd = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/TPJNFView.jsp?jnf_id={jnf_id}&com_id={com_id}&yop={year}&user_type=SU&rollno={ROLL_NUMBER}"
-        apply_link = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/TPJNFViewAction.jsp?jnf_id={jnf_id}&com_id={com_id}&year={year}&rollno={ROLL_NUMBER}"
+        apply_link = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/TPJNFViewAction.jsp?jnf_id={jnf_id}&com_id={com_id}&year={year}&rollno={ROLL_NUMBER}&mode=ApplyCV1"
         additional_jd = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/JnfMoreDet.jsp?mode=jnfMoreDet&rollno={ROLL_NUMBER}&year={year}&com_id={com_id}&jnf_id={jnf_id}"
         form_additional_details = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/AdmFilePDF.htm?type=JNF&year={year}&jnf_id={jnf_id}&com_id={com_id}"
 

@@ -1,6 +1,7 @@
 import re
 import logging
 from email import encoders
+from endpoints import TPSTUDENT_URL
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -55,11 +56,39 @@ def send_companies(mail, gmail_api, smtp):
                 logging.error(f" Failed to Send Mail : {mail['Subject']} ~ {str(e)}")
 
 
-def format_companies(companies):
+def format_companies(ssoToken, companies):
+    print('[FORMATTING COMPANY UPDATES]', flush=True)
+
+    message = MIMEMultipart()
+    message["Subject"] = "APPLY NOW! | Companies Open = Y & Applied = N "
+    message["From"] = f'MFTP < {FROM_EMAIL} >'
+    message["Bcc"] = ", ".join(HOSTER_EMAIL)
+
+    def generate_row(company):
+        return f"""
+        <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;">
+                <a href="{company['Company_Additional_Details']}&ssoToken={ssoToken}" target="_blank">{company['Name']}</a>
+            </td>
+            <td style="border: 1px solid #ddd; padding: 8px;">
+                <a href="{company['Apply_Link']}&ssoToken={ssoToken}" target="_blank">{company['Role']}</a>
+            </td>
+            <td style="border: 1px solid #ddd; padding: 8px;">
+                <a href="{company['Additional_Job_Description']}&ssoToken={ssoToken}" target="_blank">{company.get('CTC', 'N/A')}</a>
+            </td>
+            <td style="border: 1px solid #ddd; padding: 8px;">{company['End_Date']}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">{company['Interview_Date']}</td>
+        </tr>
+        """
+    company_rows = ''.join(generate_row(company) for company in companies)
+    
     html_content = """
     <html>
         <body>
             <div style="font-family: Arial, sans-serif; width: 90%; margin: 0 auto; border: 1px solid #333; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);">
+                <div align="center">
+                    !! Click <a href="{companies_url}" target="_blank">here</a>, in order to enable the links below !!
+                </div>
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="background-color: #f2f2f2;">
@@ -78,32 +107,7 @@ def format_companies(companies):
         </body>
     </html>
     """
-    
-    def generate_row(company):
-        return f"""
-        <tr>
-            <td style="border: 1px solid #ddd; padding: 8px;">
-                <a href="{company['Company_Additional_Details']}">{company['Name']}</a>
-            </td>
-            <td style="border: 1px solid #ddd; padding: 8px;">
-                <a href="{company['Apply_Link']}">{company['Role']}</a>
-            </td>
-            <td style="border: 1px solid #ddd; padding: 8px;">
-                <a href="{company['Additional_Job_Description']}">{company.get('CTC', 'N/A')}</a>
-            </td>
-            <td style="border: 1px solid #ddd; padding: 8px;">{company['End_Date']}</td>
-            <td style="border: 1px solid #ddd; padding: 8px;">{company['Interview_Date']}</td>
-        </tr>
-        """
-    
-    message = MIMEMultipart()
-    message["Subject"] = "Currently Open but Not applied companies"
-    message["From"] = f'MFTP < {FROM_EMAIL} >'
-    message["Bcc"] = ", ".join(HOSTER_EMAIL)
-
-    company_rows = ''.join(generate_row(company) for company in companies)
-    companies_table = html_content.format(company_rows=company_rows)
-
+    companies_table = html_content.format(companies_url=f"{TPSTUDENT_URL}?ssoToken={ssoToken}" ,company_rows=company_rows)
     message.attach(MIMEText(companies_table, "html"))
 
     return message
