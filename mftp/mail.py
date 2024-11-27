@@ -4,10 +4,64 @@ from email import encoders
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
-from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S
+from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S, HOSTER_EMAIL
 
 
-def send(mails, smtp, gmail_api, notice_db):
+def format_companies(companies):
+    html_content = """
+    <html>
+        <body>
+            <div style="font-family: Arial, sans-serif; width: 90%; margin: 0 auto; border: 1px solid #333; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #f2f2f2;">
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Company</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Role</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">CTC</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">End Date</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Interview Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {company_rows}
+                    </tbody>
+                </table>
+            </div>
+        </body>
+    </html>
+    """
+    
+    def generate_row(company):
+        return f"""
+        <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;">
+                <a href="{company['Company_Additional_Details']}">{company['Name']}</a>
+            </td>
+            <td style="border: 1px solid #ddd; padding: 8px;">
+                <a href="{company['Apply_Link']}">{company['Role']}</a>
+            </td>
+            <td style="border: 1px solid #ddd; padding: 8px;">
+                <a href="{company['Additional_Job_Description']}">{company.get('CTC', 'N/A')}</a>
+            </td>
+            <td style="border: 1px solid #ddd; padding: 8px;">{company['End_Date']}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">{company['Interview_Date']}</td>
+        </tr>
+        """
+    
+    message = MIMEMultipart()
+    message["Subject"] = "Currently Open but Not applied companies"
+    message["From"] = f'MFTP < {FROM_EMAIL} >'
+    message["Bcc"] = ", ".join(HOSTER_EMAIL)
+
+    company_rows = ''.join(generate_row(company) for company in companies)
+    companies_table = html_content.format(company_rows=company_rows)
+
+    message.attach(MIMEText(companies_table, "html"))
+
+    return message
+
+
+def send_notices(mails, smtp, gmail_api, notice_db):
     print('[SENDING MAILS]', flush=True)
 
     if gmail_api:
@@ -62,7 +116,13 @@ def send(mails, smtp, gmail_api, notice_db):
                     break
 
 
-def format_notice(notices):
+def parse_notice_body(body_data):
+    body = body_data.decode_contents(formatter='html')
+    
+    return str(body)
+
+
+def format_notices(notices):
     print('[FORMATTING MAILS]', flush=True)
 
     formatted_notifs = []
@@ -75,7 +135,7 @@ def format_notice(notices):
         message["Bcc"] = ", ".join(BCC_EMAIL_S)
         
         try:
-            body = parse_body(notice['BodyData'])
+            body = parse_notice_body(notice['BodyData'])
             notice['Body'] = body
             notice.pop('BodyData', None) # Remove unparsed body data
         except Exception as e:
@@ -118,12 +178,6 @@ def format_notice(notices):
         formatted_notifs.append({"formatted_notice": message, "original_notice": notice})
 
     return formatted_notifs
-
-
-def parse_body(body_data):
-    body = body_data.decode_contents(formatter='html')
-    
-    return str(body)
 
 
 def generate_send_service():

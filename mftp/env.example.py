@@ -22,6 +22,8 @@ FROM_EMAIL_PASS = "**********" # App password for the above email-id
 ## EMAIL - Receiver's Address
 BCC_EMAIL_S = ["xyz@googlegroups.com", "abc@googlegroups.com"] # Multiple mails for bcc
 # BCC_EMAIL_S = ["xyz@googlegroups.com"] # This is how you can set single mail in a list
+## Hoster's address to receive personalised updates
+HOSTER_EMAIL = ["abc@kgpian.iitkgp.ac.in"]
 
 # NTFY
 NTFY_BASE_URL = "https://ntfy.sh"
