@@ -5,7 +5,7 @@ import logging
 import requests
 from urllib.parse import quote
 from bs4 import BeautifulSoup as bs
-from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
+from endpoints import NOTICE_CONTENT_URL
 from env import NTFY_BASE_URL, NTFY_TOPICS, NTFY_TOPIC_ICON, NTFY_USER, NTFY_PASS, HEIMDALL_COOKIE
 
 
@@ -83,18 +83,9 @@ MFTP is unofficial. Not affiliated with CDC, ERP, or Placement Committee. Do not
         # NTFY TOPICS LIST: Based on filters
         notification["NTFY_TOPICS"] = filter_subscribers(notice, NTFY_TOPICS)
 
-        # Handling attachments
-        try:
-            attachment = parseAttachment(session, year, id_)
-        except Exception as e:
-            logging.error(f" Failed to parse attachment ~ {str(e)}")
-            break
-
-        if len(attachment) != 0:
-            notice['Attachment'] = attachment
-
+        if 'Attachment' in notice:
             file_name = notification['Attachment']
-            if save_file(file_name, attachment): 
+            if save_file(file_name, notice['Attachment']): 
                 notification['Attachment'] = file_name
             else: 
                 break
@@ -215,15 +206,6 @@ def delete_file(file_name):
     except Exception as e:
         logging.error(f" Failed to delete the pdf {file_name} ~ {str(e)}")
         return False
-
-
-def parseAttachment(session, year, id_):
-    stream = session.get(ATTACHMENT_URL.format(year, id_), stream=True)
-    attachment = b''
-    for chunk in stream.iter_content(4096):
-        attachment += chunk
-    
-    return attachment
 
 
 def parseBody(notice, session, year, id_):

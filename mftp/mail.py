@@ -4,9 +4,9 @@ from email import encoders
 from bs4 import BeautifulSoup as bs
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
+from endpoints import NOTICE_CONTENT_URL
 from email.mime.multipart import MIMEMultipart
 from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S
-from endpoints import NOTICE_CONTENT_URL, ATTACHMENT_URL
 
 
 def send(mails, smtp, gmail_api, notice_db):
@@ -108,22 +108,13 @@ def format_notice(notices, session):
         
         message.attach(MIMEText(body, "html"))
         
-        # Handling attachment
-        try:
-            attachment = parseAttachment(session, year, id_)
-        except Exception as e:
-            logging.error(f" Failed to parse mail attachment ~ {str(e)}")
-            break
-
-        if len(attachment) != 0:
-            notice['Attachment'] = attachment
-
+        if 'Attachment' in notice:
             file = MIMEBase('application', 'octet-stream')
-            file.set_payload(attachment)
+            file.set_payload(notice['Attachment'])
             encoders.encode_base64(file)
             file.add_header('Content-Disposition', 'attachment', filename='Attachment.pdf')
             message.attach(file)
-            logging.info(f" [PDF ATTACHED] On notice #{id_} of length ~ {len(attachment)}")
+            logging.info(f" [PDF ATTACHED] On notice #{id_} of length ~ {len(notice['Attachment'])}")
             
         formatted_notifs.append({"formatted_notice": message, "original_notice": notice})
 
@@ -137,15 +128,6 @@ def parseBody(session, year, id_):
     body = content_html_div.decode_contents(formatter='html')
     
     return str(body)
-
-
-def parseAttachment(session, year, id_):
-    stream = session.get(ATTACHMENT_URL.format(year, id_), stream=True)
-    attachment = b''
-    for chunk in stream.iter_content(4096):
-        attachment += chunk
-    
-    return attachment
 
 
 def generate_send_service():

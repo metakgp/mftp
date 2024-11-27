@@ -1,7 +1,7 @@
 import logging
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup as bs
-from endpoints import TPSTUDENT_URL, NOTICEBOARD_URL, NOTICES_URL
+from endpoints import TPSTUDENT_URL, NOTICEBOARD_URL, NOTICES_URL, ATTACHMENT_URL
 
 
 LAST_NOTICES_CHECK_COUNT = 30
@@ -40,6 +40,16 @@ def fetch(headers, session, ssoToken, notice_db):
             'Company': row.find('cell[4]').text.strip(),
         }
 
+        # Handling attachment
+        try:
+            attachment = parseAttachment(session, year, id_)
+        except Exception as e:
+            logging.error(f" Failed to parse mail attachment ~ {str(e)}")
+            break
+
+        if attachment:
+            notice['Attachment'] = attachment
+
         latest_notices.append(notice)
     
     # This is done to reduce DB queries
@@ -52,4 +62,13 @@ def fetch(headers, session, ssoToken, notice_db):
         logging.info(f" [NEW NOTICE]: #{notice['UID'].split('_')[0]} | {notice['Type']} | {notice['Subject']} | {notice['Company']} | {notice['Time']}")
 
     return new_notices
+
+
+def parseAttachment(session, year, id_):
+    stream = session.get(ATTACHMENT_URL.format(year, id_), stream=True)
+    attachment = b''
+    for chunk in stream.iter_content(4096):
+        attachment += chunk
+    
+    return attachment
 
