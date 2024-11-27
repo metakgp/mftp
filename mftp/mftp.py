@@ -40,11 +40,11 @@ while True:
   notices = notice.fetch(headers, session, ssoToken, notice_db)
   if notices:
     if args.ntfy:
-      notifications = ntfy.format_notice(notices, session)
+      notifications = ntfy.format_notice(notices)
       if notifications:
           ntfy.send(notifications, notice_db)
     else:
-      mails = mail.format_notice(notices, session)
+      mails = mail.format_notice(notices)
       if mails:
           mail.send(mails, args.smtp, args.gmail_api, notice_db)
   else:

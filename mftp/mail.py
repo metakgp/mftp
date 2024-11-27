@@ -1,10 +1,8 @@
 import re
 import logging
 from email import encoders
-from bs4 import BeautifulSoup as bs
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
-from endpoints import NOTICE_CONTENT_URL
 from email.mime.multipart import MIMEMultipart
 from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S
 
@@ -64,12 +62,12 @@ def send(mails, smtp, gmail_api, notice_db):
                     break
 
 
-def format_notice(notices, session):
+def format_notice(notices):
     print('[FORMATTING MAILS]', flush=True)
 
     formatted_notifs = []
     for notice in reversed(notices):
-        id_, year = notice['UID'].split('_')
+        id_ = notice['UID'].split('_')[0]
         
         message = MIMEMultipart()
         message["Subject"] = f"#{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']}"
@@ -77,8 +75,9 @@ def format_notice(notices, session):
         message["Bcc"] = ", ".join(BCC_EMAIL_S)
         
         try:
-            body = parseBody(session, year, id_)
+            body = parse_body(notice['BodyData'])
             notice['Body'] = body
+            notice.pop('BodyData', None) # Remove unparsed body data
         except Exception as e:
             logging.error(f" Failed to parse mail body ~ {str(e)}")
             break
@@ -121,11 +120,8 @@ def format_notice(notices, session):
     return formatted_notifs
 
 
-def parseBody(session, year, id_):
-    content = session.get(NOTICE_CONTENT_URL.format(year, id_))
-    content_html = bs(content.text, 'html.parser')
-    content_html_div = bs.find_all(content_html, 'div', {'id': 'printableArea'})[0]
-    body = content_html_div.decode_contents(formatter='html')
+def parse_body(body_data):
+    body = body_data.decode_contents(formatter='html')
     
     return str(body)
 

@@ -1,7 +1,7 @@
 import logging
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup as bs
-from endpoints import TPSTUDENT_URL, NOTICEBOARD_URL, NOTICES_URL, ATTACHMENT_URL
+from endpoints import TPSTUDENT_URL, NOTICEBOARD_URL, NOTICES_URL, ATTACHMENT_URL, NOTICE_CONTENT_URL
 
 
 LAST_NOTICES_CHECK_COUNT = 30
@@ -40,15 +40,22 @@ def fetch(headers, session, ssoToken, notice_db):
             'Company': row.find('cell[4]').text.strip(),
         }
 
+        # Handling Body
+        try:
+            body_data = parse_body_data(session, year, id_)
+            notice['BodyData'] = body_data
+        except Exception as e:
+            logging.error(f" Failed to parse mail body ~ {str(e)}")
+            break
+
         # Handling attachment
         try:
-            attachment = parseAttachment(session, year, id_)
+            attachment = parse_attachment(session, year, id_)
+            if attachment:
+                notice['Attachment'] = attachment
         except Exception as e:
             logging.error(f" Failed to parse mail attachment ~ {str(e)}")
             break
-
-        if attachment:
-            notice['Attachment'] = attachment
 
         latest_notices.append(notice)
     
@@ -64,7 +71,15 @@ def fetch(headers, session, ssoToken, notice_db):
     return new_notices
 
 
-def parseAttachment(session, year, id_):
+def parse_body_data(session, year, id_):
+    content = session.get(NOTICE_CONTENT_URL.format(year, id_))
+    content_html = bs(content.text, 'html.parser')
+    body_data = bs.find_all(content_html, 'div', {'id': 'printableArea'})[0]
+
+    return body_data
+
+
+def parse_attachment(session, year, id_):
     stream = session.get(ATTACHMENT_URL.format(year, id_), stream=True)
     attachment = b''
     for chunk in stream.iter_content(4096):

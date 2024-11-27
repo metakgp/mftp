@@ -4,8 +4,6 @@ import base64
 import logging
 import requests
 from urllib.parse import quote
-from bs4 import BeautifulSoup as bs
-from endpoints import NOTICE_CONTENT_URL
 from env import NTFY_BASE_URL, NTFY_TOPICS, NTFY_TOPIC_ICON, NTFY_USER, NTFY_PASS, HEIMDALL_COOKIE
 
 
@@ -43,17 +41,18 @@ def ntfy_emoji(subject):
     return emoji
 
 
-def format_notice(notices, session):
+def format_notice(notices):
     print('[FORMATTING NOTIFICATIONS]', flush=True)
 
     formatted_notifs = []
     for notice in reversed(notices):
-        id_, year = notice['UID'].split('_')
+        id_ = notice['UID'].split('_')[0]
 
         try:
-            data = parseBody(notice, session, year, id_)
+            data = parse_body(notice['BodyData'], notice['Time'])
             notice['Body'] = data
-            body, links = parseLinks(data)
+            notice.pop('BodyData', None) # Remove unparsed body data
+            body, links = parse_links(data)
             body += '''
 --------------
 
@@ -208,21 +207,17 @@ def delete_file(file_name):
         return False
 
 
-def parseBody(notice, session, year, id_):
-    content = session.get(NOTICE_CONTENT_URL.format(year, id_))
-    content_html = bs(content.text, 'html.parser')
-    content_html_div = bs.find_all(content_html, 'div', {'id': 'printableArea'})[0]
-
+def parse_body(body_data, time):
     body = ''
-    for br in content_html_div.find_all('br'):
+    for br in body_data.find_all('br'):
         body = body + br.next_sibling.strip() + '\n'
 
-    body = body + notice['Time']
+    body = body + time
 
     return body
 
 
-def parseLinks(data):
+def parse_links(data):
     body = data
     links = re.findall(r'(https?://[^\s]+)', data)
     action_template = "view, Link {}, {}"
