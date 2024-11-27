@@ -25,7 +25,7 @@ def fetch(headers, session, ssoToken, notice_db):
         logging.error(f" Failed to extract data from Noticeboard ~ {str(e)}")
         return []
 
-    latest_notices = []
+    latest_X_notices = []
     for i, row in enumerate(root.findall('row')):
         if i >= LAST_NOTICES_CHECK_COUNT:
             break
@@ -57,18 +57,23 @@ def fetch(headers, session, ssoToken, notice_db):
             logging.error(f" Failed to parse mail attachment ~ {str(e)}")
             break
 
-        latest_notices.append(notice)
+        latest_X_notices.append(notice)
     
     # This is done to reduce DB queries
     # Get all first X notices from ERP in latest_notices
     # Check if these notices exist in the DB using their UIDs in a single query
     # Get new notice uids, filter out new notices from latest_notices based on uids
-    new_notice_uids = notice_db.find_new_notices([notice['UID'] for notice in latest_notices])
-    new_notices = [notice for notice in latest_notices if notice['UID'] in new_notice_uids]
+    new_notices, modified_notices = notice_db.find_to_send_notices(latest_X_notices)
+
+    # Log new notices
     for notice in new_notices:
         logging.info(f" [NEW NOTICE]: #{notice['UID'].split('_')[0]} | {notice['Type']} | {notice['Subject']} | {notice['Company']} | {notice['Time']}")
 
-    return new_notices
+    # Log modified notices
+    for notice in modified_notices:
+        logging.info(f" [MODIFIED NOTICE]: #{notice['UID'].split('_')[0]} | {notice['Type']} | {notice['Subject']} | {notice['Company']} | {notice['Time']}")
+
+    return new_notices + modified_notices
 
 
 def parse_body_data(session, year, id_):
