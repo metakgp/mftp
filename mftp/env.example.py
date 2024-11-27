@@ -15,8 +15,8 @@ MONGO_PORT = "27017"
 MONGO_URI = f'mongodb://{MONGO_ROOT_USERNAME}:{MONGO_ROOT_PASSWORD}@db:{MONGO_PORT}'
 MONGO_COLLECTION = "AY_2024-25"
 
-# EMAIL (via SMTP)
-## Senders' Credentials
+# EMAIL
+## Senders' Credentials (via SMTP)
 FROM_EMAIL = "abc@gmail.com" # Notification Sender Email-id
 FROM_EMAIL_PASS = "**********" # App password for the above email-id
 ## EMAIL - Receiver's Address

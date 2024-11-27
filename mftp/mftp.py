@@ -35,12 +35,13 @@ while True:
   print('[ERP LOGIN]', flush=True)
   _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
 
-  if now - last_companies_email_time >= timedelta(hours=1):
-    companies = company.fetch(session, headers, ssoToken)
-    open_not_applied_companies = company.filter(companies, "OPEN_N")
-    companies_update_mail = mail.format_companies(session.cookies.get('ssoToken'), open_not_applied_companies)
-    mail.send_companies(companies_update_mail, args.gmail_api, args.smtp)
-    last_companies_email_time = now
+  if args.gmail_api or args.smtp:
+    if now - last_companies_email_time >= timedelta(hours=1):
+      companies = company.fetch(session, headers, ssoToken)
+      open_not_applied_companies = company.filter(companies, "OPEN_N")
+      companies_update_mail = mail.format_companies(session.cookies.get('ssoToken'), open_not_applied_companies)
+      mail.send_companies(companies_update_mail, args.gmail_api, args.smtp)
+      last_companies_email_time = now
 
   notice_db = db.NoticeDB(config={
     'uri': env.MONGO_URI,
