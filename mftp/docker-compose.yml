@@ -5,7 +5,6 @@ services:
             dockerfile: Dockerfile
         image: metakgporg/mftp
         container_name: mftp
-        restart: unless-stopped
         command: $MFTP_MODE
         volumes:
             - $MFTP_CONFIG/env.py:/app/env.py
@@ -22,7 +21,6 @@ services:
     db:
         image: mongo:latest
         container_name: mftp-db
-        restart: unless-stopped
         environment:
             - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
             - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
