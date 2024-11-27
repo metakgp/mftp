@@ -41,7 +41,7 @@ def ntfy_emoji(subject):
     return emoji
 
 
-def format_notice(notices):
+def format_notices(notices):
     print('[FORMATTING NOTIFICATIONS]', flush=True)
 
     formatted_notifs = []
@@ -96,7 +96,7 @@ MFTP is unofficial. Not affiliated with CDC, ERP, or Placement Committee. Do not
     return formatted_notifs
 
 
-def send(notifications, notice_db):
+def send_notices(notifications, notice_db):
     print('[SENDING NOTIFICATIONS]', flush=True)
 
     for notif in notifications:
