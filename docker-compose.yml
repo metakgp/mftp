@@ -1,5 +1,3 @@
-version: "3"
-
 services:
     mftp:
         build:
@@ -23,7 +21,6 @@ services:
     db:
         image: mongo:latest
         container_name: mftp-db
-        restart: unless-stopped
         environment:
             - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
             - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
@@ -63,4 +60,3 @@ volumes:
 networks:
     mftp_network:
         driver: bridge
-
