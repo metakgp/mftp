@@ -7,6 +7,54 @@ from email.mime.multipart import MIMEMultipart
 from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S, HOSTER_EMAIL
 
 
+def send_companies(mail, gmail_api, smtp):
+    print('[SENDING COMPANY UPDATES]', flush=True)
+
+    if gmail_api:
+        import base64
+        
+        try:
+            service = generate_send_service()
+        except Exception as e:
+            logging.error(f" Failed to generate GMAIL API creds ~ {str(e)}")
+            return
+
+        try:
+            response = service.users().messages().send(
+                userId="me", 
+                body={"raw": base64.urlsafe_b64encode(mail.as_bytes()).decode()}
+            ).execute()
+        except Exception as e:
+            logging.error(f"  Failed to send request to GMAIL API : {mail['Subject']} ~ {str(e)}")
+            return
+        
+        if 'id' in response:
+            logging.info(f" [MAIL SENT] ~ {mail['Subject']}")
+        else:
+            logging.error(f" Failed to Send Mail : {mail['Subject']} ~ {response}")
+            return
+    elif smtp:
+        import ssl
+        import smtplib
+        context = ssl.create_default_context()
+
+        logging.info(" [Connecting to smtp.google.com] ...")
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+            logging.info(" [Connected!]")
+            try:
+                server.login(FROM_EMAIL, FROM_EMAIL_PASS)
+                logging.info(" [Logged In!]")
+            except Exception as e:
+                logging.error(f" Failed to log in ~ {str(e)}")
+                return
+
+            try:
+                server.sendmail(mail["From"], mail["Bcc"].split(', '), mail.as_string())
+                logging.info(f" [MAIL SENT] ~ {mail['Subject']}")
+            except smtplib.SMTPException as e:
+                logging.error(f" Failed to Send Mail : {mail['Subject']} ~ {str(e)}")
+
+
 def format_companies(companies):
     html_content = """
     <html>
@@ -108,7 +156,7 @@ def send_notices(mails, smtp, gmail_api, notice_db):
             for notif in mails: 
                 mail = notif.get('formatted_notice')
                 try:
-                    server.sendmail(mail["From"], BCC_EMAIL_S, mail.as_string())
+                    server.sendmail(mail["From"], mail["Bcc"].split(', '), mail.as_string())
                     logging.info(f" [MAIL SENT] ~ {mail['Subject']}")
                     notice_db.save_notice(notif['original_notice'])
                 except smtplib.SMTPException as e:
