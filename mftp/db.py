@@ -3,8 +3,8 @@ from pymongo import DESCENDING
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
-from typing import Any, Dict, List, Optional
 from pymongo.errors import ConnectionFailure
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class NoticeDB:
@@ -87,21 +87,46 @@ class NoticeDB:
 
         # Update the document to set the subscribers list to an empty list
         collection.delete_one({"uid": uid})
-
-    def find_new_notices(self, uid_list: List[str]) -> List[str]:
-        """Find and return the list of UIDs that have not been sent."""
-        # Query for UIDs that exist in the database
-        query = {"UID": {"$in": uid_list}}
-        sent_notices = self.__find_many(query, {"UID": 1})
-
-        # Extract UIDs that are already sent
-        sent_uids = set()
-        if sent_notices:
-            sent_uids = {notice["UID"] for notice in sent_notices}
-
-        # Return UIDs that are not sent
-        return [uid for uid in uid_list if uid not in sent_uids]
     
+    def find_to_send_notices(self, latest_X_notices: List[Dict[str, str]]) -> Tuple[List[Dict[str, str]], List[Dict[str, str]]]:
+        """Find new and modified notices compared to existing records in the database."""
+        # Check if latest_X_notices is empty
+        if not latest_X_notices:
+            return [], []
+        
+        # Prepare a query to match all notices
+        latest_X_uids = [notice['UID'] for notice in latest_X_notices]
+        query = {"UID": {"$in": latest_X_uids}}
+        
+        # Find all existing notices that match any of the criteria
+        existing_notices = self.__find_many(query)
+        if not existing_notices:
+            return latest_X_notices, []
+        
+        # Create a mapping of existing notices by UID
+        existing_notices_map = {notice['UID']: notice for notice in existing_notices}
+        
+        new_notices, modified_notices = [], []
+        for latest_notice in latest_X_notices:
+            uid = latest_notice.get('UID')
+
+            if uid not in existing_notices_map:
+                # New notice
+                new_notices.append(latest_notice)
+            else:
+                # Check if the notice is modified
+                existing_notice = existing_notices_map[uid]
+                is_modified = any(
+                    existing_notice.get(key) != value
+                    for key, value in latest_notice.items()
+                    if key != 'BodyData'
+                )
+                
+                if is_modified:
+                    modified_notices.append(latest_notice)
+        
+        return new_notices, modified_notices
+
     def save_notice(self, document: Dict) -> str:
         return self.__insert_one(document)
 
@@ -115,8 +140,17 @@ class NoticeDB:
     def __insert_one(self, document: Dict) -> str:
         """Insert single document and return inserted ID."""
         collection = self.__get_collection()
-        result = collection.insert_one(document)
-        return str(result.inserted_id)
+
+        uid = document.get('UID')
+        # Use replace_one with upsert=True to overwrite or insert
+        result = collection.replace_one(
+            {"UID": uid},  # Match criteria
+            document,      # New document to replace with
+            upsert=True    # Insert if not exists
+        )
+        
+        # Return the ID of the document
+        return str(result.upserted_id if result.upserted_id else uid)
 
     # Read operations
     def __find_many(self, query: Optional[Dict] = None, projection: Optional[Dict] = None) -> Optional[List]:
