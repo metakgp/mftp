@@ -6,18 +6,18 @@ from bs4 import BeautifulSoup as bs
 from endpoints import TPSTUDENT_URL, COMPANIES_URL
 
 
-def send_updates():
-    pass
-
-
 def filter(companies, filter):
     filter_func = currently_open
     if filter.upper() == "OPEN":
         filter_func = currently_open
+    elif filter.upper() == "OPEN_N":
+        filter_func = open_not_applied # important
     elif filter.upper() == "APPLIED":
         filter_func = applied
-    elif filter.upper() == "APPLIED_AVAILABLE":
-        filter_func = currently_open
+    elif filter.upper() == "APPLIED_Y":
+        filter_func = applied_available # important
+    elif filter.upper() == "APPLIED_N":
+        filter_func = applied_not_available # important
 
     filtered = []
     for company in companies:
@@ -25,6 +25,7 @@ def filter(companies, filter):
             filtered.append(company)
 
     return filtered
+
 
 def fetch(session, headers, ssoToken):
     session.post(
@@ -98,8 +99,16 @@ def get_ctc_with_currency(session, headers, jd_url):
     return ctc
 
 
+def open_not_applied(company):
+    return currently_open(company) and not applied(company)
+
+
+def applied_not_available(company):
+    return applied(company) and compare_deadline_gt(company, "Interview_Date")
+
+
 def applied_available(company):
-    return applied(company) and compare_deadline(company, "Interview_Date")
+    return applied(company) and compare_deadline_lt(company, "Interview_Date")
 
 
 def applied(company):
@@ -107,10 +116,17 @@ def applied(company):
 
 
 def currently_open(company):
-    return compare_deadline(company, "End_Date")
+    return compare_deadline_lt(company, "End_Date")
 
 
-def compare_deadline(company, deadline_key):
+def compare_deadline_gt(company, deadline_key):
+    current_time = datetime.now()
+    deadline = parse_date(company, deadline_key)
+
+    return deadline is None or current_time > deadline
+
+
+def compare_deadline_lt(company, deadline_key):
     current_time = datetime.now()
     deadline = parse_date(company, deadline_key)
 

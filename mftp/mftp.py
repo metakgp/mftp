@@ -27,10 +27,9 @@ while True:
   now = datetime.now()
   print(f"================ <<: {now.strftime('%H:%M:%S %d-%m-%Y')} :>> ================", flush=True)
 
-
   print('[ERP LOGIN]', flush=True)
   _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
-  
+
   notice_db = db.NoticeDB(config={
     'uri': env.MONGO_URI,
     'db_name': env.MONGO_DATABASE
@@ -44,9 +43,9 @@ while True:
       if notifications:
           ntfy.send(notifications, notice_db)
     else:
-      mails = mail.format_notice(notices)
+      mails = mail.format_notices(notices)
       if mails:
-          mail.send(mails, args.smtp, args.gmail_api, notice_db)
+          mail.send_notices(mails, args.smtp, args.gmail_api, notice_db)
   else:
     print('[NO NEW NOTICES]', flush=True)
 
