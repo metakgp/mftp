@@ -7,6 +7,8 @@ from endpoints import TPSTUDENT_URL, COMPANIES_URL
 
 
 def filter(companies, filter):
+    print('[FILTERING COMPANY UPDATES]', flush=True)
+
     filter_func = currently_open
     if filter.upper() == "OPEN":
         filter_func = currently_open
@@ -28,6 +30,8 @@ def filter(companies, filter):
 
 
 def fetch(session, headers, ssoToken):
+    print('[FETCHING COMPANY UPDATES]', flush=True)
+
     session.post(
         TPSTUDENT_URL,
         data=dict(ssoToken=ssoToken, menu_id=11, module_id=26),
@@ -141,7 +145,7 @@ def parse_date(company, date_key):
         try:
             date = datetime.strptime(company[date_key], date_format)
         except ValueError as e:
-            logging.error(f" Failed to parse date ~ {str(e)}")
+            logging.error(f" Failed to parse date for {company['Name']} ~ {str(e)}")
             date = None
 
     return date
