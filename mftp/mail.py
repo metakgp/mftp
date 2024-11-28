@@ -56,11 +56,11 @@ def send_companies(mail, gmail_api, smtp):
                 logging.error(f" Failed to Send Mail : {mail['Subject']} ~ {str(e)}")
 
 
-def format_companies(ssoToken, companies):
+def format_companies(ssoToken, companies, subject):
     print('[FORMATTING COMPANY UPDATES]', flush=True)
 
     message = MIMEMultipart()
-    message["Subject"] = "APPLY NOW! | Companies Open = Y & Applied = N "
+    message["Subject"] = subject
     message["From"] = f'MFTP < {FROM_EMAIL} >'
     message["Bcc"] = ", ".join(HOSTER_EMAIL)
 
