@@ -6,6 +6,7 @@ import ntfy
 import notice
 import company
 
+import logging
 import requests
 import argparse
 from datetime import datetime
@@ -32,11 +33,30 @@ while True:
   _, ssoToken = erp.login(headers, session, ERPCREDS=env, OTP_CHECK_INTERVAL=2, LOGGING=True, SESSION_STORAGE_FILE='.session')
 
   if args.gmail_api or args.smtp:
-    if now.minute == 0:
-      companies = company.fetch(session, headers, ssoToken)
-      open_not_applied_companies = company.filter(companies, "OPEN_N")
-      companies_update_mail = mail.format_companies(session.cookies.get('ssoToken'), open_not_applied_companies)
-      mail.send_companies(companies_update_mail, args.gmail_api, args.smtp)
+    _, new, modified = company.fetch(session, headers, ssoToken)
+
+    if new:
+      print('[NEW COMPANIES]', flush=True)
+      for com in new:
+        logging.info(f' {com["Name"]} | {com["Role"]} | {com["CTC"]} | {com["End_Date"]} | {com["Interview_Date"]}')
+    if modified:
+      print('[MODIFIED COMPANIES]', flush=True)
+      for com in modified:
+        logging.info(f' {com["Name"]} | {com["Role"]} | {com["CTC"]} | {com["End_Date"]} | {com["Interview_Date"]}')
+
+    filtered = []
+    if new + modified:
+      filtered = company.filter(new + modified, "OPEN_N")
+      if filtered:
+        for com in filtered:
+          logging.info(f' {com["Name"]} | {com["Role"]} | {com["CTC"]} | {com["End_Date"]} | {com["Interview_Date"]}')
+
+          latest_ssoToken = session.cookies.get('ssoToken')
+          mail_subject = "APPLY NOW! New companies opened"
+          companies_mail = mail.format_companies(latest_ssoToken, filtered, mail_subject)
+          mail.send_companies(companies_mail, args.gmail_api, args.smtp)
+    else:
+      print("[NO NEW COMPANIES]")
 
   notice_db = db.NoticeDB(config={
     'uri': env.MONGO_URI,

@@ -1,9 +1,14 @@
+import os
+import json
 import logging
 from env import ROLL_NUMBER
 from datetime import datetime
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup as bs
 from endpoints import TPSTUDENT_URL, COMPANIES_URL
+
+
+COMPANIES_FILE = f"{os.path.dirname(__file__)}/companies.json"
 
 
 def filter(companies, filter):
@@ -44,7 +49,7 @@ def fetch(session, headers, ssoToken):
     xml_encoded = xml_string.encode("utf-8")
     root = ET.fromstring(xml_encoded)
 
-    companies = []
+    fetched_companies = []
     for row in root.findall("row"):
         jd_args = row.find("cell[4]").text.split("'")[5].split('"')
         jnf_id, com_id, year = jd_args[1], jd_args[3], jd_args[5]
@@ -75,9 +80,52 @@ def fetch(session, headers, ssoToken):
             "Interview_Date": row.find("cell[12]").text.strip() if row.find("cell[12]").text.strip() else None,
         }
         
-        companies.append(company_info)
+        fetched_companies.append(company_info)
+    
+    stored_companies = get_list()
+    new_companies, modified_companies = get_new_and_modified_companies(fetched_companies, stored_companies)
 
-    return companies
+    store_list(fetched_companies)
+
+    return fetched_companies, new_companies, modified_companies
+
+
+def get_new_and_modified_companies(fetched, stored, unique_key="Job_Description"):
+    # Create dictionaries for quick lookup by the unique key
+    stored_dict = {entry[unique_key]: entry for entry in stored}
+    fetched_dict = {entry[unique_key]: entry for entry in fetched}
+
+    new_entries = []
+    updated_entries = []
+
+    for key, fetched_entry in fetched_dict.items():
+        if key not in stored_dict:
+            # New entry
+            new_entries.append(fetched_entry)
+        else:
+            # Compare the values of the fetched entry with the stored entry
+            stored_entry = stored_dict[key]
+            if any(fetched_entry[k] != stored_entry.get(k) for k in fetched_entry):
+                updated_entries.append(fetched_entry)
+
+    return new_entries, updated_entries
+
+
+def store_list(companies):
+    with open(COMPANIES_FILE, "w") as json_file:
+        json.dump(companies, json_file, indent=2)
+
+
+def get_list():
+    try:
+        with open(COMPANIES_FILE, "r") as json_file:
+            return json.load(json_file)
+    except json.JSONDecodeError as _:
+        store_list([])
+        return []
+    except FileNotFoundError:
+        store_list([])
+        return []
 
 
 # Downloads pdf content in bytes format

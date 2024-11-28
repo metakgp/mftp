@@ -13,6 +13,7 @@ services:
             - $MFTP_CONFIG/mail_send_token.json:/app/mail_send_token.json
             - $MFTP_CONFIG/mail_send_creds.json:/app/mail_send_creds.json
             - $MFTP_CONFIG/.session:/app/.session
+            - $MFTP_CONFIG/companies.json:/app/companies.json
         depends_on:
             - db
         networks:
