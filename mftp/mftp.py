@@ -101,7 +101,10 @@ while True:
     )
     notice_db.connect()
 
-    notices = notice.fetch(headers, session, ssoToken, notice_db)
+    notices, shortlists = notice.fetch(headers, session, ssoToken, notice_db)
+    if shortlists:
+        if args.gmail_api or args.smtp:
+            pass
     if notices:
         if args.ntfy:
             notifications = ntfy.format_notices(notices)

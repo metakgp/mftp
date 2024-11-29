@@ -8,6 +8,10 @@ from email.mime.multipart import MIMEMultipart
 from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S, HOSTER_EMAIL
 
 
+def format_shortlist():
+    pass
+
+
 def send_companies(mail, gmail_api, smtp):
     print('[SENDING COMPANY UPDATES]', flush=True)
 

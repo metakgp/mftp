@@ -15,6 +15,31 @@ MONGO_PORT = "27017"
 MONGO_URI = f'mongodb://{MONGO_ROOT_USERNAME}:{MONGO_ROOT_PASSWORD}@db:{MONGO_PORT}'
 MONGO_COLLECTION = "AY_2024-25"
 
+# HOSTER'S DETAILS - For personalised updates (MUST)
+## If hoster wish to share their powers with others as well
+## Sort of emergency contact?
+## That is why it is a list of emails
+HOSTER_EMAIL = ["hoster@kgpian.iitkgp.ac.in", "emergency.hoster@kgpian.iitkgp.ac.in"] 
+HOSTER_NAME = "Arpit Bhardwaj"
+HOSTER_ROLL = ROLL_NUMBER
+HOSTER_INTERESTED_ROLLS = [HOSTER_ROLL, "XXYYXXXXX", "NNAANNNNN"]
+
+# SHORTLIST CONFIG (MUST)
+## Maps roll number to student names
+ROLL_NAME = {
+    HOSTER_ROLL: HOSTER_NAME,
+    "XXYYXXXXX": "XY Sharma",
+    "NNAANNNNN": "AB Gupta",
+}
+## Maps roll number to their emails
+## So, that individuals are notified if they are mentioned somewhere
+## It is a list again, which act as emergency contact
+ROLL_MAIL = {
+    HOSTER_ROLL: HOSTER_EMAIL,
+    "XXYYXXXXX": ["xy@kgpian.iitkgp.ac.in", "emergency.xy@kgpian.iitkgp.ac.in"],
+    "NNAANNNNN": ["ab@kgpian.iitkgp.ac.in", "emergency.ab@kgpian.iitkgp.ac.in"],
+}
+
 # EMAIL
 ## Senders' Credentials (via SMTP)
 FROM_EMAIL = "abc@gmail.com" # Notification Sender Email-id
@@ -22,8 +47,6 @@ FROM_EMAIL_PASS = "**********" # App password for the above email-id
 ## EMAIL - Receiver's Address
 BCC_EMAIL_S = ["xyz@googlegroups.com", "abc@googlegroups.com"] # Multiple mails for bcc
 # BCC_EMAIL_S = ["xyz@googlegroups.com"] # This is how you can set single mail in a list
-## Hoster's address to receive personalised updates
-HOSTER_EMAIL = ["abc@kgpian.iitkgp.ac.in"]
 
 # NTFY
 NTFY_BASE_URL = "https://ntfy.sh"
