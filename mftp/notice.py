@@ -3,7 +3,6 @@ import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup as bs
 from endpoints import TPSTUDENT_URL, NOTICEBOARD_URL, NOTICES_URL, ATTACHMENT_URL, NOTICE_CONTENT_URL
 
-import shortlist
 
 LAST_NOTICES_CHECK_COUNT = 30
 
@@ -26,7 +25,6 @@ def fetch(headers, session, ssoToken, notice_db):
         logging.error(f" Failed to extract data from Noticeboard ~ {str(e)}")
         return []
 
-    shortlists = []
     latest_X_notices = []
     for i, row in enumerate(root.findall('row')):
         if i >= LAST_NOTICES_CHECK_COUNT:
@@ -50,15 +48,6 @@ def fetch(headers, session, ssoToken, notice_db):
             logging.error(f" Failed to parse notice body ~ {str(e)}")
             break
 
-        # Handling Shortists in Body
-        try:
-            body_shortlists = shortlist.from_notice_body(notice)
-            if body_shortlists:
-                shortlists.append(body_shortlists)
-        except Exception as e:
-            logging.error(f" Failed to parse shortlists from notice body ~ {str(e)}")
-            continue
-
         # Handling attachment
         try:
             attachment = parse_attachment(session, year, id_)
@@ -67,16 +56,6 @@ def fetch(headers, session, ssoToken, notice_db):
         except Exception as e:
             logging.error(f" Failed to parse attachment ~ {str(e)}")
             break
-
-        # Handling Shortlist in attachment
-        try:
-            if 'Attachment' in notice:
-                attachment_shortlists = shortlist.from_attachment(notice)
-                if attachment_shortlists:
-                    shortlists.append(attachment_shortlists)
-        except Exception as e:
-            logging.error(f" Failed to parse shortlists from attachment ~ {str(e)}")
-            continue
 
         latest_X_notices.append(notice)
     
@@ -94,7 +73,9 @@ def fetch(headers, session, ssoToken, notice_db):
     for notice in modified_notices:
         logging.info(f" [MODIFIED NOTICE]: #{notice['UID'].split('_')[0]} | {notice['Type']} | {notice['Subject']} | {notice['Company']} | {notice['Time']}")
 
-    return new_notices + modified_notices, shortlists
+    notices = new_notices + modified_notices
+
+    return notices
 
 
 def parse_body_data(session, year, id_):

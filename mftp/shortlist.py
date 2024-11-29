@@ -6,7 +6,34 @@ from collections import defaultdict
 from env import HOSTER_INTERESTED_ROLLS, ROLL_MAIL, ROLL_NAME
 
 
-def from_notice_body(notice):
+def search(notices):
+    print('[SEARCHING SHORTLISTS]', flush=True)
+
+    shortlists = []
+    for notice in notices:
+        # Handling Shortists in Body
+        try:
+            body_shortlists = search_body(notice)
+            if body_shortlists:
+                shortlists.append(body_shortlists)
+        except Exception as e:
+            logging.error(f" Failed to parse shortlists from notice body ~ {str(e)}")
+            continue
+
+        # Handling Shortlist in attachment
+        try:
+            if 'Attachment' in notice:
+                attachment_shortlists = search_attachment(notice)
+                if attachment_shortlists:
+                    shortlists.append(attachment_shortlists)
+        except Exception as e:
+            logging.error(f" Failed to parse shortlists from attachment ~ {str(e)}")
+            continue
+
+    return shortlists
+
+
+def search_body(notice):
     shortlists = defaultdict(dict)
     body_data = notice["BodyData"]
     body = body_data.decode_contents(formatter="html")
@@ -27,18 +54,18 @@ def from_notice_body(notice):
                 "mails": mails,
             }
             logging.info(
-                f" [SHORTLIST (noticebody)] {name} ({count}) -> {company} (#{id_})"
+                f" [NOTICEBODY] {name} ({count}) -> {company} (#{id_})"
             )
 
     return shortlists
 
 
-def from_attachment(notice):
+def search_attachment(notice):
     shortlists = defaultdict(dict)
     attachment = notice["Attachment"]
 
     for roll in HOSTER_INTERESTED_ROLLS:
-        count = search_pdf_bytes(attachment, roll)
+        count = parse_pdf_bytes(attachment, roll)
         if count > 0:
             id_ = notice["UID"].split("_")[0]
             company = notice["Company"]
@@ -53,13 +80,13 @@ def from_attachment(notice):
                 "mails": mails,
             }
             logging.info(
-                f" [SHORTLIST (attachment)] {name} ({count}) -> {company} (#{id_})"
+                f" [ATTACHMENT] {name} ({count}) -> {company} (#{id_})"
             )
 
     return shortlists
 
 
-def search_pdf_bytes(pdf_bytes, search_string):
+def parse_pdf_bytes(pdf_bytes, search_string):
     try:
         pdf_file = io.BytesIO(pdf_bytes)
         pdf_reader = PyPDF2.PdfReader(pdf_file)

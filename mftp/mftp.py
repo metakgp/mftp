@@ -5,6 +5,7 @@ import time
 import ntfy
 import notice
 import company
+import shortlist
 
 import logging
 import requests
@@ -101,16 +102,16 @@ while True:
     )
     notice_db.connect()
 
-    notices, shortlists = notice.fetch(headers, session, ssoToken, notice_db)
-    if shortlists:
-        if args.gmail_api or args.smtp:
-            pass
+    notices = notice.fetch(headers, session, ssoToken, notice_db)
     if notices:
         if args.ntfy:
             notifications = ntfy.format_notices(notices)
             if notifications:
                 ntfy.send_notices(notifications, notice_db)
         else:
+            shortlists = shortlist.search(notices)
+            if shortlists:
+                pass
             mails = mail.format_notices(notices)
             if mails:
                 mail.send_notices(mails, args.smtp, args.gmail_api, notice_db)
