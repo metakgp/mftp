@@ -22,7 +22,7 @@ MONGO_COLLECTION = "AY_2024-25"
 HOSTER_EMAIL = ["hoster@kgpian.iitkgp.ac.in", "emergency.hoster@kgpian.iitkgp.ac.in"] 
 HOSTER_NAME = "Arpit Bhardwaj"
 HOSTER_ROLL = ROLL_NUMBER
-HOSTER_INTERESTED_ROLLS = [HOSTER_ROLL, "XXYYXXXXX", "NNAANNNNN"]
+HOSTER_INTERESTED_ROLLS = ["XXYYXXXXX", "NNAANNNNN"]
 
 # SHORTLIST CONFIG (MUST)
 ## Maps roll number to student names

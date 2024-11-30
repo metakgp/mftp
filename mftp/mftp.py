@@ -7,7 +7,6 @@ import notice
 import company
 import shortlist
 
-import logging
 import requests
 import argparse
 from datetime import datetime
@@ -65,28 +64,10 @@ while True:
     if args.gmail_api or args.smtp:
         _, new, modified = company.fetch(session, headers, ssoToken)
 
-        if new:
-            print("[NEW COMPANIES]", flush=True)
-            for com in new:
-                logging.info(
-                    f" {com['Name']} | {com['Role']} | {com['CTC']} | {com['End_Date']} | {com['Interview_Date']}"
-                )
-        if modified:
-            print("[MODIFIED COMPANIES]", flush=True)
-            for com in modified:
-                logging.info(
-                    f" {com['Name']} | {com['Role']} | {com['CTC']} | {com['End_Date']} | {com['Interview_Date']}"
-                )
-
         filtered = []
         if new + modified:
             filtered = company.filter(new + modified, "OPEN_N")
             if filtered:
-                for com in filtered:
-                    logging.info(
-                        f" {com['Name']} | {com['Role']} | {com['CTC']} | {com['End_Date']} | {com['Interview_Date']}"
-                    )
-
                 latest_ssoToken = session.cookies.get("ssoToken")
                 mail_subject = "APPLY NOW! New companies opened"
                 companies_mail = mail.format_companies(
@@ -111,7 +92,9 @@ while True:
         else:
             shortlists = shortlist.search(notices)
             if shortlists:
-                pass
+                shortlists_mails = mail.format_shortlists(shortlists)
+                if shortlists_mails:
+                    mail.send_shortlists(shortlists_mails, args.gmail_api, args.ntfy)
             mails = mail.format_notices(notices)
             if mails:
                 mail.send_notices(mails, args.smtp, args.gmail_api, notice_db)

@@ -5,11 +5,144 @@ from endpoints import TPSTUDENT_URL
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
-from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S, HOSTER_EMAIL
+from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S, HOSTER_EMAIL, HOSTER_INTERESTED_ROLLS, ROLL_MAIL, ROLL_NAME
 
 
-def format_shortlist():
-    pass
+def send_shortlists(mails, gmail_api, smtp):
+    print('[SENDING SHORTLIST UPDATES]', flush=True)
+    
+    if gmail_api:
+        import base64
+        
+        try:
+            service = generate_send_service()
+        except Exception as e:
+            logging.error(f" Failed to generate GMAIL API creds ~ {str(e)}")
+            return
+
+        for mail in mails:
+            try:
+                response = service.users().messages().send(
+                    userId="me", 
+                    body={"raw": base64.urlsafe_b64encode(mail.as_bytes()).decode()}
+                ).execute()
+            except Exception as e:
+                logging.error(f"  Failed to send request to GMAIL API : {mail['Subject']} -x-> ({mail['Bcc']}) ~ {str(e)}")
+                break
+            
+            if 'id' in response:
+                logging.info(f" [MAIL SENT] ~ {mail['Subject']} -> ({mail['Bcc']})")
+            else:
+                logging.error(f" Failed to Send Mail : {mail['Subject']} -x-> ({mail['Bcc']}) ~ {response}")
+                break
+    elif smtp:
+        import ssl
+        import smtplib
+        context = ssl.create_default_context()
+
+        logging.info(" [Connecting to smtp.google.com] ...")
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+            logging.info(" [Connected!]")
+            try:
+                server.login(FROM_EMAIL, FROM_EMAIL_PASS)
+                logging.info(" [Logged In!]")
+            except Exception as e:
+                logging.error(f" Failed to log in ~ {str(e)}")
+                return
+
+            for mail in mails: 
+                try:
+                    server.sendmail(mail["From"], mail["Bcc"].split(', '), mail.as_string())
+                    logging.info(f" [MAIL SENT] ~ {mail['Subject']} -> ({mail['Bcc']})")
+                except smtplib.SMTPException as e:
+                    logging.error(f" Failed to Send Mail : {mail['Subject']} -x-> ({mail['Bcc']}) ~ {str(e)}")
+                    break
+
+
+def format_shortlists(shortlists):
+    print('[FORMATTING SHORTLIST UPDATES]', flush=True)
+    
+    table_body = """
+    <html>
+        <body>
+            <div style="font-family: Arial, sans-serif; width: 90%; margin: 0 auto; border: 1px solid #333; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);">
+                <div align="center">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #f2f2f2;">
+                                {columns}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </body>
+    </html>
+    """
+
+    host_interested_message = MIMEMultipart()
+    host_interested_message["Subject"] = "People you are interested in are shortlisted!"
+    host_interested_message["From"] = f'MFTP < {FROM_EMAIL} >'
+    host_interested_message["Bcc"] = ", ".join(HOSTER_EMAIL)
+
+    host_interested_cols = """
+    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Name (count)</th>
+    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Company (notice_id)</th>
+    """
+
+    def generate_row(company_shortlist):
+        return f"""
+        <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;">{company_shortlist['company']} (#{company_shortlist['id']})</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">{company_shortlist['count']}</td>
+        </tr>
+        """
+
+    def generate_host_interested_row(name, company_shortlist):
+        return f"""
+        <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;">{name} ({company_shortlist['count']})</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">{company_shortlist['company']} (#{company_shortlist['id']})</td>
+        </tr>
+        """
+
+    host_interested_rows_list = []
+
+    mails = []
+    for roll, shortlist in shortlists.items():
+        if roll in HOSTER_INTERESTED_ROLLS:
+            name = ROLL_NAME.get(roll)
+            host_interested_rows_list += [generate_host_interested_row(name, company_shortlist) for company_shortlist in shortlist]
+
+        student_mails = ROLL_MAIL.get(roll)
+        if student_mails is None:
+            continue
+
+        message = MIMEMultipart()
+        message["Subject"] = "You have been shortlisted!"
+        message["From"] = f'MFTP < {FROM_EMAIL} >'
+        message["Bcc"] = ", ".join(student_mails)
+
+        rows = ''.join(generate_row(company_shortlist) for company_shortlist in shortlist)
+        columns = """
+        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Company (notice_id)</th>
+        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Count</th>
+        """
+
+        shortlist_table = table_body.format(columns=columns, rows=rows)
+        message.attach(MIMEText(shortlist_table, "html"))
+
+        mails.append(message)
+
+    host_interested_rows = ''.join(host_interested_rows_list)
+    host_interested_shortlist_table = table_body.format(columns=host_interested_cols, rows=host_interested_rows)
+    host_interested_message.attach(MIMEText(host_interested_shortlist_table, "html"))
+    mails.append(host_interested_message)
+
+    return mails
 
 
 def send_companies(mail, gmail_api, smtp):

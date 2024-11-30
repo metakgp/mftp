@@ -30,6 +30,9 @@ def filter(companies, filter):
     for company in companies:
         if filter_func(company):
             filtered.append(company)
+            logging.info(
+                f" {company['Name']} | {company['Role']} | {company['CTC']} | {company['End_Date']} | {company['Interview_Date']}"
+            )
 
     return filtered
 
@@ -102,11 +105,17 @@ def get_new_and_modified_companies(fetched, stored, unique_key="Job_Description"
         if key not in stored_dict:
             # New entry
             new_entries.append(fetched_entry)
+            logging.info(
+                f" [NEW COMPANY]: {fetched_entry['Name']} | {fetched_entry['Role']} | {fetched_entry['CTC']} | {fetched_entry['End_Date']} | {fetched_entry['Interview_Date']}"
+            )
         else:
             # Compare the values of the fetched entry with the stored entry
             stored_entry = stored_dict[key]
             if any(fetched_entry[k] != stored_entry.get(k) for k in fetched_entry):
                 updated_entries.append(fetched_entry)
+                logging.info(
+                    f" [MODIFIED COMPANY]: {fetched_entry['Name']} | {fetched_entry['Role']} | {fetched_entry['CTC']} | {fetched_entry['End_Date']} | {fetched_entry['Interview_Date']}"
+                )
 
     return new_entries, updated_entries
 
