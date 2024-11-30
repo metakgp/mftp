@@ -2,35 +2,66 @@ import re
 import io
 import PyPDF2
 import logging
+from env import ROLL_NAME
 from collections import defaultdict
-from env import HOSTER_INTERESTED_ROLLS, ROLL_MAIL, ROLL_NAME
 
 
 def search(notices):
-    print('[SEARCHING SHORTLISTS]', flush=True)
+    notice_wise_shortlists = search_notice_wise_shortlists(notices)
+    if notice_wise_shortlists:
+        student_wise_shortlists = calc_student_wise_shortlists(notice_wise_shortlists)
+        return student_wise_shortlists
+    else:
+        print("[NO NEW SHORTLISTS]", flush=True)
+        return defaultdict(list)
 
-    shortlists = []
+
+def calc_student_wise_shortlists(notice_wise_shortlists):
+    print("[PARSING STUDENT WISE SHORTLISTS]", flush=True)
+
+    student_wise_shortlists = defaultdict(list)
+
+    for notice_shortlist in notice_wise_shortlists:
+        for roll, shortlists in notice_shortlist.items():
+            student = student_wise_shortlists[roll]
+            student.append(shortlists)
+
+    for roll, shortlists in student_wise_shortlists.items():
+        shortlists_str = " | ".join([
+            f"{shortlist['company']} (#{shortlist['id']}) [{shortlist['count']}]"
+            for shortlist in shortlists
+        ])
+        name = ROLL_NAME.get(roll)
+        logging.info(f" [{name} ({roll})]: {shortlists_str}")
+
+    return student_wise_shortlists
+
+
+def search_notice_wise_shortlists(notices):
+    print("[SEARCHING NOTICE WISE SHORTLISTS]", flush=True)
+
+    notice_wise_shortlists = []
     for notice in notices:
         # Handling Shortists in Body
         try:
             body_shortlists = search_body(notice)
             if body_shortlists:
-                shortlists.append(body_shortlists)
+                notice_wise_shortlists.append(body_shortlists)
         except Exception as e:
             logging.error(f" Failed to parse shortlists from notice body ~ {str(e)}")
             continue
 
         # Handling Shortlist in attachment
         try:
-            if 'Attachment' in notice:
+            if "Attachment" in notice:
                 attachment_shortlists = search_attachment(notice)
                 if attachment_shortlists:
-                    shortlists.append(attachment_shortlists)
+                    notice_wise_shortlists.append(attachment_shortlists)
         except Exception as e:
             logging.error(f" Failed to parse shortlists from attachment ~ {str(e)}")
             continue
 
-    return shortlists
+    return notice_wise_shortlists
 
 
 def search_body(notice):
@@ -38,23 +69,20 @@ def search_body(notice):
     body_data = notice["BodyData"]
     body = body_data.decode_contents(formatter="html")
 
-    for roll in HOSTER_INTERESTED_ROLLS:
+    for roll in ROLL_NAME.keys():
         count = body.count(roll)
         if count > 0:
             id_ = notice["UID"].split("_")[0]
             company = notice["Company"]
             name = ROLL_NAME.get(roll)
-            mails = ROLL_MAIL.get(roll)
 
             shortlists[roll] = {
                 "id": id_,
                 "company": company,
-                "name": name,
                 "count": count,
-                "mails": mails,
             }
             logging.info(
-                f" [NOTICEBODY] {name} ({count}) -> {company} (#{id_})"
+                f" [NOTICEBODY] {name} ({roll}) [{count}] -> {company} (#{id_})"
             )
 
     return shortlists
@@ -64,23 +92,20 @@ def search_attachment(notice):
     shortlists = defaultdict(dict)
     attachment = notice["Attachment"]
 
-    for roll in HOSTER_INTERESTED_ROLLS:
+    for roll in ROLL_NAME.keys():
         count = parse_pdf_bytes(attachment, roll)
         if count > 0:
             id_ = notice["UID"].split("_")[0]
             company = notice["Company"]
             name = ROLL_NAME.get(roll)
-            mails = ROLL_MAIL.get(roll)
 
             shortlists[roll] = {
                 "id": id_,
                 "company": company,
-                "name": name,
                 "count": count,
-                "mails": mails,
             }
             logging.info(
-                f" [ATTACHMENT] {name} ({count}) -> {company} (#{id_})"
+                f" [ATTACHMENT] {name} ({roll}) [{count}] -> {company} (#{id_})"
             )
 
     return shortlists
