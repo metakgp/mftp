@@ -62,7 +62,7 @@ def fetch(session, headers, ssoToken):
         company_additional_details = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/AdmFilePDF.htm?type=COM&year={year}&com_id={com_id}"
         ppt = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/AdmFilePDF.htm?type=PPT&year={year}&com_id={com_id}"
         jd = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/TPJNFView.jsp?jnf_id={jnf_id}&com_id={com_id}&yop={year}&user_type=SU&rollno={ROLL_NUMBER}"
-        apply_link = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/TPJNFViewAction.jsp?jnf_id={jnf_id}&com_id={com_id}&year={year}&rollno={ROLL_NUMBER}&mode=ApplyCV1"
+        apply_link_cv = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/TPJNFViewAction.jsp?jnf_id={jnf_id}&com_id={com_id}&year={year}&rollno={ROLL_NUMBER}&mode=ApplyCV"
         additional_jd = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/JnfMoreDet.jsp?mode=jnfMoreDet&rollno={ROLL_NUMBER}&year={year}&com_id={com_id}&jnf_id={jnf_id}"
         form_additional_details = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/AdmFilePDF.htm?type=JNF&year={year}&jnf_id={jnf_id}&com_id={com_id}"
 
@@ -73,7 +73,7 @@ def fetch(session, headers, ssoToken):
             "PPT": ppt,
             "Role": row.find("cell[4]").text.split("'")[1].strip(),
             "Job_Description": jd,
-            "Apply_Link": apply_link,
+            "Apply_Link_CV": apply_link_cv,
             "Additional_Job_Description": additional_jd,
             "CTC": get_ctc_with_currency(session, headers, additional_jd),
             "Form_Additional_Details": form_additional_details,

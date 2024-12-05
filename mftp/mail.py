@@ -5,7 +5,7 @@ from endpoints import TPSTUDENT_URL
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
-from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S, HOSTER_EMAIL, HOSTER_INTERESTED_ROLLS, ROLL_MAIL, ROLL_NAME
+from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S, HOSTER_EMAIL, HOSTER_INTERESTED_ROLLS, HOSTER_NAME, ROLL_MAIL, ROLL_NAME
 
 
 def send_shortlists(mails, gmail_api, smtp):
@@ -193,11 +193,11 @@ def send_companies(mail, gmail_api, smtp):
                 logging.error(f" Failed to Send Mail : {mail['Subject']} ~ {str(e)}")
 
 
-def format_companies(ssoToken, companies, subject):
+def format_companies(ssoToken, companies):
     print('[FORMATTING COMPANY UPDATES]', flush=True)
 
     message = MIMEMultipart()
-    message["Subject"] = subject
+    message["Subject"] = f"{HOSTER_NAME} Apply Now! New companies opened"
     message["From"] = f'MFTP < {FROM_EMAIL} >'
     message["Bcc"] = ", ".join(HOSTER_EMAIL)
 
@@ -208,7 +208,10 @@ def format_companies(ssoToken, companies, subject):
                 <a href="{company['Company_Additional_Details']}&ssoToken={ssoToken}" target="_blank">{company['Name']}</a>
             </td>
             <td style="border: 1px solid #ddd; padding: 8px;">
-                <a href="{company['Apply_Link']}&ssoToken={ssoToken}" target="_blank">{company['Role']}</a>
+                {company['Role']} 
+                (<a href="{company['Apply_Link_CV']}1&ssoToken={ssoToken}" target="_blank">CV1</a>,
+                 <a href="{company['Apply_Link_CV']}2&ssoToken={ssoToken}" target="_blank">CV2</a>,
+                 <a href="{company['Apply_Link_CV']}3&ssoToken={ssoToken}" target="_blank">CV3</a>)
             </td>
             <td style="border: 1px solid #ddd; padding: 8px;">
                 <a href="{company['Additional_Job_Description']}&ssoToken={ssoToken}" target="_blank">{company.get('CTC', 'N/A')}</a>
@@ -232,7 +235,7 @@ def format_companies(ssoToken, companies, subject):
                         <thead>
                             <tr style="background-color: #f2f2f2;">
                                 <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Company</th>
-                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Role</th>
+                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Role (Apply)</th>
                                 <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">CTC</th>
                                 <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">End Date</th>
                                 <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Interview Date</th>

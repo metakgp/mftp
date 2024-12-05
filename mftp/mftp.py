@@ -69,9 +69,8 @@ while True:
             filtered = company.filter(new + modified, "OPEN_N")
             if filtered:
                 latest_ssoToken = session.cookies.get("ssoToken")
-                mail_subject = "APPLY NOW! New companies opened"
                 companies_mail = mail.format_companies(
-                    latest_ssoToken, filtered, mail_subject
+                    latest_ssoToken, filtered
                 )
                 mail.send_companies(companies_mail, args.gmail_api, args.smtp)
         else:
