@@ -147,11 +147,7 @@ _Now that the environment has been set up and configured to properly compile and
        
 3. #### Configuring environment variables
 
-   - Copy `env.example.py` as `env.py`. It looks like this:
-     ```python
-     TOPIC_URL = "https://ntfy.sh/metakgp-mftp" # NTFY topic to send doctors' notifications on
-     EMAIL = "abc@xyz.com" # Email to send doctors' notifications on
-     ```
+   - Copy [env.example.py](./env.example.py) as `env.py`.
      > You can read about you can learn about ntfy from their docs: https://docs.ntfy.sh/
    - Update the values inside the `double quotes` ("). **DO NOT CHANGE VAR NAMES.**
 

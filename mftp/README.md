@@ -3,7 +3,7 @@
 <!-- ABOUT THE PROJECT -->
 ## MFTP Scripts
 
-[mftp.py](./mftp.py) continuously monitors the CDC Noticeboard and forwards incoming notices to the configured email address, whether it's an individual account or a Google Group.
+[mftp.py](./mftp.py) continuously monitors the CDC Noticeboard and forwards incoming notices to the configured email address - whether it's an individual account or a Google Group - and [ntfy](https://docs.ntfy.sh/) topic(s).
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -59,7 +59,7 @@ The following requirements are to be satisfied for the project to function prope
          ```sh
          sudo docker build -t metakgporg/mftp .
          ```
-2. Create a directory which will contain your tokens and env.py, name it as `mftp_config`
+2. Create a directory which will contain your `tokens` and `env.py`, name it as `mftp_config`
 3. Follow the steps to [configure mail sending](#sending-emails). **Skip this step if you wish to use method not involving mails, for example, ntfy**
 4. Follow the steps to [configure env variables](#configuring-environment-variables)
 
@@ -71,7 +71,7 @@ The following requirements are to be satisfied for the project to function prope
 
 #### Docker Compose
 
-It is mandatory to provide both of the following `env variables` before the _docker-compose_ command.
+It is mandatory to provide both of the following `env variables` for the _docker-compose_ command.
 - `MFTP_CONFIG`: Absolute path to `mftp_config` directory
 - `MFTP_MODE`: Mode of sending mail - **--smtp**, **--gmail-api** and **--ntfy**
 
@@ -230,34 +230,7 @@ _Now that the environment has been set up and configured to properly compile and
        
 4. #### Configuring environment variables
 
-   - Copy `env.example.py` as `env.py`. It looks like this:
-     ```python
-     # ERP Credentials (MUST)
-     ROLL_NUMBER = "XXYYXXXXX" # Institute Roll Number
-     PASSWORD = "**********" # ERP Password
-     SECURITY_QUESTIONS_ANSWERS = { # ERP Secret Questions and their Answers
-         "Q1" : "A1",
-         "Q2" : "A2",
-         "Q3" : "A3",
-     }
-
-     # EMAIL (via SMTP)
-     ## Senders' Credentials
-     FROM_EMAIL = "abc@gmail.com" # Notification Sender Email-id
-     FROM_EMAIL_PASS = "**********" # App password for the above email-id
-     ## EMAIL - Receiver's Address
-     BCC_EMAIL_S = ["xyz@googlegroups.com", "abc@googlegroups.com"] # Multiple mails for bcc
-     # BCC_EMAIL_S = ["xyz@googlegroups.com"] # This is how you can set single mail in a list
-
-     # NTFY
-     NTFY_BASE_URL = "https://ntfy.sh"
-     NTFY_TOPIC = "mftp"
-     ## Optional: only if you want a custom icon
-     NTFY_TOPIC_ICON = "https://miro.medium.com/v2/resize:fit:600/1*O94LHxqfD_JGogOKyuBFgA.jpeg"
-     ## Optional: only if the topic is restricted
-     NTFY_USER = "testuser"
-     NTFY_PASS = "fakepassword"
-     ```
+   - Copy [env.example.py](./env.example.py) as `env.py`.
    - Update the values inside the `double quotes` ("). **DO NOT CHANGE VAR NAMES.**
 
 <p align="right">(<a href="#top">back to top</a>)</p>

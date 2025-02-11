@@ -13,8 +13,6 @@
 
 </div>
 
-<br />
-
 <div align="center">
   <!-- PROJECT LOGO -->
   <!-- <a href="https://github.com/metakgp/MFTP">
@@ -55,7 +53,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-MFTP continuously monitors the CDC Noticeboard and forwards incoming notices to the configured email address, whether it's an individual account or a Google Group. It is also available as a service and as a cronjob on linux systems along with a [heath checkup utility](./mftp-doctor) to monitor and notify for any errors.
+MFTP continuously monitors the CDC Noticeboard and forwards incoming notices to the configured email address and ntfy topic. It is also available as a service and as a cronjob on linux systems along with a [heath checkup utility](./mftp-doctor) to monitor and notify for any errors.
 
 > [!Warning]
 > This tool is completely legal, but the way you use it can get you into legal trouble. Some things you **cannot** do are:
