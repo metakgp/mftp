@@ -201,6 +201,7 @@ The following requirements are to be satisfied for the project to function prope
   sudo apt install python3
   ```
 * This project depends on [ERP Login module](https://github.com/proffapt/iitkgp-erp-login-pypi) by [Arpit Bhardwaj](https://github.com/proffapt) for the ERP Login workflow. Read its [documentation](https://github.com/proffapt/iitkgp-erp-login-pypi?tab=readme-ov-file#input) and setup your OTP fetching token mentioned in second point (`OTP_CHECK_INTERVAL`) of optional arguments.
+* You will also need a mongodb database - either locally-hosted or hosted on cloud. Configure the `MONGODB_URI` in the `env.py`.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
