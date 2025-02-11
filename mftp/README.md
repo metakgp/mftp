@@ -87,6 +87,10 @@ sudo MFTP_CONFIG=/path/to/mftp_config MFTP_MODE=--gmail-api docker-compose up -d
 sudo MFTP_CONFIG=/path/to/mftp_config MFTP_MODE=--ntfy docker-compose up -d # Using Gmail API for sending mails
 ```
 
+> [!Note] 
+> All the environment variables mentioned above can be placed in a `.env` file and conveniently used via:
+> `sudo docker-compose --env-file .env up -d`
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 #### Docker Command
@@ -160,6 +164,10 @@ It is also possible to run these docker containers as a cronjob:
           ```sh
           sudo MFTP_CONFIG=/path/to/mftp_config MFTP_MODE="--ntfy --cron" docker-compose up -d
           ```
+> [!Note] 
+> All the environment variables mentioned above can be placed in a `.env` file and conveniently used via:
+> `sudo docker-compose --env-file .env up -d`
+
 - ##### With Docker Command
     - Remove `--restart=unless-stopped` flag & append `--cron` at the end of any of [these](#docker-command) commands. For example:
       ```sh

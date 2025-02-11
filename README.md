@@ -113,8 +113,11 @@ sudo MFTP_CONFIG=/path/to/mftp_config DOCTOR_CONFIG=/path/to/doctor_config MFTP_
 ```sh
 sudo MFTP_CONFIG=/path/to/mftp_config DOCTOR_CONFIG=/path/to/doctor_config MFTP_MODE="--ntfy" docker-compose up -d # Using NTFY for serving notifications
 ```
+> [!Note] 
+> All the environment variables mentioned below can be placed in a `.env` file and conveniently used via:
+> `sudo docker-compose --env-file .env up -d`
 
-> [!NOTE]
+> [!Important]
 > There also is `DOCTOR_MODE` as one of the environment variables, which is optional and considers one value only `--cron`. We will use it in the sub-section just next.
 
 #### As a cronjob
@@ -135,6 +138,11 @@ It is also possible to run these docker containers as a cronjob:
       ```sh
       sudo MFTP_CONFIG=/path/to/mftp_config DOCTOR_CONFIG=/path/to/doctor_config MFTP_MODE="--ntfy --cron" DOCTOR_MODE="--cron" docker-compose up -d
       ```
+
+> [!Note] 
+> All the environment variables mentioned above can be placed in a `.env` file and conveniently used via:
+> `sudo docker-compose --env-file .env up -d`
+
 - Add the updated command with desired [cron expression](https://crontab.cronhub.io/) into your cronjob using [crontab -e](https://www.man7.org/linux/man-pages/man5/crontab.5.html)
 
 <p align="right">(<a href="#top">back to top</a>)</p>

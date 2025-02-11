@@ -77,6 +77,10 @@ It is mandatory to provide the following `env variable` before the _docker-compo
 sudo DOCTOR_CONFIG=/path/to/doctor_config docker-compose up -d
 ```
 
+> [!Note] 
+> All the environment variables mentioned above can be placed in a `.env` file and conveniently used via:
+> `sudo docker-compose --env-file .env up -d`
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 #### Docker Command
@@ -100,6 +104,11 @@ It is also possible to run these docker containers as a cronjob:
         ```sh
         sudo DOCTOR_CONFIG=/path/to/doctor_config DOCTOR_MODE=--cron docker-compose up -d
         ```
+
+> [!Note] 
+> All the environment variables mentioned above can be placed in a `.env` file and conveniently used via:
+> `sudo docker-compose --env-file .env up -d`
+
 - ##### With Docker Command
     - Append `--cron` at the end of [this](#docker-command) commands, as follows:
       ```sh
