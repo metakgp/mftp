@@ -61,20 +61,21 @@ while True:
         SESSION_STORAGE_FILE=".session",
     )
 
-    if args.gmail_api or args.smtp:
-        _, new, modified = company.fetch(session, headers, ssoToken)
+    if env.COMPANY_NOTIFIER:
+        if args.gmail_api or args.smtp:
+            _, new, modified = company.fetch(session, headers, ssoToken)
 
-        filtered = []
-        if new + modified:
-            filtered = company.filter(new + modified, "OPEN_N")
-            if filtered:
-                latest_ssoToken = session.cookies.get("ssoToken")
-                companies_mail = mail.format_companies(
-                    latest_ssoToken, filtered
-                )
-                mail.send_companies(companies_mail, args.gmail_api, args.smtp)
-        else:
-            print("[NO NEW COMPANIES]")
+            filtered = []
+            if new + modified:
+                filtered = company.filter(new + modified, "OPEN_N")
+                if filtered:
+                    latest_ssoToken = session.cookies.get("ssoToken")
+                    companies_mail = mail.format_companies(
+                        latest_ssoToken, filtered
+                    )
+                    mail.send_companies(companies_mail, args.gmail_api, args.smtp)
+            else:
+                print("[NO NEW COMPANIES]")
 
     notice_db = db.NoticeDB(
         config={"uri": env.MONGO_URI, "db_name": env.MONGO_DATABASE},
@@ -89,11 +90,12 @@ while True:
             if notifications:
                 ntfy.send_notices(notifications, notice_db)
         else:
-            shortlists = shortlist.search(notices)
-            if shortlists:
-                shortlists_mails = mail.format_shortlists(shortlists)
-                if shortlists_mails:
-                    mail.send_shortlists(shortlists_mails, args.gmail_api, args.ntfy)
+            if env.SHORTLIST_NOTIFIER:
+                shortlists = shortlist.search(notices)
+                if shortlists:
+                    shortlists_mails = mail.format_shortlists(shortlists)
+                    if shortlists_mails:
+                        mail.send_shortlists(shortlists_mails, args.gmail_api, args.ntfy)
             mails = mail.format_notices(notices)
             if mails:
                 mail.send_notices(mails, args.smtp, args.gmail_api, notice_db)
