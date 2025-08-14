@@ -10,34 +10,32 @@ from env import NTFY_BASE_URL, NTFY_TOPICS, NTFY_TOPIC_ICON, NTFY_USER, NTFY_PAS
 def ntfy_priority(subject):
     match subject:
         case 'Urgent':
-            priority="5"
+            priority = "5"
         case _:
-            priority="3"
-    
+            priority = "3"
     return priority
 
 
 def ntfy_emoji(subject):
     match subject:
         case 'Urgent':
-            emoji="exclamation"
+            emoji = "exclamation"
         case 'CV Submission':
-            emoji="rotating_light"
+            emoji = "rotating_light"
         case 'Result':
-            emoji="newspaper"
+            emoji = "newspaper"
         case 'Shortlist':
-            emoji="postbox"
+            emoji = "postbox"
         case 'Date extension':
-            emoji="date"
+            emoji = "date"
         case 'PPT/Workshop/Seminars etc':
-            emoji="briefcase"
+            emoji = "briefcase"
         case 'Schedule':
-            emoji="calendar"
+            emoji = "calendar"
         case 'Re-schedule':
-            emoji="spiral_calendar"
+            emoji = "spiral_calendar"
         case _:
-            emoji=""
-    
+            emoji = ""
     return emoji
 
 
@@ -51,7 +49,7 @@ def format_notices(notices):
         try:
             data = parse_body(notice['BodyData'], notice['Time'])
             notice['Body'] = data
-            notice.pop('BodyData', None) # Remove unparsed body data
+            notice.pop('BodyData', None)
             body, links = parse_links(data)
             body += '''
 --------------
@@ -84,15 +82,13 @@ MFTP is unofficial. Not affiliated with CDC, ERP, or Placement Committee. Do not
 
         if 'Attachment' in notice:
             file_name = notification['Attachment']
-            if save_file(file_name, notice['Attachment']): 
+            if save_file(file_name, notice['Attachment']):
                 notification['Attachment'] = file_name
-            else: 
+            else:
                 break
-        else: 
+        else:
             notification['Attachment'] = None
-        
         formatted_notifs.append({'formatted_notice': notification, 'original_notice': notice})
-  
     return formatted_notifs
 
 
@@ -115,7 +111,7 @@ def send_notices(notifications, notice_db):
                 query_params = f"message={quote(notification['Body'])}"
                 request_url = f"{NTFY_BASE_URL}/{ntfy_topic}?{query_params}"
 
-                headers={
+                headers = {
                     "Title": notification["Title"],
                     "Tags": notification["Tags"],
                     "Priority": notification["Priority"],
@@ -133,7 +129,7 @@ def send_notices(notifications, notice_db):
                 if notification['Attachment']:
                     headers['Filename'] = notification['Attachment']
                     response = requests.put(
-                        request_url, 
+                        request_url,
                         headers=headers,
                         data=open(notification['Attachment'], 'rb'),
                         cookies=cookies
@@ -152,7 +148,6 @@ def send_notices(notifications, notice_db):
                 logging.error(f" Failed to send notification: `{notification['Title'].split(' | ')[0]} -> {ntfy_topic}` ~ {response.text}")
                 notification_sent_to_all_subscribers = False
                 break
-        
         # Delete attachment files
         if notification['Attachment']:
             delete_file(notification['Attachment'])
@@ -160,7 +155,7 @@ def send_notices(notifications, notice_db):
         if notification_sent_to_all_subscribers:
             notice_db.delete_successful_ntfy_subscribers(original_notice['UID'])
             notice_db.save_notice(original_notice)
-        else: 
+        else:
             break
 
 
@@ -224,9 +219,9 @@ def parse_links(data):
     actions = ""
 
     for i, link in enumerate(links, 1):
-        if i == 4: 
+        if i == 4:
             break
-        elif i > 1: 
+        elif i > 1:
             actions = actions + "; "
 
         body = body.replace(link, f'<LINK {i}>')
@@ -234,4 +229,3 @@ def parse_links(data):
         actions = actions + template.format(i, link)
 
     return body, actions
-

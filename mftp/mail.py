@@ -10,10 +10,8 @@ from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S, HOSTER_EMAIL, HOSTER_I
 
 def send_shortlists(mails, gmail_api, smtp):
     print('[SENDING SHORTLIST UPDATES]', flush=True)
-    
     if gmail_api:
         import base64
-        
         try:
             service = generate_send_service()
         except Exception as e:
@@ -23,13 +21,12 @@ def send_shortlists(mails, gmail_api, smtp):
         for mail in mails:
             try:
                 response = service.users().messages().send(
-                    userId="me", 
+                    userId="me",
                     body={"raw": base64.urlsafe_b64encode(mail.as_bytes()).decode()}
                 ).execute()
             except Exception as e:
                 logging.error(f"  Failed to send request to GMAIL API : {mail['Subject']} -x-> ({mail['Bcc']}) ~ {str(e)}")
                 break
-            
             if 'id' in response:
                 logging.info(f" [MAIL SENT] ~ {mail['Subject']} -> ({mail['Bcc']})")
             else:
@@ -61,7 +58,6 @@ def send_shortlists(mails, gmail_api, smtp):
 
 def format_shortlists(shortlists):
     print('[FORMATTING SHORTLIST UPDATES]', flush=True)
-    
     table_body = """
     <html>
         <body>
@@ -250,7 +246,7 @@ def format_companies(ssoToken, companies):
         </body>
     </html>
     """
-    companies_table = html_content.format(companies_url=f"{TPSTUDENT_URL}?ssoToken={ssoToken}" ,company_rows=company_rows)
+    companies_table = html_content.format(companies_url=f"{TPSTUDENT_URL}?ssoToken={ssoToken}", company_rows=company_rows)
     message.attach(MIMEText(companies_table, "html"))
 
     return message
@@ -313,7 +309,6 @@ def send_notices(mails, smtp, gmail_api, notice_db):
 
 def parse_notice_body(body_data):
     body = body_data.decode_contents(formatter='html')
-    
     return str(body)
 
 
@@ -323,16 +318,14 @@ def format_notices(notices):
     formatted_notifs = []
     for notice in reversed(notices):
         id_ = notice['UID'].split('_')[0]
-        
         message = MIMEMultipart()
         message["Subject"] = f"#{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']}"
         message["From"] = f'MFTP < {FROM_EMAIL} >'
         message["Bcc"] = ", ".join(BCC_EMAIL_S)
-        
         try:
             body = parse_notice_body(notice['BodyData'])
             notice['Body'] = body
-            notice.pop('BodyData', None) # Remove unparsed body data
+            notice.pop('BodyData', None)
         except Exception as e:
             logging.error(f" Failed to parse mail body ~ {str(e)}")
             break
@@ -381,7 +374,6 @@ def generate_send_service():
     from google.oauth2.credentials import Credentials
     from google.auth.transport.requests import Request
     from google_auth_oauthlib.flow import InstalledAppFlow
-    
     creds = None
     SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 
@@ -400,4 +392,3 @@ def generate_send_service():
             token.write(creds.to_json())
 
     return build("gmail", "v1", credentials=creds)
-

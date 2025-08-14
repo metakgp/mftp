@@ -16,7 +16,6 @@ class NoticeDB:
             'max_pool_size': (config or {}).get('max_pool_size', 10),
             'timeout_ms': (config or {}).get('timeout_ms', 5000)
         }
-        
         self.db: Optional[Database] = None
         self.client: Optional[MongoClient] = None
         self.logger = logging.getLogger(__name__)
@@ -37,7 +36,6 @@ class NoticeDB:
                 self.client.admin.command('ping')
                 self.db = self.client[self.config['db_name']]
                 self.logger.info(f"Successfully connected to MongoDB: {self.config['db_name']}")
-            
             return self.db
         except ConnectionFailure as e:
             self.logger.error(f"Failed to connect to MongoDB: {str(e)}")
@@ -45,7 +43,7 @@ class NoticeDB:
 
     def add_successful_ntfy_subscriber(self, notice_uid: str, ntfy_topic: str) -> None:
         """
-        Add a subscriber to the 'ntfy_last_successful_subscriber_state' document. 
+        Add a subscriber to the 'ntfy_last_successful_subscriber_state' document.
         If the document does not exist, create it.
         """
         uid = f"ntfy_lssl-{notice_uid}"
@@ -93,19 +91,15 @@ class NoticeDB:
         # Check if latest_X_notices is empty
         if not latest_X_notices:
             return [], []
-        
         # Prepare a query to match all notices
         latest_X_uids = [notice['UID'] for notice in latest_X_notices]
         query = {"UID": {"$in": latest_X_uids}}
-        
         # Find all existing notices that match any of the criteria
         existing_notices = self.__find_many(query)
         if not existing_notices:
             return latest_X_notices, []
-        
         # Create a mapping of existing notices by UID
         existing_notices_map = {notice['UID']: notice for notice in existing_notices}
-        
         new_notices, modified_notices = [], []
         for latest_notice in latest_X_notices:
             uid = latest_notice.get('UID')
@@ -121,10 +115,8 @@ class NoticeDB:
                     for key, value in latest_notice.items()
                     if key != 'BodyData'
                 )
-                
                 if is_modified:
                     modified_notices.append(latest_notice)
-        
         return new_notices, modified_notices
 
     def save_notice(self, document: Dict) -> str:
@@ -148,7 +140,6 @@ class NoticeDB:
             document,      # New document to replace with
             upsert=True    # Insert if not exists
         )
-        
         # Return the ID of the document
         return str(result.upserted_id if result.upserted_id else uid)
 
@@ -157,4 +148,3 @@ class NoticeDB:
         """Find and return single document matching query."""
         collection = self.__get_collection()
         return list(collection.find(query or {}, projection))
-
