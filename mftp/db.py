@@ -77,7 +77,7 @@ class NoticeDB:
         if existing_doc:
             return existing_doc.get("subscribers", [])
         return []
-    
+
     def delete_successful_ntfy_subscribers(self, notice_uid: str) -> None:
         """Delete the ntfy subscriber list document corresponding to a notice."""
         uid = f"ntfy_lssl-{notice_uid}"
@@ -85,7 +85,7 @@ class NoticeDB:
 
         # Update the document to set the subscribers list to an empty list
         collection.delete_one({"uid": uid})
-    
+
     def find_to_send_notices(self, latest_X_notices: List[Dict[str, str]]) -> Tuple[List[Dict[str, str]], List[Dict[str, str]]]:
         """Find new and modified notices compared to existing records in the database."""
         # Check if latest_X_notices is empty
