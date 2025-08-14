@@ -2,6 +2,7 @@ import os
 import json
 import logging
 from env import ROLL_NUMBER
+from utils import safe_text
 from datetime import datetime
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup as bs
@@ -18,13 +19,13 @@ def filter(companies, filter):
     if filter.upper() == "OPEN":
         filter_func = currently_open
     elif filter.upper() == "OPEN_N":
-        filter_func = open_not_applied # important
+        filter_func = open_not_applied
     elif filter.upper() == "APPLIED":
         filter_func = applied
     elif filter.upper() == "APPLIED_Y":
-        filter_func = applied_available # important
+        filter_func = applied_available
     elif filter.upper() == "APPLIED_N":
-        filter_func = applied_not_available # important
+        filter_func = applied_not_available
 
     filtered = []
     for company in companies:
@@ -54,7 +55,7 @@ def fetch(session, headers, ssoToken):
 
     fetched_companies = []
     for row in root.findall("row"):
-        jd_args = row.find("cell[4]").text.split("'")[5].split('"')
+        jd_args = safe_text(row.find("cell[4]")).split("'")[5].split('"')
         jnf_id, com_id, year = jd_args[1], jd_args[3], jd_args[5]
 
         # Links
@@ -67,24 +68,22 @@ def fetch(session, headers, ssoToken):
         form_additional_details = f"https://erp.iitkgp.ac.in/TrainingPlacementSSO/AdmFilePDF.htm?type=JNF&year={year}&jnf_id={jnf_id}&com_id={com_id}"
 
         company_info = {
-            "Name": row.find("cell[1]").text.split(">")[1].split("<")[0].strip(),
+            "Name": safe_text(row.find("cell[1]")).split(">")[1].split("<")[0].strip(),
             "Company_Details": company_details,
             "Company_Additional_Details": company_additional_details,
             "PPT": ppt,
-            "Role": row.find("cell[4]").text.split("'")[1].strip(),
+            "Role": safe_text(row.find("cell[4]")).split("'")[1].strip(),
             "Job_Description": jd,
             "Apply_Link_CV": apply_link_cv,
             "Additional_Job_Description": additional_jd,
             "CTC": get_ctc_with_currency(session, headers, additional_jd),
             "Form_Additional_Details": form_additional_details,
-            "Application_Status": row.find("cell[9]").text.strip() if row.find("cell[9]").text.strip() else "N",
-            "Start_Date": row.find("cell[10]").text.strip(),
-            "End_Date": row.find("cell[11]").text.strip(),
-            "Interview_Date": row.find("cell[12]").text.strip() if row.find("cell[12]").text.strip() else None,
+            "Application_Status": safe_text(row.find("cell[9]"), "N"),
+            "Start_Date": safe_text(row.find("cell[10]")),
+            "End_Date": safe_text(row.find("cell[11]")),
+            "Interview_Date": safe_text(row.find("cell[12]"), None),
         }
-        
         fetched_companies.append(company_info)
-    
     stored_companies = get_list()
     new_companies, modified_companies = get_new_and_modified_companies(fetched_companies, stored_companies)
 
@@ -129,7 +128,7 @@ def get_list():
     try:
         with open(COMPANIES_FILE, "r") as json_file:
             return json.load(json_file)
-    except json.JSONDecodeError as _:
+    except json.JSONDecodeError:
         store_list([])
         return []
     except FileNotFoundError:
@@ -138,13 +137,12 @@ def get_list():
 
 
 # Downloads pdf content in bytes format
-## Not used currently
+# Not used currently
 def parse_link(session, link):
     stream = session.get(link, stream=True)
     attachment = b''
     for chunk in stream.iter_content(4096):
         attachment += chunk
-    
     return attachment
 
 
@@ -196,7 +194,6 @@ def compare_deadline_lt(company, deadline_key):
 
 def parse_date(company, date_key):
     date_format = "%d-%m-%Y %H:%M"
-    
     date = None
     if company.get(date_key):
         try:
@@ -206,4 +203,3 @@ def parse_date(company, date_key):
             date = None
 
     return date
-

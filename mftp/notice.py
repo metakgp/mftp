@@ -1,4 +1,5 @@
 import logging
+from utils import safe_text
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup as bs
 from endpoints import TPSTUDENT_URL, NOTICEBOARD_URL, NOTICES_URL, ATTACHMENT_URL, NOTICE_CONTENT_URL
@@ -6,7 +7,7 @@ from endpoints import TPSTUDENT_URL, NOTICEBOARD_URL, NOTICES_URL, ATTACHMENT_UR
 
 LAST_NOTICES_CHECK_COUNT = 30
 
-    
+
 def fetch(headers, session, ssoToken, notice_db):
     print('[FETCHING NOTICES]', flush=True)
     try:
@@ -30,14 +31,15 @@ def fetch(headers, session, ssoToken, notice_db):
         if i >= LAST_NOTICES_CHECK_COUNT:
             break
 
-        id_ = row.find('cell[1]').text.strip()
-        year = root.findall('row')[0].find('cell[8]').text.split('"')[1].strip()
+        id_ = safe_text(row.find('cell[1]'))
+        year = safe_text(root.findall('row')[0].find('cell[8]')).split('"')[1].strip()
+
         notice = {
-            'UID': f'{id_}_{year}',
-            'Time': row.find('cell[7]').text.strip(),
-            'Type': row.find('cell[2]').text.strip(),
-            'Subject': row.find('cell[3]').text.strip(),
-            'Company': row.find('cell[4]').text.strip(),
+            "UID": f"{id_}_{year}",
+            "Company": safe_text(row.find("cell[4]")),
+            "Time": safe_text(row.find("cell[7]")),
+            "Type": safe_text(row.find("cell[2]")),
+            "Subject": safe_text(row.find("cell[3]"))
         }
 
         # Handling Body
@@ -58,7 +60,6 @@ def fetch(headers, session, ssoToken, notice_db):
             break
 
         latest_X_notices.append(notice)
-    
     # This is done to reduce DB queries
     # Get all first X notices from ERP in latest_notices
     # Check if these notices exist in the DB using their UIDs in a single query
@@ -91,6 +92,4 @@ def parse_attachment(session, year, id_):
     attachment = b''
     for chunk in stream.iter_content(4096):
         attachment += chunk
-    
     return attachment
-
