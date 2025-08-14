@@ -1,7 +1,7 @@
 from typing import Optional
 
 
-def safe_text(element, default: Optional[str] = ""):
+def safe_text(element, default: Optional[str] = "-"):
     """
     Return stripped text from an element, or a default value if None or empty.
 
