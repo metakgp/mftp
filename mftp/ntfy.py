@@ -61,7 +61,7 @@ MFTP is unofficial. Not affiliated with CDC, ERP, or Placement Committee. Do not
 --------------
             '''
         except Exception as e:
-            logging.error(f" Failed to parse notification body ~ {str(e)}")
+            logging.error(f" Failed to parse notification body ~ {str(e)}", exc_info=True)
             break
 
         # NTFY specific features
@@ -205,7 +205,7 @@ def delete_file(file_name):
 def parse_body(body_data, time):
     body = ''
     for br in body_data.find_all('br'):
-        body = body + br.next_sibling.strip() + '\n'
+        body = body + str(br.next_sibling).strip() + '\n'
 
     body = body + time
 
