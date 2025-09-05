@@ -5,7 +5,9 @@ import logging
 import requests
 import argparse
 from datetime import datetime
-from env import TOPIC_URL, EMAIL
+from env import DOCTOR_TOPIC_URL, TOPIC_URL, EMAIL
+
+last_notification_sent_time = "NULL"
 
 def get_logs():
   client = docker.from_env()
@@ -27,6 +29,7 @@ def parse_latest_runtime_logs(logs):
     parts = last_part_with_timestamp.split(delim)
     if len(parts) == 2:
       timestamp = parts[0].strip()
+      last_notification_sent_time = timestamp
       latest_runtime_logs = parts[1].strip()
     else:
       timestamp = "NULL"
@@ -50,10 +53,34 @@ def check_error(logs):
     else:
       logging.info(" NO ERROR(s) DETECTED!")
 
+def check_downtime():
+    downtime_threshold = 30
 
-def send_notification(logs):
+    if last_notification_sent_time == "NULL":
+      logging.info(" LAST SENT TIME IS NULL, SKIPPING DOWNTIME CHECK")
+      return
+
+    try:
+      last_time = datetime.strptime(last_notification_sent_time, '%H:%M:%S %d-%m-%Y')
+      diff = (datetime.now() - last_time).total_seconds() / 60
+
+      if diff > downtime_threshold:
+        logging.info(f" DOWNTIME DETECTED (Last log was {diff:.2f} minutes ago)")
+
+        try: 
+          resp = send_notification(f"DOWNTIME DETECTED. Last log was {diff:.2f} minutes ago", TOPIC_URL)
+        except Exception as e:
+          logging.error(f" FAILED TO SEND NOTIFICATION : {str(e)}")
+        finally:
+          logging.info(f" NOTIFICATION STATUS : {resp}")
+      else:
+        logging.info(" NO DOWNTIME DETECTED")
+    except Exception as e:
+      logging.error(f" FAILED TO CHECK DOWNTIME : {str(e)}")
+
+def send_notification(logs, topic_url=DOCTOR_TOPIC_URL):
     query_params = f"message={logs}"
-    request_url = f"{TOPIC_URL}?{query_params}"
+    request_url = f"{topic_url}?{query_params}"
 
     headers = {
         "Priority": "5",
@@ -82,6 +109,7 @@ def health_check():
   delim = ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
   logging.info(f" [ LATEST RUNTIME LOGS | {timestamp} ] \n{delim}\n{latest_runtime_logs}\n{delim}")
 
+  check_downtime()
   check_error(latest_runtime_logs)
 
 
