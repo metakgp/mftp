@@ -67,7 +67,7 @@ def check_downtime():
         logging.info(f" DOWNTIME DETECTED (Last log was {diff:.2f} minutes ago)")
 
         try:
-          body = f"DOWNTIME DETECTED.\n\nPlease check the CDC Noticeboard from your ERP account until MFTP is back online.\n"
+          body = f"\nDOWNTIME DETECTED.\n\nPlease check the CDC Noticeboard from your ERP account until MFTP is back online.\n"
           body += '''
 --------------
 
