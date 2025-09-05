@@ -7,8 +7,6 @@ import argparse
 from datetime import datetime
 from env import DOCTOR_TOPIC_URL, TOPIC_URL, EMAIL
 
-last_notification_sent_time = "NULL"
-
 def get_logs():
   client = docker.from_env()
   try:
@@ -29,6 +27,7 @@ def parse_latest_runtime_logs(logs):
     parts = last_part_with_timestamp.split(delim)
     if len(parts) == 2:
       timestamp = parts[0].strip()
+      global last_notification_sent_time
       last_notification_sent_time = timestamp
       latest_runtime_logs = parts[1].strip()
     else:
@@ -68,7 +67,7 @@ def check_downtime():
         logging.info(f" DOWNTIME DETECTED (Last log was {diff:.2f} minutes ago)")
 
         try:
-          body = f"DOWNTIME DETECTED.\nPlease check the CDC Noticeboard from your ERP account until MFTP is back online.\n"
+          body = f"DOWNTIME DETECTED.\n\nPlease check the CDC Noticeboard from your ERP account until MFTP is back online.\n"
           body += '''
 --------------
 
@@ -94,7 +93,7 @@ def send_notification(logs, topic_url=DOCTOR_TOPIC_URL):
 
     headers = {
         "Priority": "5",
-        "Tags": "warning,skull,rotating_light,mftp,error",
+        "Tags": "warning,mftp,error",
         "Title": "MFTP encountered an error",
         "Markdown": "yes"
     }
@@ -125,6 +124,8 @@ def health_check():
 
 args = parse_args()
 logging.basicConfig(level=logging.INFO)
+last_notification_sent_time = "NULL"
+
 while True:
   now = datetime.now()
   print(f"================ <<: {now.strftime('%H:%M:%S %d-%m-%Y')} :>> ================", flush=True)
