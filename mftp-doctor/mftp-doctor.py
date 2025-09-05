@@ -67,8 +67,18 @@ def check_downtime():
       if diff > downtime_threshold:
         logging.info(f" DOWNTIME DETECTED (Last log was {diff:.2f} minutes ago)")
 
-        try: 
-          resp = send_notification(f"DOWNTIME DETECTED. Last log was {diff:.2f} minutes ago", TOPIC_URL)
+        try:
+          body = f"DOWNTIME DETECTED.\nPlease check the CDC Noticeboard from your ERP account until MFTP is back online.\n"
+          body += '''
+--------------
+
+⚠️ DISCLAIMER ⚠️
+
+MFTP is unofficial. Not affiliated with CDC, ERP, or Placement Committee. Do not rely solely on MFTP for updates. MFTP-related issues cannot be used as arguments with official authorities.
+
+--------------
+            '''
+          resp = send_notification(body, TOPIC_URL)
         except Exception as e:
           logging.error(f" FAILED TO SEND NOTIFICATION : {str(e)}")
         finally:
