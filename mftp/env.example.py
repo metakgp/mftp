@@ -19,7 +19,7 @@ MONGO_COLLECTION = "AY_2024-25"
 ## If hoster wish to share their powers with others as well
 ## Sort of emergency contact?
 ## That is why it is a list of emails
-HOSTER_EMAIL = ["hoster@kgpian.iitkgp.ac.in", "emergency.hoster@kgpian.iitkgp.ac.in"] 
+HOSTER_EMAIL = ["hoster@kgpian.iitkgp.ac.in", "emergency.hoster@kgpian.iitkgp.ac.in"]
 HOSTER_NAME = "Arpit Bhardwaj"
 HOSTER_ROLL = ROLL_NUMBER
 HOSTER_INTERESTED_ROLLS = ["XXYYXXXXX", "NNAANNNNN"]
@@ -75,3 +75,8 @@ NTFY_USER = "testuser"
 NTFY_PASS = "fakepassword"
 ## Optional (specific to metakgp [naarad] architecture): Heimdall security token
 HEIMDALL_COOKIE = '17ab96bd8ffbe8ca58a78657a918558'
+
+
+EMAIL = "doctor@kgpian.iitkgp.ac.in"
+TOPIC_URL = "https://ntfy.sh/metakgp-mftp"
+DOCTOR_TOPIC_URL = "https://ntfy.sh/metakgp-mftp"
