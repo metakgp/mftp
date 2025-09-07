@@ -32,24 +32,58 @@ def check_error(logs):
     else:
       logging.info(" NO ERROR(s) DETECTED!")
 
-def send_notification(logs):
+def send_notification(logs, topic_url=env.DOCTOR_TOPIC_URL):
     query_params = f"message={logs}"
-    request_url = f"{env.TOPIC_URL}?{query_params}"
+    request_url = f"{topic_url}?{query_params}"
 
     headers = {
         "Priority": "5",
-        "Tags": "warning,skull,rotating_light,mftp,error",
+        "Tags": "warning,mftp,error",
         "Title": "MFTP encountered an error",
         "Markdown": "yes"
     }
 
-    print(query_params)
-
     if env.EMAIL:
-      headers["Email"] = env.EMAIL
+        headers["Email"] = env.EMAIL
 
     response = requests.put(request_url, headers=headers)
     return response.status_code
+
+def check_downtime(timestamp):
+    downtime_threshold = 30
+
+    if timestamp == "NULL":
+        logging.info(" LAST SENT TIME IS NULL, SKIPPING DOWNTIME CHECK")
+        return
+
+    try:
+        last_time = datetime.strptime(timestamp, '%H:%M:%S %d-%m-%Y')
+        diff = (datetime.now() - last_time).total_seconds() / 60
+
+        if diff > downtime_threshold:
+            logging.info(f" DOWNTIME DETECTED (Last log was {diff:.2f} minutes ago)")
+
+            try:
+                body = f"\nDOWNTIME DETECTED.\n\nPlease check the CDC Noticeboard from your ERP account until MFTP is back online.\n"
+                body += '''
+--------------
+
+⚠️ DISCLAIMER ⚠️
+
+MFTP is unofficial. Not affiliated with CDC, ERP, or Placement Committee. Do not rely solely on MFTP for updates. MFTP-related issues cannot be used as arguments with official authorities.
+
+--------------
+                '''
+                resp = send_notification(body, env.TOPIC_URL)
+            except Exception as e:
+                logging.error(f" FAILED TO SEND NOTIFICATION : {str(e)}")
+                resp = None
+            finally:
+                logging.info(f" NOTIFICATION STATUS : {resp}")
+        else:
+            logging.info(" NO DOWNTIME DETECTED")
+    except Exception as e:
+        logging.error(f" FAILED TO CHECK DOWNTIME : {str(e)}")
 
 # mftp
 
@@ -148,9 +182,14 @@ while True:
         else:
             print("[NO NEW NOTICES]", flush=True)
 
-    except Exception as e:
-            runtime_logs.append(str(e))
+        timestamp = now.strftime('%H:%M:%S %d-%m-%Y')
 
+    except Exception as e:
+        timestamp = now.strftime('%H:%M:%S %d-%m-%Y')
+        runtime_logs.append(str(e))
+        logging.error(runtime_logs)
+
+    check_downtime(timestamp)
     check_error("\n".join(runtime_logs))
     if args.cron:
         break

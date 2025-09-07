@@ -77,6 +77,6 @@ NTFY_PASS = "fakepassword"
 HEIMDALL_COOKIE = '17ab96bd8ffbe8ca58a78657a918558'
 
 
-EMAIL = "doctor@kgpian.iitkgp.ac.in"
-TOPIC_URL = "https://ntfy.sh/metakgp-mftp"
-DOCTOR_TOPIC_URL = "https://ntfy.sh/metakgp-mftp"
+DOCTOR_TOPIC_URL = "https://ntfy.sh/metakgp-mftp" # NTFY topic to send doctors' notifications on
+TOPIC_URL = "https://ntfy.sh/metakgp-mftp" # NTFY topic to which mftp sends notifications (set the same topic as in mftp config)
+EMAIL = "abc@xyz.com" # Email to send doctors' notifications on
