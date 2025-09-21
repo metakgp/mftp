@@ -44,8 +44,9 @@
     - [Prerequisites](#prerequisites-without-docker)
     - [Installation](#installation-without-docker)
     - [Usage](#usage-without-docker)
-- [Maintainer(s)](#maintainers)
 - [Contact](#contact)
+    - [Maintainer(s)](#maintainers)
+    - [Past Maintainer(s)](#past-maintainers)
 - [Additional documentation](#additional-documentation)
 
 </details>
@@ -242,12 +243,7 @@ Command:
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-## Maintainer(s)
 
-- [Arpit Bhardwaj](https://github.com/proffapt)
-- [Dhanvith Nayak](https://github.com/dhanvithnayak)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Contact
 
@@ -272,6 +268,16 @@ Command:
   <img align="center" alt="metakgp's Instagram" width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/instagram.svg" />
 </a>
 </p>
+
+### Maintainer(s)
+
+- [Dhanvith Nayak](https://github.com/dhanvithnayak)
+
+### Past Maintainer(s)
+
+- [Arpit Bhardwaj](https://github.com/proffapt)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
