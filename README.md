@@ -245,6 +245,7 @@ Command:
 ## Maintainer(s)
 
 - [Arpit Bhardwaj](https://github.com/proffapt)
+- [Dhanvith Nayak](https://github.com/dhanvithnayak)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
