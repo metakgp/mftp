@@ -279,8 +279,6 @@ Command:
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 ## Additional documentation
 
   - [License](/LICENSE)
