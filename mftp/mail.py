@@ -5,7 +5,7 @@ from endpoints import TPSTUDENT_URL
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
-from env import FROM_EMAIL, FROM_EMAIL_PASS, BCC_EMAIL_S, HOSTER_EMAIL, HOSTER_INTERESTED_ROLLS, HOSTER_NAME, ROLL_MAIL, ROLL_NAME
+from env import FROM_EMAIL, SMTP_HOST, SMTP_USER, SMTP_PASS, BCC_EMAIL_S, HOSTER_EMAIL, HOSTER_INTERESTED_ROLLS, HOSTER_NAME, ROLL_MAIL, ROLL_NAME
 
 
 def send_shortlists(mails, gmail_api, smtp):
@@ -37,11 +37,11 @@ def send_shortlists(mails, gmail_api, smtp):
         import smtplib
         context = ssl.create_default_context()
 
-        logging.info(" [Connecting to smtp.google.com] ...")
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        logging.info(f" [Connecting to {SMTP_HOST}] ...")
+        with smtplib.SMTP_SSL(SMTP_HOST, 465, context=context) as server:
             logging.info(" [Connected!]")
             try:
-                server.login(FROM_EMAIL, FROM_EMAIL_PASS)
+                server.login(SMTP_USER, SMTP_PASS)
                 logging.info(" [Logged In!]")
             except Exception as e:
                 logging.error(f" Failed to log in ~ {str(e)}")
@@ -172,11 +172,11 @@ def send_companies(mail, gmail_api, smtp):
         import smtplib
         context = ssl.create_default_context()
 
-        logging.info(" [Connecting to smtp.google.com] ...")
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        logging.info(f" [Connecting to {SMTP_HOST}] ...")
+        with smtplib.SMTP_SSL(SMTP_HOST, 465, context=context) as server:
             logging.info(" [Connected!]")
             try:
-                server.login(FROM_EMAIL, FROM_EMAIL_PASS)
+                server.login(SMTP_USER, SMTP_PASS)
                 logging.info(" [Logged In!]")
             except Exception as e:
                 logging.error(f" Failed to log in ~ {str(e)}")
@@ -286,11 +286,11 @@ def send_notices(mails, smtp, gmail_api, notice_db):
         import smtplib
         context = ssl.create_default_context()
 
-        logging.info(" [Connecting to smtp.google.com] ...")
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        logging.info(f" [Connecting to {SMTP_HOST}] ...")
+        with smtplib.SMTP_SSL(SMTP_HOST, 465, context=context) as server:
             logging.info(" [Connected!]")
             try:
-                server.login(FROM_EMAIL, FROM_EMAIL_PASS)
+                server.login(SMTP_USER, SMTP_PASS)
                 logging.info(" [Logged In!]")
             except Exception as e:
                 logging.error(f" Failed to log in ~ {str(e)}")

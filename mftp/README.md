@@ -230,11 +230,11 @@ _Now that the environment has been set up and configured to properly compile and
    - ##### Using SMTP
      > `--smtp`
      - [Create an app password](https://support.google.com/accounts/answer/185833?hl=en) for the senders' email.
-     - After creating app password use it as your `FROM_EMAIL_PASS` value in  next step.
+     - After creating app password use it as your `SMTP_PASS` value in  next step.
    - ##### Using GMAIL API
      > `--gmail-api`
      - Follow this [quick start guide](https://developers.google.com/gmail/api/quickstart/python) to configure _gmail api_ on the senders' mail.
-     - After successfull configuration of gmail api, you can leave the value of `FROM_EMAIL_PASS` as it is in the next step.
+     - After successfull configuration of gmail api, you can leave the value of `SMTP_PASS` as it is in the next step.
      - Save the generated token as `mail_send_token.json`
        
 4. #### Configuring environment variables
