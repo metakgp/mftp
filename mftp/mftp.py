@@ -52,14 +52,21 @@ while True:
     )
 
     print("[ERP LOGIN]", flush=True)
-    _, ssoToken = erp.login(
-        headers,
-        session,
-        ERPCREDS=env,
-        OTP_CHECK_INTERVAL=2,
-        LOGGING=True,
-        SESSION_STORAGE_FILE=".session",
-    )
+    try:    
+        _, ssoToken = erp.login(
+            headers,
+            session,
+            ERPCREDS=env,
+            OTP_CHECK_INTERVAL=2,
+            LOGGING=True,
+            SESSION_STORAGE_FILE=".session",
+        )
+    except erp.ErpLoginError as e:
+        print(f"[ERP LOGIN FAILED] {e}", flush=True)
+        if args.cron:
+            break
+        print("[RETRYING]", flush=True)
+        continue
 
     if env.COMPANY_NOTIFIER:
         if args.gmail_api or args.smtp:
