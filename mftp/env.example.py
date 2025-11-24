@@ -47,7 +47,10 @@ ROLL_MAIL = {
 # EMAIL
 ## Senders' Credentials (via SMTP)
 FROM_EMAIL = "abc@gmail.com" # Notification Sender Email-id
-FROM_EMAIL_PASS = "**********" # App password for the above email-id
+# SMTP Credentials
+SMTP_HOST = "smtp.gmail.com"
+FROM_EMAIL_USER = "xxxxxxxxxxxxxxxxxxxx"  # Same as FROM_EMAIL in case of Gmail SMTP
+FROM_EMAIL_PASS = "xxxxxxxxxxxxxxxxxxxx"  # App password in case of Gmail SMTP
 ## EMAIL - Receiver's Address
 BCC_EMAIL_S = ["xyz@googlegroups.com", "abc@googlegroups.com"] # Multiple mails for bcc
 # BCC_EMAIL_S = ["xyz@googlegroups.com"] # This is how you can set single mail in a list
