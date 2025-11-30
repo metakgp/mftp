@@ -193,7 +193,7 @@ def compare_deadline_lt(company, deadline_key):
 
 
 def parse_date(company, date_key):
-    date_format = "%d-%m-%Y %H:%M"
+    date_format = "%Y-%m-%d %H:%M"
     date = None
     if company.get(date_key):
         try:
