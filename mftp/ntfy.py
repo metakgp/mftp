@@ -52,7 +52,6 @@ def format_notices(notices):
             notice.pop('BodyData', None)
             body, links = parse_links(data)
             body = body[:5000] + '...\n\n[NOTICE SIZE EXCEEDED, PLEASE CHECK NOTICEBOARD]\n' if len(body) > 5000 else body
-            body = body.replace('\u27e8', '<').replace('\u27e9', '>')
             body += '''
 --------------
 
@@ -71,11 +70,11 @@ MFTP is unofficial. Not affiliated with CDC, ERP, or Placement Committee. Do not
         emoji = ntfy_emoji(subject=notice['Subject'])
 
         notification = {
-            "Title":  f"#{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']}",
+            "Title":  f"#{id_} | {notice['Type']} | {notice['Subject']} | {notice['Company']}".encode('latin-1', 'ignore').decode('latin-1'),
             "Body": body,
-            "Tags": f"{emoji}, {notice['Type']}, {notice['Subject']}, {notice['Company']}",
+            "Tags": f"{emoji}, {notice['Type']}, {notice['Subject']}, {notice['Company']}".encode('latin-1', 'ignore').decode('latin-1'),
             "Priority": priority,
-            "Links": links,
+            "Links": links.encode('latin-1', 'ignore').decode('latin-1'),
             "Attachment":  f"{id_}-{notice['Type']}-{notice['Subject']}-{notice['Company']}.pdf".replace(' ', '_').replace('/', '_')
         }
 
