@@ -52,6 +52,7 @@ def format_notices(notices):
             notice.pop('BodyData', None)
             body, links = parse_links(data)
             body = body[:5000] + '...\n\n[NOTICE SIZE EXCEEDED, PLEASE CHECK NOTICEBOARD]\n' if len(body) > 5000 else body
+            body = body.replace('\u27e8', '<').replace('\u27e9', '>')
             body += '''
 --------------
 
