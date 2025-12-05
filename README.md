@@ -58,7 +58,7 @@ MFTP continuously monitors the CDC Noticeboard and forwards incoming notices to 
 
 > [!Warning]
 > This tool is completely legal, but the way you use it can get you into legal trouble. Some things you **cannot** do are:
-> - Use this tool to send CDC notifications to **any non-KGPian**.
+> - Use this tool to send CDC notifications to **any non-KGPian**. Sharing any CDC notification to non-KGPian is prohibited by CDC.
 > - Use this tool on a wide scale or publicise its running instance without consent from the Placement Committee.
 >
 > Please use this tool responsibly and within ethical and legal bounds. We do not promote violating company policies or laws. The extent of the punishment may very **from disciplinary action by the institute to blacklisting from CDC process**.
