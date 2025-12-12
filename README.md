@@ -244,6 +244,16 @@ Command:
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
+## How to Contribute
+
+We welcome contributions of all kinds — bug fixes, feature improvements, documentation updates, and discussions.
+
+If you want to contribute, follow these steps:
+
+1. **Fork the repository**
+2. **Create a new branch** for your work:
+   ```bash
+   git checkout -b your-feature-name
 
 ## Contact
 
