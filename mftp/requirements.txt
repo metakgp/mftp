@@ -1,4 +1,4 @@
-lxml==4.9.3
+lxml==6.1.0
 dnspython==2.4.2
 pymongo==4.10.1
 pypdf2==3.0.1
